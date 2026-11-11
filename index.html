@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apoloprimer — Tu cine privado</title>
+<meta name="theme-color" content="#090909">
+<style>
+:root{--red:#e50914;--bg:#090909;--panel:#171717;--muted:#aaa;--line:#303030}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:15px/1.45 Arial,sans-serif}
+header{height:68px;display:flex;align-items:center;gap:26px;padding:0 5%;position:sticky;top:0;z-index:5;background:#080808ed;border-bottom:1px solid #222}
+.logo{font-size:25px;font-weight:900;letter-spacing:-1px;color:var(--red)}nav{display:flex;gap:18px}nav a{color:#eee;text-decoration:none;font-size:14px}.right{margin-left:auto}
+button,.btn{border:0;border-radius:4px;padding:10px 15px;background:var(--red);color:white;font-weight:700;cursor:pointer}button.secondary{background:#333}button:disabled{opacity:.5;cursor:not-allowed}
+.hero{min-height:470px;padding:120px 5% 70px;background:linear-gradient(90deg,#000 0%,#000d 42%,#0003 100%),linear-gradient(0deg,var(--bg),transparent 65%),url('https://images.unsplash.com/photo-1489599849927-2ee91c?auto=format&fit=crop&w=1800&q=80') center/cover}
+.hero h1{font-size:clamp(38px,6vw,66px);margin:0 0 12px;max-width:700px}.hero p{max-width:550px;color:#ddd;font-size:17px}.eyebrow{font-size:12px;letter-spacing:2px;font-weight:bold}
+main{padding:0 5% 60px}.section{margin:32px 0}.section h2{font-size:21px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+.movie{background:var(--panel);border-radius:5px;overflow:hidden;cursor:pointer}.movie:hover{outline:1px solid #666}.poster{height:225px;background:#252525 center/cover;display:flex;align-items:center;justify-content:center;color:#aaa}.movie-info{padding:10px}.movie-info b{display:block}.movie-info small{color:var(--muted)}
+.panel{background:#151515;border:1px solid var(--line);border-radius:8px;padding:18px;margin:22px 0}.hidden{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+input,select{width:100%;padding:11px;border:1px solid #444;border-radius:4px;background:#222;color:white;margin-top:6px}label{font-size:13px;color:#ccc}
+.uploadrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:14px}.muted{color:#aaa}.small{font-size:12px}
+.room-shell{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:14px;margin-top:16px}.room-video,.chat-panel{background:#151515;border:1px solid #333;border-radius:8px;overflow:hidden}.room-video{padding:14px}.room-video video{width:100%;max-height:58vh;background:#000;border-radius:5px}.room-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.chat-panel{display:flex;flex-direction:column;min-height:420px}.chat-head{padding:14px;border-bottom:1px solid #333;font-weight:bold}.chat-messages{padding:12px;display:flex;flex-direction:column;gap:9px;flex:1;max-height:360px;overflow:auto}.chat-msg{background:#242424;border-radius:7px;padding:8px 10px;font-size:13px;overflow-wrap:anywhere}.chat-msg b{color:#ff7379;display:block}.chat-compose{display:flex;gap:6px;padding:10px;border-top:1px solid #333}.chat-compose input{margin:0;min-width:0}.room-banner{background:linear-gradient(120deg,#241014,#101010);border:1px solid #482126;border-radius:8px;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.modal{position:fixed;inset:0;background:#000d;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}.modal-card{width:min(440px,100%);background:#171717;border:1px solid #444;border-radius:10px;padding:20px}
+#player{position:fixed;inset:0;background:#000e;z-index:15;display:flex;align-items:center;justify-content:center;padding:18px}#player .modal-card{width:min(950px,100%)}#player video{width:100%;max-height:70vh;background:#000}
+footer{padding:28px 5%;border-top:1px solid #222;color:#777;font-size:12px}
+@media(max-width:800px){nav{display:none}.room-shell{grid-template-columns:1fr}.chat-panel{min-height:300px}.chat-messages{max-height:220px}}
+</style>
+</head>
+<body>
+<header><div class="logo">APOLOPRIMER</div><nav><a href="#">Inicio</a><a href="#catalogo">Películas</a><a href="#salas">Salas privadas</a></nav><button class="right" id="authBtn">Entrar</button></header>
+<section class="hero"><div class="eyebrow">APOLOPRIMER PRESENTA</div><h1>Tu cine. Tu mundo.</h1><p>Descubre películas y comparte una función con tus amigos desde cualquier lugar.</p><button onclick="document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'})">Explorar películas</button></section>
+<main>
+<section class="section" id="catalogo"><h2>Películas</h2><div class="grid" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
+<section class="panel hidden" id="adminPanel">
+ <h2>Panel de administración</h2><p class="muted small">Solo las cuentas autorizadas como administradoras pueden subir contenido.</p>
+ <div class="formgrid">
+  <label>Título<input id="movieTitle" placeholder="Nombre de la película"></label>
+  <label>Categoría<select id="movieCategory"><option>Acción</option><option>Terror</option><option>Romance</option><option>Comedia</option><option>Drama</option><option>Ciencia ficción</option><option>Documental</option></select></label>
+  <label>Año<input id="movieYear" type="number" placeholder="2026"></label>
+  <label>Portada<input id="movieCover" type="file" accept="image/*"></label>
+  <label>Video<input id="movieVideo" type="file" accept="video/mp4,video/webm,video/quicktime"></label>
+ </div><div class="uploadrow"><button id="uploadBtn">Subir película</button><span class="muted small" id="uploadStatus"></span></div>
+</section>
+<section class="section" id="salas"><div class="room-banner"><div><h2 style="margin:0">Salas privadas</h2><p class="muted" style="margin:5px 0 0">Crea una sala y comparte su código de invitación.</p></div><div class="uploadrow"><button id="createRoomBtn">＋ Crear sala</button><button class="secondary" id="joinRoomBtn">Unirme con código</button></div></div>
+ <div class="room-shell hidden" id="roomShell">
+  <div class="room-video"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><h3 id="roomName" style="margin:0">Sala</h3><div class="muted small">Código: <b id="roomCode"></b></div></div><button class="secondary" id="leaveRoomBtn">Salir</button></div>
+   <video id="roomPlayer" controls playsinline></video><div class="room-tools"><button id="playAllBtn">▶ Reproducir para todos</button><button class="secondary" id="pauseAllBtn">Ⅱ Pausar para todos</button><button class="secondary" id="backBtn">↶ 10 s</button><button class="secondary" id="forwardBtn">10 s ↷</button></div>
+   <p class="muted small" id="syncStatus">La sala se sincroniza en tiempo real.</p>
+   <label>Película de la sala<select id="roomMovie"><option value="">Selecciona una película</option></select></label>
+  </div>
+  <aside class="chat-panel"><div class="chat-head">💬 Chat en vivo</div><div class="chat-messages" id="chatMessages"></div><div class="chat-compose"><input id="chatInput" maxlength="400" placeholder="Escribe un mensaje..."><button id="sendChatBtn">Enviar</button></div><div class="small muted" style="padding:0 12px 12px">Sé respetuoso y no compartas información privada.</div></aside>
+ </div>
+</section>
+</main>
+<footer>© 2026 Apoloprimer · Publica únicamente películas que tengas derecho a distribuir.</footer>
+<div class="modal hidden" id="authModal"><div class="modal-card"><h2 id="authTitle">Entrar</h2><label>Correo electrónico<input id="authEmail" type="email" autocomplete="email"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password"></label><div class="uploadrow"><button id="authSubmit">Entrar</button><button class="secondary" id="authToggle">Crear cuenta</button><button class="secondary" id="authClose">Cerrar</button></div><p class="muted small" id="authStatus"></p></div></div>
+<div class="modal hidden" id="roomModal"><div class="modal-card"><h2 id="roomModalTitle">Crear sala</h2><label id="roomNameLabel">Nombre<input id="roomNameInput" placeholder="Noche de películas"></label><label id="roomCodeLabel" class="hidden">Código<input id="roomCodeInput" maxlength="8" placeholder="Código de invitación"></label><div class="uploadrow"><button id="roomModalSubmit">Continuar</button><button class="secondary" id="roomModalClose">Cancelar</button></div><p class="muted small" id="roomModalStatus"></p></div></div>
+<div id="player" class="hidden"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="playerTitle"></h3><button class="secondary" id="closePlayer">Cerrar</button></div><video id="soloPlayer" controls playsinline></video></div></div>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+// 1) Crea un proyecto Supabase y pega aquí Project URL y anon key.
+const SUPABASE_URL = 'PEGA_AQUI_TU_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'PEGA_AQUI_TU_SUPABASE_ANON_KEY';
+const configured = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PEGA_AQUI');
+const supabase = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+let session=null, isAdmin=false, movies=[], room=null, roomChannel=null, authMode='login', syncLock=false;
+const $=id=>document.getElementById(id);
+const say=(id,msg)=>$(id).textContent=msg;
+function notice(){return !supabase ? 'Falta configurar Supabase. Consulta README.md.' : ''}
+async function init(){
+ if(!supabase){$('movies').innerHTML='<div class="muted">La interfaz está lista. Falta conectar Supabase para activar cuentas, catálogo, subidas y salas entre distintos celulares.</div>';return}
+ const {data}=await supabase.auth.getSession();session=data.session;await refreshUser();
+ supabase.auth.onAuthStateChange(async(_e,s)=>{session=s;await refreshUser();});
+ await loadMovies();
+}
+async function refreshUser(){
+ isAdmin=false;
+ if(session){const {data}=await supabase.from('admins').select('user_id').eq('user_id',session.user.id).maybeSingle();isAdmin=!!data}
+ $('authBtn').textContent=session?'Mi cuenta':'Entrar';
+ $('adminPanel').classList.toggle('hidden',!isAdmin);
+ if(session && isAdmin)$('authBtn').title='Administrador conectado';
+}
+function showAuth(){authMode='login';$('authTitle').textContent='Entrar';$('authSubmit').textContent='Entrar';$('authToggle').textContent='Crear cuenta';$('authStatus').textContent='';$('authModal').classList.remove('hidden')}
+$('authBtn').onclick=()=>session?accountMenu():showAuth();
+async function accountMenu(){if(confirm('¿Quieres cerrar sesión?')){await supabase.auth.signOut()}}
+$('authToggle').onclick=()=>{authMode=authMode==='login'?'signup':'login';$('authTitle').textContent=authMode==='login'?'Entrar':'Crear cuenta';$('authSubmit').textContent=authMode==='login'?'Entrar':'Registrarme';$('authToggle').textContent=authMode==='login'?'Crear cuenta':'Ya tengo cuenta'};
+$('authClose').onclick=()=>$('authModal').classList.add('hidden');
+$('authSubmit').onclick=async()=>{if(!supabase)return;let email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||password.length<8){say('authStatus','Escribe un correo y una contraseña de al menos 8 caracteres.');return}let r=authMode==='login'?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password});say('authStatus',r.error?.message||'Listo. Revisa tu correo si se solicita confirmación.');if(!r.error && authMode==='login')$('authModal').classList.add('hidden')};
+async function loadMovies(){
+ const {data,error}=await supabase.from('movies').select('*').order('created_at',{ascending:false});
+ if(error){$('movies').textContent='No se pudo cargar el catálogo.';return}movies=data||[];renderMovies();
+}
+function renderMovies(){
+ $('movies').innerHTML='';if(!movies.length){$('movies').innerHTML='<div class="muted">Todavía no hay películas. Vuelve pronto.</div>';return}
+ movies.forEach(m=>{let c=document.createElement('article');c.className='movie';let poster=document.createElement('div');poster.className='poster';if(m.cover_url)poster.style.backgroundImage=`url("${m.cover_url}")`;else poster.textContent='APOLOPRIMER';let info=document.createElement('div');info.className='movie-info';let b=document.createElement('b');b.textContent=m.title;let s=document.createElement('small');s.textContent=`${m.category} · ${m.year||'—'}`;info.append(b,s);c.append(poster,info);c.onclick=()=>openMovie(m);$('movies').append(c)});
+ refreshRoomMovies();
+}
+function openMovie(m){$('playerTitle').textContent=m.title;$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden');$('soloPlayer').play().catch(()=>{})}
+$('closePlayer').onclick=()=>{$('soloPlayer').pause();$('soloPlayer').removeAttribute('src');$('player').classList.add('hidden')};
+$('uploadBtn').onclick=async()=>{
+ if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
+ let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0];if(!title||!vf){say('uploadStatus','Agrega título y archivo de video.');return}
+ if(vf.size>2*1024*1024*1024){say('uploadStatus','El video supera el límite recomendado de 2 GB.');return}
+ say('uploadStatus','Subiendo video y portada…');
+ const safe=s=>s.replace(/[^a-z0-9._-]/gi,'_');
+ let videoPath=`${session.user.id}/${crypto.randomUUID()}-${safe(vf.name)}`;
+ let up=await supabase.storage.from('movies').upload(videoPath,vf,{upsert:false});
+ if(up.error){say('uploadStatus',up.error.message);return}
+ let videoUrl=supabase.storage.from('movies').getPublicUrl(videoPath).data.publicUrl,coverUrl=null;
+ if(cf){let cp=`${session.user.id}/${crypto.randomUUID()}-${safe(cf.name)}`;let cu=await supabase.storage.from('covers').upload(cp,cf);if(cu.error){say('uploadStatus','Video subido; error de portada: '+cu.error.message);return}coverUrl=supabase.storage.from('covers').getPublicUrl(cp).data.publicUrl}
+ let ins=await supabase.from('movies').insert({title,category:$('movieCategory').value,year:Number($('movieYear').value)||null,video_url:videoUrl,video_path:videoPath,cover_url:coverUrl,owner_id:session.user.id});
+ if(ins.error){say('uploadStatus',ins.error.message);return}
+ say('uploadStatus','Película publicada.');$('movieTitle').value='';$('movieVideo').value='';$('movieCover').value='';await loadMovies();
+};
+function refreshRoomMovies(){let s=$('roomMovie');s.innerHTML='<option value="">Selecciona una película</option>';movies.forEach(m=>{let o=document.createElement('option');o.value=m.id;o.textContent=m.title;s.append(o)})}
+let roomMode='create';$('createRoomBtn').onclick=()=>openRoomModal('create');$('joinRoomBtn').onclick=()=>openRoomModal('join');
+function openRoomModal(mode){if(!session){showAuth();return}roomMode=mode;$('roomModalTitle').textContent=mode==='create'?'Crear sala privada':'Unirme a una sala';$('roomNameLabel').classList.toggle('hidden',mode==='join');$('roomCodeLabel').classList.toggle('hidden',mode==='create');$('roomModalStatus').textContent='';$('roomModal').classList.remove('hidden')}
+$('roomModalClose').onclick=()=>$('roomModal').classList.add('hidden');
+$('roomModalSubmit').onclick=async()=>{
+ if(roomMode==='create'){let name=$('roomNameInput').value.trim()||'Sala de películas',code=crypto.randomUUID().replaceAll('-','').slice(0,12).toUpperCase();let r=await supabase.from('rooms').insert({code,name,owner_id:session.user.id}).select().single();if(r.error){say('roomModalStatus',r.error.message);return}enterRoom(r.data)}
+ else{let code=$('roomCodeInput').value.trim().toUpperCase();let r=await supabase.rpc('find_room_by_code',{p_code:code});let found=Array.isArray(r.data)?r.data[0]:r.data;if(r.error||!found){say('roomModalStatus','No encontramos esa sala. Revisa el código.');return}enterRoom(found)}
+ $('roomModal').classList.add('hidden');
+};
+async function enterRoom(r){
+ if(roomChannel)await supabase.removeChannel(roomChannel);room=r;$('roomName').textContent=r.name;$('roomCode').textContent=r.code;$('roomShell').classList.remove('hidden');$('chatMessages').innerHTML='';
+ roomChannel=supabase.channel('room-'+r.code,{config:{broadcast:{self:false},presence:{key:session.user.id}}});
+ roomChannel.on('broadcast',{event:'chat'},({payload})=>addChat(payload.name,payload.text,false));
+ roomChannel.on('broadcast',{event:'control'},({payload})=>applyControl(payload,false));
+ roomChannel.on('presence',{event:'sync'},()=>say('syncStatus','Participantes conectados: '+Object.keys(roomChannel.presenceState()).length));
+ roomChannel.subscribe(async status=>{if(status==='SUBSCRIBED'){await roomChannel.track({name:session.user.email?.split('@')[0]||'Invitado'});say('syncStatus','Sala conectada. Los controles los maneja el creador.')}});
+ $('salas').scrollIntoView({behavior:'smooth'});
+}
+function canControl(){return !!room && room.owner_id===session.user.id}
+function applyControl(p,broadcast=true){
+ let v=$('roomPlayer');if(p.video_url && v.dataset.url!==p.video_url){v.src=p.video_url;v.dataset.url=p.video_url}
+ if(Number.isFinite(p.time)){try{v.currentTime=p.time}catch{}}
+ if(p.action==='play')v.play().catch(()=>{});else if(p.action==='pause')v.pause();
+ if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'control',payload:p});
+}
+function control(action){if(!canControl()){say('syncStatus','Solo quien creó la sala puede controlar la película.');return}let v=$('roomPlayer');applyControl({action,time:v.currentTime||0,video_url:v.currentSrc||v.src})}
+$('playAllBtn').onclick=()=>control('play');$('pauseAllBtn').onclick=()=>control('pause');
+$('backBtn').onclick=()=>seek(-10);$('forwardBtn').onclick=()=>seek(10);
+function seek(delta){if(!canControl())return;let v=$('roomPlayer');v.currentTime=Math.max(0,v.currentTime+delta);applyControl({action:'pause',time:v.currentTime,video_url:v.currentSrc||v.src})}
+$('roomMovie').onchange=()=>{if(!canControl())return;let m=movies.find(x=>x.id===$('roomMovie').value);if(!m)return;let v=$('roomPlayer');v.src=m.video_url;v.dataset.url=m.video_url;applyControl({action:'pause',time:0,video_url:m.video_url})};
+function addChat(name,text,broadcast=true){let d=document.createElement('div');d.className='chat-msg';let b=document.createElement('b');b.textContent=name;let t=document.createElement('span');t.textContent=text;d.append(b,t);$('chatMessages').append(d);$('chatMessages').scrollTop=$('chatMessages').scrollHeight;if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'chat',payload:{name,text}})}
+$('sendChatBtn').onclick=sendChat;$('chatInput').onkeydown=e=>{if(e.key==='Enter')sendChat()};
+function sendChat(){let t=$('chatInput').value.trim();if(!t||!roomChannel)return;addChat(session.user.email?.split('@')[0]||'Invitado',t);$('chatInput').value=''}
+$('leaveRoomBtn').onclick=async()=>{if(roomChannel)await supabase.removeChannel(roomChannel);roomChannel=null;room=null;$('roomPlayer').pause();$('roomPlayer').removeAttribute('src');$('roomShell').classList.add('hidden')};
+init();
+</script>
+</body></html>
