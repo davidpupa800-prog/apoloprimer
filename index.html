@@ -49,7 +49,7 @@ body{background:#050505;font-family:Arial,sans-serif}
 .brand-mark{font-size:34px;color:#e50914;font-weight:900;line-height:1}
 .stream-header nav{display:flex;gap:22px}
 .stream-header nav a{font-size:14px;color:#ddd}.stream-header nav a.nav-active{color:#fff;font-weight:bold}
-.header-actions{display:flex;align-items:center;gap:9px}
+.header-actions{display:flex;align-items:center;gap:9px}.account-chip{display:flex;align-items:center;gap:9px;min-width:0;max-width:210px;padding:6px 12px 6px 7px;border:1px solid #343434;border-radius:28px;background:#202020;color:#fff;font-weight:700;cursor:pointer}.account-chip-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;background:linear-gradient(135deg,#e50914,#761016);font-size:16px}.account-chip-avatar img{width:100%;height:100%;object-fit:cover;object-position:var(--header-avatar-x,50%) var(--header-avatar-y,50%)}.account-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-chip-chevron{color:#aaa;font-size:16px}
 .header-actions .icon-action{font-size:27px;background:transparent;padding:5px 10px}
 .stream-hero{min-height:490px;position:relative;display:flex;align-items:flex-end;padding:55px 5% 60px;background:linear-gradient(90deg,#000 0%,#000c 35%,#0002 100%),linear-gradient(0deg,#050505 0%,transparent 48%),radial-gradient(ellipse at 70% 35%,#31535b,#101a20 45%,#090909 80%);background-size:cover;background-position:center;overflow:hidden}
 .stream-hero.has-poster{background-size:cover;background-position:center 28%}
@@ -71,11 +71,11 @@ main{padding:0 2.5% 60px}.stream-section{margin:20px 0 34px}.section-heading{dis
 #salas{margin-top:45px}
 footer{margin-top:35px}
 @media(min-width:900px){.movie-rail .movie{flex-basis:190px}.movie-rail .poster{height:275px}.stream-hero{min-height:570px}}
-@media(max-width:650px){.stream-header{height:64px;padding:0 4%;gap:10px}.stream-header .logo{font-size:18px}.brand-mark{font-size:29px}.stream-header nav{display:none}.header-actions .icon-action{display:none}.stream-hero{min-height:500px;padding:35px 5% 56px}.hero-content h1{font-size:42px}.hero-content p{font-size:15px}.hero-meta{display:none}main{padding:0 4% 50px}.movie-rail .movie{flex-basis:145px}.movie-rail .poster{height:210px}.section-heading .muted{display:none}}
+@media(max-width:650px){.stream-header{height:64px;padding:0 4%;gap:10px}.stream-header .logo{font-size:18px}.brand-mark{font-size:29px}.stream-header nav{display:none}.header-actions .icon-action{display:none}.account-chip{max-width:155px;padding:5px 9px 5px 5px;gap:7px}.account-chip-avatar{width:34px;height:34px}.account-chip-name{font-size:13px}.stream-hero{min-height:500px;padding:35px 5% 56px}.hero-content h1{font-size:42px}.hero-content p{font-size:15px}.hero-meta{display:none}main{padding:0 4% 50px}.movie-rail .movie{flex-basis:145px}.movie-rail .poster{height:210px}.section-heading .muted{display:none}}
 </style>
 </head>
 <body>
-<header class="stream-header"><div class="logo"><span class="brand-mark">A</span> APOLOPRIMER</div><nav class="top-nav"><a class="nav-active" href="#" data-go="home">Inicio</a><a href="#" data-go="explore">Explorar</a><a href="#" data-go="search">Buscar</a><a href="#" data-go="mylist">Mi lista</a><a href="#" data-go="downloads">Descargas</a><a href="#" data-go="rooms">Salas</a></nav><div class="right header-actions"><button class="icon-action" id="searchJump" aria-label="Buscar">⌕</button><button class="secondary" id="profileBtn">Mi perfil</button><button id="authBtn">Entrar</button></div></header>
+<header class="stream-header"><div class="logo"><span class="brand-mark">A</span> APOLOPRIMER</div><nav class="top-nav"><a class="nav-active" href="#" data-go="home">Inicio</a><a href="#" data-go="explore">Explorar</a><a href="#" data-go="search">Buscar</a><a href="#" data-go="mylist">Mi lista</a><a href="#" data-go="downloads">Descargas</a><a href="#" data-go="rooms">Salas</a></nav><div class="right header-actions"><button class="icon-action" id="searchJump" aria-label="Buscar">⌕</button><button class="account-chip" id="accountChip" type="button" aria-label="Abrir cuenta"><span class="account-chip-avatar" id="headerAvatar">A</span><span class="account-chip-name" id="headerAccountName">Entrar</span><span class="account-chip-chevron">⌄</span></button></div></header>
 <section id="featuredHero" class="stream-hero app-screen" data-screen="home"><div class="hero-shade"></div><div class="hero-content"><div class="eyebrow">APOLOPRIMER ORIGINAL</div><h1 id="featuredTitle">Tu cine. Tu mundo.</h1><p id="featuredDescription">Descubre películas y comparte una función con tus amigos desde cualquier lugar.</p><div class="hero-actions"><button id="featuredPlay">▶ Reproducir</button><button class="secondary" id="featuredList">＋ Mi lista</button></div></div><div class="hero-meta">Películas · Series · Estrenos</div></section>
 <main>
 <section class="section stream-section app-screen" id="catalogo" data-screen="home"><div class="section-heading"><h2>Continuar viendo</h2><span class="muted small">Tu entretenimiento continúa aquí</span></div><div class="grid movie-rail" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
@@ -133,15 +133,25 @@ async function init(){
 async function refreshUser(){
  isAdmin=false;
  if(session){const {data}=await supabase.from('admins').select('user_id').eq('user_id',session.user.id).maybeSingle();isAdmin=!!data}
- $('authBtn').textContent=session?'Cuenta':'Entrar';
- $('profileBtn').classList.toggle('hidden',!session);
+ updateHeaderAccount();
  $('adminPanel').classList.toggle('hidden',!isAdmin);
  if(session && isAdmin)$('authBtn').title='Administrador conectado';
  if(session)populateAccount();
 }
+function updateHeaderAccount(){
+ const chip=$('accountChip'),avatar=$('headerAvatar'),label=$('headerAccountName');
+ if(!chip||!avatar||!label)return;
+ const meta=session?.user?.user_metadata||{},name=meta.display_name||meta.username||session?.user?.email?.split('@')[0]||'Entrar';
+ label.textContent=name;
+ const url=meta.avatar_url||'';
+ avatar.innerHTML=url?'<img alt="" src="'+url.replace(/"/g,'&quot;')+'">':(name.trim().charAt(0).toUpperCase()||'A');
+ const pos=(meta.avatar_position||'50% 50%').split(' ');
+ avatar.style.setProperty('--header-avatar-x',pos[0]||'50%');avatar.style.setProperty('--header-avatar-y',pos[1]||'50%');
+ chip.setAttribute('aria-label',session?'Abrir cuenta de '+name:'Entrar o crear cuenta');
+}
 function populateAccount(){
  const u=session.user,meta=u.user_metadata||{},name=meta.display_name||'',username=meta.username||'',bio=meta.bio||'',avatar=meta.avatar_url||'',pos=meta.avatar_position||'50% 50%';
- $('profileEmail').textContent=u.email||'Usuario';$('profileName').value=name;$('profileUsername').value=username;$('profileBio').value=bio;$('profileAvatarFile').value='';
+ $('profileEmail').textContent=u.email||'Usuario';updateHeaderAccount();$('profileName').value=name;$('profileUsername').value=username;$('profileBio').value=bio;$('profileAvatarFile').value='';
  $('profileAvatar').innerHTML=avatar?'<img alt="Foto de perfil" src="'+avatar.replace(/"/g,'&quot;')+'">':(name||u.email||'A').trim().charAt(0).toUpperCase();$('profileAvatar').style.setProperty('--avatar-x',pos.split(' ')[0]);$('profileAvatar').style.setProperty('--avatar-y',pos.split(' ')[1]);$('avatarX').value=parseInt(pos.split(' ')[0])||50;$('avatarY').value=parseInt(pos.split(' ')[1])||50;updateAvatarCropPreview();
  $('settingEmails').checked=meta.email_updates!==false;
 }
@@ -150,7 +160,7 @@ $('avatarX').oninput=updateAvatarCropPreview;$('avatarY').oninput=updateAvatarCr
 $('profileAvatarFile').onchange=()=>{const f=$('profileAvatarFile').files[0];if(!f)return;const url=URL.createObjectURL(f);$('avatarCropPreview').innerHTML='<img alt="Vista previa de recorte" src="'+url+'">';updateAvatarCropPreview()};
 function openAccount(tab='profile'){if(!session){showAuth();return}populateAccount();showAccountTab(tab);$('accountModal').classList.remove('hidden')}
 function showAccountTab(tab){$('profileSection').classList.toggle('hidden',tab!=='profile');$('settingsSection').classList.toggle('hidden',tab!=='settings');$('profileTab').classList.toggle('active',tab==='profile');$('settingsTab').classList.toggle('active',tab==='settings');$('profileTab').classList.toggle('secondary',tab!=='profile');$('settingsTab').classList.toggle('secondary',tab!=='settings')}
-$('profileBtn').onclick=()=>openAccount('profile');$('bottomProfile')?.addEventListener('click',()=>openAccount('profile'));
+$('accountChip').onclick=()=>session?openAccount('profile'):showAuth();$('bottomProfile')?.addEventListener('click',()=>openAccount('profile'));
 function showScreen(name){
  document.querySelectorAll('.app-screen').forEach(el=>el.classList.toggle('is-active',el.dataset.screen===name));
  document.querySelectorAll('[data-go]').forEach(el=>el.classList.toggle('active',el.dataset.go===name));
