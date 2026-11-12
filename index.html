@@ -964,6 +964,18 @@ footer{margin-top:35px}
   border-radius:50%!important;
  }
 }
+
+/* Centrar el conjunto de los tres controles principales respecto a la pantalla */
+#player .cinema-center{
+ left:50%!important;right:auto!important;width:max-content!important;
+ max-width:calc(100% - 150px)!important;
+ transform:translate(-50%,-50%)!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:clamp(34px,6vw,88px)!important;
+}
+@media(orientation:portrait){
+ #player .cinema-center{gap:clamp(30px,7vw,58px)!important;max-width:calc(100% - 112px)!important}
+}
 </style>
 </head>
 <body>
