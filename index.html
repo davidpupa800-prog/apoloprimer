@@ -101,16 +101,35 @@ $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
  let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0];if(!title||!vf){say('uploadStatus','Agrega título y archivo de video.');return}
  if(vf.size>2*1024*1024*1024){say('uploadStatus','El video supera el límite recomendado de 2 GB.');return}
- say('uploadStatus','Subiendo video y portada…');
+ say('uploadStatus','Preparando subida segura a Cloudflare R2…');
  const safe=s=>s.replace(/[^a-z0-9._-]/gi,'_');
- let videoPath=`${session.user.id}/${crypto.randomUUID()}-${safe(vf.name)}`;
- let up=await supabase.storage.from('movies').upload(videoPath,vf,{upsert:false});
- if(up.error){say('uploadStatus',up.error.message);return}
- let videoUrl=supabase.storage.from('movies').getPublicUrl(videoPath).data.publicUrl,coverUrl=null;
- if(cf){let cp=`${session.user.id}/${crypto.randomUUID()}-${safe(cf.name)}`;let cu=await supabase.storage.from('covers').upload(cp,cf);if(cu.error){say('uploadStatus','Video subido; error de portada: '+cu.error.message);return}coverUrl=supabase.storage.from('covers').getPublicUrl(cp).data.publicUrl}
- let ins=await supabase.from('movies').insert({title,category:$('movieCategory').value,year:Number($('movieYear').value)||null,video_url:videoUrl,video_path:videoPath,cover_url:coverUrl,owner_id:session.user.id});
- if(ins.error){say('uploadStatus',ins.error.message);return}
- say('uploadStatus','Película publicada.');$('movieTitle').value='';$('movieVideo').value='';$('movieCover').value='';await loadMovies();
+ async function uploadToR2(kind,file){
+  const response=await fetch('https://apoloprimer-r2-api-production.up.railway.app/upload-url',{
+   method:'POST',
+   headers:{'Authorization':`Bearer ${session.access_token}`,'Content-Type':'application/json'},
+   body:JSON.stringify({kind,fileName:safe(file.name),contentType:file.type,size:file.size})
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||'No se pudo preparar la subida.');
+  const put=await fetch(data.uploadUrl,{method:'PUT',headers:{'Content-Type':file.type},body:file});
+  if(!put.ok)throw new Error('R2 rechazó el archivo ('+put.status+'). Revisa CORS del bucket.');
+  return data;
+ }
+ try{
+  const video=await uploadToR2('movie',vf);
+  let cover=null;
+  if(cf)cover=await uploadToR2('cover',cf);
+  say('uploadStatus','Guardando información de la película…');
+  const ins=await supabase.from('movies').insert({
+   title,category:$('movieCategory').value,year:Number($('movieYear').value)||null,
+   video_url:video.playbackUrl,video_path:video.key,cover_url:cover?.playbackUrl||null,owner_id:session.user.id
+  });
+  if(ins.error)throw new Error(ins.error.message);
+  say('uploadStatus','Película publicada correctamente en R2.');
+  $('movieTitle').value='';$('movieVideo').value='';$('movieCover').value='';
+  await loadMovies();
+ }catch(error){say('uploadStatus',error.message||'Error al subir el archivo.')}
+
 };
 function refreshRoomMovies(){let s=$('roomMovie');s.innerHTML='<option value="">Selecciona una película</option>';movies.forEach(m=>{let o=document.createElement('option');o.value=m.id;o.textContent=m.title;s.append(o)})}
 let roomMode='create';$('createRoomBtn').onclick=()=>openRoomModal('create');$('joinRoomBtn').onclick=()=>openRoomModal('join');
