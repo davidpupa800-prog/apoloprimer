@@ -17,12 +17,13 @@ Incluye:
 ## Configuración Supabase
 1. Crea un proyecto en https://supabase.com.
 2. En SQL Editor, ejecuta el contenido completo de `supabase-schema.sql`.
-3. En Authentication, crea tu usuario con tu correo y contraseña.
-4. Copia el UUID de ese usuario desde Authentication > Users.
-5. En SQL Editor ejecuta, sustituyendo el UUID:
+3. En SQL Editor, ejecuta también `supabase-room-function.sql` para habilitar la búsqueda de salas por código.
+4. En Authentication, crea tu usuario con tu correo y contraseña.
+5. Copia el UUID de ese usuario desde Authentication > Users.
+6. En SQL Editor ejecuta, sustituyendo el UUID:
    `insert into public.admins (user_id) values ('TU-UUID');`
-6. En Project Settings > API, copia Project URL y anon/public key.
-7. En `index.html`, sustituye:
+7. En Project Settings > API, copia Project URL y anon/public key.
+8. En `index.html`, sustituye:
    - `PEGA_AQUI_TU_SUPABASE_URL`
    - `PEGA_AQUI_TU_SUPABASE_ANON_KEY`
 
