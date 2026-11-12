@@ -89,6 +89,44 @@ footer{margin-top:35px}
 .cinema-message{font-size:12px;color:#ddd;padding-top:6px;min-height:18px}
 #player.controls-locked .cinema-top,#player.controls-locked .cinema-bottom,#player.controls-locked .cinema-center{opacity:0;pointer-events:none}
 @media(orientation:portrait){.cinema-toolbar button{font-size:11px;padding:8px}.cinema-actions{gap:4px}.cinema-actions button{padding:8px}.cinema-center{gap:22px}}
+
+/* Premium Netflix-like cinema player */
+#player{position:fixed;inset:0;background:#000;z-index:50;padding:0;display:flex;align-items:center;justify-content:center}
+#player .cinema-player{position:relative;width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;color:#fff;isolation:isolate}
+#player #soloPlayer{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:contain;background:#000;filter:brightness(100%);cursor:pointer}
+.cinema-top,.cinema-center,.cinema-bottom{position:absolute;z-index:3;transition:opacity .28s ease,transform .28s ease;pointer-events:auto}
+.cinema-top{top:0;left:0;right:0;min-height:76px;padding:max(18px,env(safe-area-inset-top)) clamp(16px,4vw,54px) 16px;background:linear-gradient(180deg,rgba(0,0,0,.88),rgba(0,0,0,.45) 70%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px}
+.cinema-top b{font-size:clamp(17px,2vw,23px);font-weight:700;letter-spacing:.15px;text-shadow:0 2px 12px #000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cinema-actions{display:flex;gap:10px;align-items:center}
+.cinema-actions button,.cinema-center button,.cinema-toolbar button{border:1px solid rgba(255,255,255,.2);color:#fff;background:rgba(35,35,35,.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 4px 18px #0006;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.cinema-actions button{width:48px;height:48px;border-radius:50%;font-size:18px;display:grid;place-items:center}
+.cinema-actions button:hover,.cinema-center button:hover,.cinema-toolbar button:hover{background:rgba(229,9,20,.88);border-color:#ff4650;transform:translateY(-1px)}
+.cinema-center{left:0;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:clamp(28px,8vw,110px);pointer-events:none}
+.cinema-center button{pointer-events:auto;border-radius:50%;width:68px;height:68px;font-size:20px;font-weight:700}
+.cinema-center .big-play{width:86px;height:86px;font-size:32px;background:rgba(25,25,25,.76);border:1px solid rgba(255,255,255,.25)}
+.cinema-bottom{left:0;right:0;bottom:0;padding:58px clamp(16px,4vw,54px) max(22px,env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(0,0,0,.96),rgba(0,0,0,.68) 55%,transparent)}
+.cinema-progress{display:flex;align-items:center;gap:15px;font-size:13px;font-weight:600;text-shadow:0 1px 5px #000}
+.cinema-progress input{flex:1;min-width:0;height:5px;accent-color:#e50914;cursor:pointer}
+.cinema-toolbar{display:flex;align-items:center;gap:10px;overflow-x:auto;padding:18px 0 3px;scrollbar-width:none}
+.cinema-toolbar::-webkit-scrollbar{display:none}
+.cinema-toolbar button{white-space:nowrap;border-radius:24px;padding:12px 17px;font-size:13px;font-weight:700;letter-spacing:.1px}
+.brightness-control{display:flex;align-items:center;gap:8px;color:#fff;white-space:nowrap;padding:0 4px}
+.brightness-control input{width:82px;accent-color:#e50914;cursor:pointer}
+.cinema-message{font-size:12px;color:#eee;padding-top:8px;min-height:22px;text-shadow:0 1px 4px #000}
+#player.controls-hidden .cinema-top,#player.controls-hidden .cinema-center,#player.controls-hidden .cinema-bottom{opacity:0;pointer-events:none}
+#player.controls-hidden .cinema-top{transform:translateY(-14px)}
+#player.controls-hidden .cinema-bottom{transform:translateY(14px)}
+#player.controls-hidden .cinema-center{transform:translateY(calc(-50% + 8px))}
+#player.controls-hidden{cursor:none}
+#player.controls-locked .cinema-top,#player.controls-locked .cinema-bottom,#player.controls-locked .cinema-center{opacity:0;pointer-events:none}
+@media(max-width:700px){
+ .cinema-top{min-height:62px;gap:8px;padding-left:14px;padding-right:14px}
+ .cinema-actions{gap:5px}.cinema-actions button{width:38px;height:38px;font-size:15px}
+ .cinema-center{gap:22px}.cinema-center button{width:52px;height:52px;font-size:15px}.cinema-center .big-play{width:66px;height:66px;font-size:26px}
+ .cinema-bottom{padding:45px 14px max(18px,env(safe-area-inset-bottom))}
+ .cinema-toolbar{gap:7px;padding-top:12px}.cinema-toolbar button{padding:10px 13px;font-size:11px}
+ .brightness-control input{width:60px}.cinema-progress{font-size:11px;gap:8px}
+}
 </style>
 </head>
 <body>
@@ -234,30 +272,33 @@ function updateFeatured(m){if(!m){$('featuredTitle').textContent='Tu cine. Tu mu
 $('searchJump').onclick=()=>{showScreen('search');$('catalogSearch').focus()};
 
 
-let activeMovie=null,playerLocked=false;
+let activeMovie=null,playerLocked=false,playerHideTimer=null;
 const solo=$('soloPlayer'),playerRoot=$('player');
-function playerSay(msg){$('playerMessage').textContent=msg}
+function playerSay(msg){$('playerMessage').textContent=msg;showPlayerControls()}
 function fmtTime(s){if(!Number.isFinite(s))return '0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function syncPlayerUI(){const d=solo.duration||0,t=solo.currentTime||0;$('playerProgress').value=d?Math.round(t/d*1000):0;$('playerTime').textContent=fmtTime(t)+' / '+fmtTime(d);$('togglePlayback').textContent=solo.paused?'▶':'Ⅱ'}
-function closeCinema(){solo.pause();solo.removeAttribute('src');solo.load();playerRoot.classList.add('hidden');playerRoot.classList.remove('controls-locked');playerLocked=false;activeMovie=null}
-$('togglePlayback').onclick=()=>solo.paused?solo.play().catch(()=>playerSay('No se pudo iniciar la reproducción.')):solo.pause();
-$('seekBack').onclick=()=>solo.currentTime=Math.max(0,(solo.currentTime||0)-10);
-$('seekForward').onclick=()=>solo.currentTime=Math.min(solo.duration||Infinity,(solo.currentTime||0)+10);
-$('playerProgress').oninput=e=>{if(solo.duration)solo.currentTime=solo.duration*(Number(e.target.value)/1000)};
-solo.addEventListener('timeupdate',syncPlayerUI);solo.addEventListener('play',syncPlayerUI);solo.addEventListener('pause',syncPlayerUI);solo.addEventListener('loadedmetadata',syncPlayerUI);
-$('playerBrightness').oninput=e=>solo.style.filter='brightness('+e.target.value+'%)';
-$('speedPlayer').onclick=()=>{const speeds=[0.5,0.75,1,1.25,1.5,2],i=speeds.indexOf(solo.playbackRate),v=speeds[(i+1)%speeds.length];solo.playbackRate=v;$('speedPlayer').textContent='Velocidad '+v+'×'};
+function showPlayerControls(){if(playerLocked)return;playerRoot.classList.remove('controls-hidden');clearTimeout(playerHideTimer);if(!solo.paused){playerHideTimer=setTimeout(()=>playerRoot.classList.add('controls-hidden'),3200)}}
+function closeCinema(){clearTimeout(playerHideTimer);solo.pause();solo.removeAttribute('src');solo.load();playerRoot.classList.add('hidden');playerRoot.classList.remove('controls-hidden','controls-locked');playerLocked=false;activeMovie=null}
+playerRoot.addEventListener('pointermove',showPlayerControls);
+playerRoot.addEventListener('touchstart',e=>{if(playerLocked){playerLocked=false;playerRoot.classList.remove('controls-locked');showPlayerControls();return}if(playerRoot.classList.contains('controls-hidden')){showPlayerControls();e.preventDefault()}else showPlayerControls()},{passive:false});
+playerRoot.addEventListener('click',e=>{if(e.target===solo||e.target===playerRoot){if(playerLocked){playerLocked=false;playerRoot.classList.remove('controls-locked')}else if(playerRoot.classList.contains('controls-hidden'))showPlayerControls();else if(!solo.paused){playerRoot.classList.add('controls-hidden');clearTimeout(playerHideTimer)}else showPlayerControls()}else showPlayerControls()});
+$('togglePlayback').onclick=()=>{if(solo.paused)solo.play().catch(()=>playerSay('No se pudo iniciar la reproducción.'));else solo.pause();showPlayerControls()};
+$('seekBack').onclick=()=>{solo.currentTime=Math.max(0,(solo.currentTime||0)-10);showPlayerControls()};
+$('seekForward').onclick=()=>{solo.currentTime=Math.min(solo.duration||Infinity,(solo.currentTime||0)+10);showPlayerControls()};
+$('playerProgress').oninput=e=>{if(solo.duration)solo.currentTime=solo.duration*(Number(e.target.value)/1000);showPlayerControls()};
+solo.addEventListener('timeupdate',syncPlayerUI);solo.addEventListener('play',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('pause',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('loadedmetadata',syncPlayerUI);
+$('playerBrightness').oninput=e=>{solo.style.filter='brightness('+e.target.value+'%)';showPlayerControls()};
+$('speedPlayer').onclick=()=>{const speeds=[0.5,0.75,1,1.25,1.5,2],i=speeds.indexOf(solo.playbackRate),v=speeds[(i+1)%speeds.length];solo.playbackRate=v;$('speedPlayer').textContent='Velocidad '+v+'×';showPlayerControls()};
 $('pipPlayer').onclick=async()=>{try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else if(document.pictureInPictureEnabled)await solo.requestPictureInPicture();else playerSay('Este navegador no permite ventana flotante.')}catch(e){playerSay('No se pudo abrir la ventana flotante.')}};
-$('fullscreenPlayer').onclick=async()=>{try{if(!document.fullscreenElement)await playerRoot.requestFullscreen();else await document.exitFullscreen()}catch(e){playerSay('Pantalla completa no disponible en este navegador.')}};
-$('lockPlayer').onclick=()=>{playerLocked=!playerLocked;playerRoot.classList.toggle('controls-locked',playerLocked);playerSay(playerLocked?'Controles bloqueados. Toca el video para desbloquear.':'Controles desbloqueados.')};
-$('cinemaPlayer').addEventListener('click',e=>{if(playerLocked&&e.target===solo){playerLocked=false;playerRoot.classList.remove('controls-locked');playerSay('Controles desbloqueados.')}});
+$('fullscreenPlayer').onclick=async()=>{try{if(!document.fullscreenElement)await playerRoot.requestFullscreen();else await document.exitFullscreen();showPlayerControls()}catch(e){playerSay('Pantalla completa no disponible en este navegador.')}};
+$('lockPlayer').onclick=()=>{playerLocked=!playerLocked;playerRoot.classList.toggle('controls-locked',playerLocked);if(!playerLocked)showPlayerControls();else clearTimeout(playerHideTimer)};
 function rateMovie(v){if(!activeMovie)return;localStorage.setItem('apoloRating:'+activeMovie.id,String(v));playerSay(v>0?'Marcaste que te gusta.':'Marcaste que no te gusta.')}
 $('rateUp').onclick=()=>rateMovie(1);$('rateDown').onclick=()=>rateMovie(-1);
 $('clipPlayer').onclick=()=>playerSay('Para recortar un fragmento necesitamos habilitar una herramienta de edición; la película original no se modificará.');
 $('episodesPlayer').onclick=()=>playerSay('Esta película no tiene episodios asociados.');
 $('nextPlayer').onclick=()=>playerSay('No hay un próximo episodio asociado a esta película.');
 $('audioPlayer').onclick=()=>{const tracks=solo.textTracks;if(!tracks||!tracks.length){playerSay('Este archivo no incluye pistas de subtítulos seleccionables.');return}let i=[...tracks].findIndex(t=>t.mode==='showing');tracks.forEach(t=>t.mode='disabled');const next=(i+1)%tracks.length;tracks[next].mode='showing';playerSay('Subtítulos: '+(tracks[next].label||tracks[next].language||'Pista '+(next+1)))};
-function openMovie(m){activeMovie=m;$('playerTitle').textContent=m.title;$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI()}
+function openMovie(m){activeMovie=m;$('playerTitle').textContent=m.title;$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden','controls-hidden','controls-locked');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI();showPlayerControls()}
 $('closePlayer').onclick=closeCinema;
 $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
