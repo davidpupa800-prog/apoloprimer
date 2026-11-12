@@ -761,6 +761,21 @@ footer{margin-top:35px}
   width:15px!important;height:15px!important;flex-basis:15px!important;
  }
 }
+
+/* Segunda reducción: controles inferiores más discretos en móvil */
+@media (max-width:760px) and (orientation:portrait){
+ #player .cinema-toolbar{gap:5px!important;padding:6px 10px!important}
+ #player .cinema-toolbar button{
+  height:34px!important;min-height:34px!important;
+  min-width:0!important;padding:0 8px!important;
+  gap:5px!important;font-size:9px!important;
+  line-height:1!important;border-radius:18px!important;
+ }
+ #player .cinema-toolbar button svg{
+  width:13px!important;height:13px!important;
+  min-width:13px!important;flex:0 0 13px!important;
+ }
+}
 </style>
 </head>
 <body>
