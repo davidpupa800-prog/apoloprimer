@@ -845,6 +845,40 @@ footer{margin-top:35px}
  #player .cinema-center button{flex-basis:42px!important;width:42px!important;height:42px!important}
  #player .cinema-center .big-play{flex-basis:72px!important;width:72px!important;height:72px!important;font-size:30px!important}
 }
+
+/* Alineación exacta de retroceder, reproducir y avanzar */
+@media (max-width:900px){
+ #player .cinema-center{
+  left:50%!important;right:auto!important;top:58%!important;
+  width:min(58vw,420px)!important;height:82px!important;
+  transform:translate(-50%,-50%)!important;
+  display:grid!important;
+  grid-template-columns:58px 82px 58px!important;
+  align-items:center!important;justify-content:space-between!important;
+  column-gap:0!important;
+ }
+ #player .cinema-center button{
+  position:static!important;margin:0!important;
+  justify-self:center!important;align-self:center!important;
+ }
+ #player .cinema-center button:nth-child(1),
+ #player .cinema-center button:nth-child(3){
+  width:58px!important;height:58px!important;
+ }
+ #player .cinema-center .big-play{
+  width:82px!important;height:82px!important;
+  justify-self:center!important;
+ }
+}
+@media (max-width:600px){
+ #player .cinema-center{
+  width:min(60vw,350px)!important;height:72px!important;
+  grid-template-columns:48px 72px 48px!important;
+ }
+ #player .cinema-center button:nth-child(1),
+ #player .cinema-center button:nth-child(3){width:48px!important;height:48px!important}
+ #player .cinema-center .big-play{width:72px!important;height:72px!important}
+}
 </style>
 </head>
 <body>
