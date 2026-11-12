@@ -997,9 +997,20 @@ footer{margin-top:35px}
  margin:0!important;padding:0!important;
 }
 
-/* Modo de imagen estirada: llena el marco sin bandas, con deformación proporcional opcional */
-#player.video-stretched #soloPlayer{object-fit:fill!important}
-#player #stretchPlayer[aria-pressed="true"]{border-color:rgba(255,65,88,.9)!important;box-shadow:0 0 16px rgba(229,9,20,.38),inset 0 1px 1px rgba(255,255,255,.34)!important}
+/* Controles según la referencia: todo visible al pie y sin modo de imagen deformada */
+#player .cinema-center{top:46%!important}
+#player .cinema-bottom{bottom:max(18px,env(safe-area-inset-bottom))!important;padding:0 clamp(22px,2.5vw,40px)!important;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent)!important}
+#player .cinema-toolbar{display:grid!important;grid-template-columns:1fr 1.4fr 1.1fr 1.55fr 1.55fr 1.55fr!important;overflow:visible!important}
+@media(max-width:760px) and (orientation:portrait){
+ #player .cinema-bottom{bottom:0!important;padding:10px 9px calc(env(safe-area-inset-bottom) + 10px)!important}
+ #player .cinema-toolbar{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;overflow:visible!important}
+ #player .cinema-toolbar button{width:100%!important;min-width:0!important;min-height:40px!important;padding:0 5px!important;font-size:10px!important}
+}
+@media(orientation:landscape) and (max-height:600px){
+ #player .cinema-bottom{bottom:max(12px,env(safe-area-inset-bottom))!important}
+ #player .cinema-toolbar{display:flex!important;flex-wrap:nowrap!important;overflow:visible!important}
+ #player .cinema-toolbar button{flex:1 1 0!important;min-width:0!important}
+}
 
 /* APOLOPRIMER — entrada épica, letra por letra */
 #apoloSplash{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
@@ -1081,7 +1092,7 @@ footer{margin-top:35px}
  <label class="side-control side-volume" title="Volumen"><span><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm13-2a7 7 0 0 1 0 10m2-13a11 11 0 0 1 0 16"/></svg></span><input id="playerVolume" type="range" min="0" max="100" value="100" aria-label="Volumen"></label>
  <div class="cinema-center"><button id="seekBack" title="Retroceder 10 segundos"><svg viewBox="0 0 24 24"><path d="M3 8V3m0 5h5M4 8a9 9 0 1 1-1 7"/><text x="7" y="16">10</text></svg></button><button id="togglePlayback" class="big-play" title="Reproducir o pausar">Ⅱ</button><button id="seekForward" title="Avanzar 10 segundos"><svg viewBox="0 0 24 24"><path d="M21 8V3m0 5h-5m4 0a9 9 0 1 0 1 7"/><text x="5" y="16">10</text></svg></button></div>
  <div class="cinema-bottom"><div class="cinema-progress"><span id="playerCurrent">0:00</span><input id="playerProgress" type="range" min="0" max="1000" value="0" aria-label="Progreso"><span id="playerDuration">0:00</span><span id="playerTime" class="hidden">0:00 / 0:00</span></div>
-  <div class="cinema-toolbar"><button id="clipPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 15l4-4 4 4"/></svg><span>Recortar</span></button><button id="speedPlayer"><svg viewBox="0 0 24 24"><path d="M4 18a9 9 0 1 1 16 0M12 12l4-4M7 19h10"/></svg><span>Velocidad 1×</span></button><button id="episodesPlayer"><svg viewBox="0 0 24 24"><path d="m12 3 9 6-9 6-9-6 9-6Zm-9 12 9 6 9-6"/></svg><span>Episodios</span></button><button id="audioPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h6"/></svg><span>Audio y subtítulos</span></button><button id="nextPlayer"><svg viewBox="0 0 24 24"><path d="m5 4 11 8-11 8V4Zm14 0v16"/></svg><span>Próximo episodio</span></button><button id="stretchPlayer" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3M8 8l-4-4M16 8l4-4M8 16l-4 4M16 16l4 4"/></svg><span>Pantalla estirada</span></button><button id="fullscreenPlayer"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span>Pantalla completa</span></button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div>
+  <div class="cinema-toolbar"><button id="clipPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 15l4-4 4 4"/></svg><span>Recortar</span></button><button id="speedPlayer"><svg viewBox="0 0 24 24"><path d="M4 18a9 9 0 1 1 16 0M12 12l4-4M7 19h10"/></svg><span>Velocidad 1×</span></button><button id="episodesPlayer"><svg viewBox="0 0 24 24"><path d="m12 3 9 6-9 6-9-6 9-6Zm-9 12 9 6 9-6"/></svg><span>Episodios</span></button><button id="audioPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h6"/></svg><span>Audio y subtítulos</span></button><button id="nextPlayer"><svg viewBox="0 0 24 24"><path d="m5 4 11 8-11 8V4Zm14 0v16"/></svg><span>Próximo episodio</span></button><button id="fullscreenPlayer"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span>Pantalla completa</span></button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div>
  </div>
  </div></div>
 <script type="module">
@@ -1216,7 +1227,7 @@ $('castPlayer').onclick=async()=>{
 };
 $('pipPlayer').onclick=async()=>{try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else if(document.pictureInPictureEnabled)await solo.requestPictureInPicture();else playerSay('Este navegador no permite ventana flotante.')}catch(e){playerSay('No se pudo abrir la ventana flotante.')}};
 $('fullscreenPlayer').onclick=async()=>{try{if(!document.fullscreenElement)await playerRoot.requestFullscreen();else await document.exitFullscreen();showPlayerControls()}catch(e){playerSay('Pantalla completa no disponible en este navegador.')}};
-$('stretchPlayer').onclick=()=>{const enabled=!playerRoot.classList.contains('video-stretched');playerRoot.classList.toggle('video-stretched',enabled);$('stretchPlayer').setAttribute('aria-pressed',String(enabled));$('stretchPlayer').querySelector('span').textContent=enabled?'Ajuste normal':'Pantalla estirada';playerSay(enabled?'Modo de pantalla estirada activado.':'Ajuste de imagen normal activado.')};
+
 $('lockPlayer').onclick=()=>{playerLocked=!playerLocked;playerRoot.classList.toggle('controls-locked',playerLocked);if(!playerLocked)showPlayerControls();else clearTimeout(playerHideTimer)};
 function rateMovie(v){if(!activeMovie)return;localStorage.setItem('apoloRating:'+activeMovie.id,String(v));playerSay(v>0?'Marcaste que te gusta.':'Marcaste que no te gusta.')}
 $('rateUp').onclick=()=>rateMovie(1);$('rateDown').onclick=()=>rateMovie(-1);
