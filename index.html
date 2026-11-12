@@ -147,7 +147,71 @@ footer{margin-top:35px}
  .side-control{height:125px;width:42px}.side-control input{height:72px}
  .cinema-bottom{padding-top:12px;padding-bottom:12px}.cinema-progress{height:34px}
  .cinema-toolbar{padding-top:8px}.cinema-toolbar button{padding:8px 12px}
-}</style>
+}/* Opción 3 — réplica cinematográfica afinada */
+#player .cinema-player{background:#030307}
+#player #soloPlayer{object-fit:contain}
+#player .cinema-top{height:104px;min-height:0;padding:24px 3.2vw 18px;background:linear-gradient(180deg,rgba(0,0,0,.78),transparent);border:0}
+#player .cinema-back{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center}
+#player .cinema-back svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#player .cinema-titleline b{font-size:clamp(20px,2vw,29px)}
+#player .cinema-meta{font-size:clamp(12px,1.15vw,17px);letter-spacing:.15px}
+#player .cinema-actions{gap:12px}
+#player .cinema-actions button{width:54px;height:54px;padding:13px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,rgba(33,34,43,.86),rgba(8,9,15,.84));}
+#player .cinema-actions svg,#player .cinema-toolbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#player .side-control{height:208px;width:58px;border-radius:30px}
+#player .side-control span svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#player .cinema-center{gap:clamp(80px,10vw,155px)}
+#player .cinema-center button{width:88px;height:88px;font-size:0}
+#player .cinema-center button svg{width:42px;height:42px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#player .cinema-center button svg text{fill:currentColor;stroke:none;font-size:9px;font-weight:700}
+#player .cinema-center .big-play{width:148px;height:148px;font-size:56px;border:2px solid #ff6474;box-shadow:0 0 0 5px #e5091424,0 0 34px #f20b3d88,inset 0 0 25px #e5091433}
+#player .cinema-bottom{padding:24px 3vw max(28px,env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(0,0,0,.76),transparent)}
+#player .cinema-progress{height:54px;border-radius:30px;padding:0 24px;gap:20px;background:rgba(23,24,31,.68);border:1px solid rgba(255,255,255,.24);box-shadow:0 8px 26px #0008,inset 0 1px #ffffff20;font-size:14px}
+#player .cinema-progress input{height:8px;accent-color:#f20d35}
+#player .cinema-toolbar{display:grid;grid-template-columns:1fr 1.45fr 1.1fr 1.55fr 1.5fr 1.55fr;gap:14px;overflow:visible;padding-top:24px}
+#player .cinema-toolbar button{min-width:0;width:100%;height:60px;padding:0 16px;border-radius:32px;font-size:clamp(11px,.95vw,15px);font-weight:700;gap:12px;justify-content:center;background:linear-gradient(155deg,rgba(39,40,49,.9),rgba(9,10,15,.9));border-color:#ffffff3b;box-shadow:0 8px 22px #0009,inset 0 1px 0 #ffffff25}
+#player .cinema-toolbar button svg{width:23px;height:23px;flex:0 0 23px}
+#player .cinema-toolbar button:hover{border-color:#ff4b63;box-shadow:0 0 22px #e5091466,inset 0 0 16px #e5091422}
+#player .cinema-message{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);width:max-content;max-width:90%;padding:10px 18px;border:1px solid #ffffff30;border-radius:20px;background:#17171deF;color:#fff;font-size:13px;text-align:center;box-shadow:0 8px 24px #0009;opacity:0;pointer-events:none;transition:opacity .2s}
+#player .cinema-message:not(:empty){opacity:1}
+#player .cinema-progress #playerTime{display:none!important}
+#player.controls-hidden .cinema-message{opacity:0}
+@media(max-width:760px){
+ #player .cinema-top{height:auto;padding:calc(env(safe-area-inset-top) + 12px) 12px 12px;align-items:center}
+ #player .cinema-back{width:40px;height:40px;flex-basis:40px}
+ #player .cinema-actions{gap:5px}
+ #player .cinema-actions button{width:36px;height:36px;padding:9px}
+ #player .cinema-actions svg{width:18px;height:18px}
+ #player .cinema-heading{gap:8px}
+ #player .cinema-titleline b{font-size:16px}
+ #player .cinema-meta{font-size:10px}
+ #player .cinema-hd{font-size:10px;padding:1px 5px}
+ #player .side-control{height:130px;width:38px;padding:7px 0}
+ #player .side-control input{height:75px}
+ #player .side-brightness{left:7px}#player .side-volume{right:7px}
+ #player .cinema-center{gap:clamp(24px,8vw,55px)}
+ #player .cinema-center button{width:50px;height:50px}
+ #player .cinema-center button svg{width:27px;height:27px}
+ #player .cinema-center .big-play{width:76px;height:76px;font-size:31px}
+ #player .cinema-bottom{padding:14px 12px max(14px,env(safe-area-inset-bottom))}
+ #player .cinema-progress{height:42px;padding:0 12px;gap:9px;font-size:10px}
+ #player .cinema-toolbar{display:flex;gap:8px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+ #player .cinema-toolbar button{width:auto;min-width:max-content;height:44px;padding:0 14px;font-size:11px;gap:7px}
+ #player .cinema-toolbar button svg{width:18px;height:18px;flex-basis:18px}
+ #player .cinema-message{font-size:11px;bottom:calc(100% + 3px)}
+}
+@media(orientation:landscape) and (max-height:520px){
+ #player .cinema-top{padding-top:10px;height:70px}
+ #player .cinema-back,#player .cinema-actions button{width:38px;height:38px}
+ #player .cinema-center button{width:58px;height:58px}
+ #player .cinema-center .big-play{width:88px;height:88px}
+ #player .side-control{height:125px}
+ #player .cinema-bottom{padding-top:12px;padding-bottom:12px}
+ #player .cinema-progress{height:40px}
+ #player .cinema-toolbar{padding-top:12px}
+ #player .cinema-toolbar button{height:44px}
+}
+</style>
 </head>
 <body>
 <header class="stream-header"><div class="logo"><span class="brand-mark">A</span> APOLOPRIMER</div><nav class="top-nav"><a class="nav-active" href="#" data-go="home">Inicio</a><a href="#" data-go="explore">Explorar</a><a href="#" data-go="search">Buscar</a><a href="#" data-go="mylist">Mi lista</a><a href="#" data-go="downloads">Descargas</a><a href="#" data-go="rooms">Salas</a></nav><div class="right header-actions"><button class="icon-action" id="searchJump" aria-label="Buscar">⌕</button><button class="account-chip" id="accountChip" type="button" aria-label="Abrir cuenta"><span class="account-chip-avatar" id="headerAvatar">A</span><span class="account-chip-name" id="headerAccountName">Entrar</span><span class="account-chip-chevron">⌄</span></button></div></header>
@@ -188,14 +252,20 @@ footer{margin-top:35px}
 <div id="player" class="hidden"><div class="cinema-player" id="cinemaPlayer">
  <video id="soloPlayer" playsinline preload="metadata"></video>
  <header class="cinema-top">
-  <div class="cinema-heading"><button id="backPlayer" class="cinema-back" title="Volver">‹</button><div class="cinema-titleblock"><div class="cinema-titleline"><b id="playerTitle"></b><span class="cinema-hd">HD</span></div><div id="playerMeta" class="cinema-meta"></div></div></div>
-  <div class="cinema-actions"><button id="rateDown" title="No me gusta">♧</button><button id="rateUp" title="Me gusta">♡</button><button id="pipPlayer" title="Ventana flotante">▣</button><button id="lockPlayer" title="Bloquear controles">♙</button><button id="closePlayer" title="Cerrar">✕</button></div>
+  <div class="cinema-heading"><button id="backPlayer" class="cinema-back" title="Volver"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><div class="cinema-titleblock"><div class="cinema-titleline"><b id="playerTitle"></b><span class="cinema-hd">HD</span></div><div id="playerMeta" class="cinema-meta"></div></div></div>
+  <div class="cinema-actions">
+   <button id="rateDown" title="No me gusta"><svg viewBox="0 0 24 24"><path d="M7 10v10H4V10h3Zm3 0 4-7c2 0 3 2 2 4l-1 3h5a2 2 0 0 1 2 2l-2 7a2 2 0 0 1-2 2h-8V10Z"/></svg></button>
+   <button id="rateUp" title="Me gusta"><svg viewBox="0 0 24 24"><path d="M7 14V4H4v10h3Zm3 0 4 7c2 0 3-2 2-4l-1-3h5a2 2 0 0 0 2-2l-2-7a2 2 0 0 0-2-2h-8v11Z"/></svg></button>
+   <button id="pipPlayer" title="Ventana flotante"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 12h6v5h-6z"/></svg></button>
+   <button id="lockPlayer" title="Bloquear controles"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></button>
+   <button id="closePlayer" title="Cerrar"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+  </div>
  </header>
  <label class="side-control side-brightness" title="Brillo"><span>☼</span><input id="playerBrightness" type="range" min="50" max="130" value="100" aria-label="Brillo"></label>
- <label class="side-control side-volume" title="Volumen"><span>◖))</span><input id="playerVolume" type="range" min="0" max="100" value="100" aria-label="Volumen"></label>
- <div class="cinema-center"><button id="seekBack" title="Retroceder 10 segundos">↶<small>10</small></button><button id="togglePlayback" class="big-play" title="Reproducir o pausar">Ⅱ</button><button id="seekForward" title="Avanzar 10 segundos">↷<small>10</small></button></div>
- <div class="cinema-bottom"><div class="cinema-progress"><span id="playerTime">0:00 / 0:00</span><input id="playerProgress" type="range" min="0" max="1000" value="0" aria-label="Progreso"></div>
-  <div class="cinema-toolbar"><button id="clipPlayer">▱ <span>Recortar</span></button><button id="speedPlayer">◴ <span>Velocidad 1×</span></button><button id="episodesPlayer">◇ <span>Episodios</span></button><button id="audioPlayer">▤ <span>Audio y subtítulos</span></button><button id="nextPlayer">▷ <span>Próximo episodio</span></button><button id="fullscreenPlayer">⛶ <span>Pantalla completa</span></button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div>
+ <label class="side-control side-volume" title="Volumen"><span><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm13-2a7 7 0 0 1 0 10m2-13a11 11 0 0 1 0 16"/></svg></span><input id="playerVolume" type="range" min="0" max="100" value="100" aria-label="Volumen"></label>
+ <div class="cinema-center"><button id="seekBack" title="Retroceder 10 segundos"><svg viewBox="0 0 24 24"><path d="M3 8V3m0 5h5M4 8a9 9 0 1 1-1 7"/><text x="7" y="16">10</text></svg></button><button id="togglePlayback" class="big-play" title="Reproducir o pausar">Ⅱ</button><button id="seekForward" title="Avanzar 10 segundos"><svg viewBox="0 0 24 24"><path d="M21 8V3m0 5h-5m4 0a9 9 0 1 0 1 7"/><text x="5" y="16">10</text></svg></button></div>
+ <div class="cinema-bottom"><div class="cinema-progress"><span id="playerCurrent">0:00</span><input id="playerProgress" type="range" min="0" max="1000" value="0" aria-label="Progreso"><span id="playerDuration">0:00</span><span id="playerTime" class="hidden">0:00 / 0:00</span></div>
+  <div class="cinema-toolbar"><button id="clipPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 15l4-4 4 4"/></svg><span>Recortar</span></button><button id="speedPlayer"><svg viewBox="0 0 24 24"><path d="M4 18a9 9 0 1 1 16 0M12 12l4-4M7 19h10"/></svg><span>Velocidad 1×</span></button><button id="episodesPlayer"><svg viewBox="0 0 24 24"><path d="m12 3 9 6-9 6-9-6 9-6Zm-9 12 9 6 9-6"/></svg><span>Episodios</span></button><button id="audioPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h6"/></svg><span>Audio y subtítulos</span></button><button id="nextPlayer"><svg viewBox="0 0 24 24"><path d="m5 4 11 8-11 8V4Zm14 0v16"/></svg><span>Próximo episodio</span></button><button id="fullscreenPlayer"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span>Pantalla completa</span></button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div>
  </div>
  </div></div>
 <script type="module">
@@ -302,7 +372,7 @@ let activeMovie=null,playerLocked=false,playerHideTimer=null;
 const solo=$('soloPlayer'),playerRoot=$('player');
 function playerSay(msg){$('playerMessage').textContent=msg;showPlayerControls()}
 function fmtTime(s){if(!Number.isFinite(s))return '0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
-function syncPlayerUI(){const d=solo.duration||0,t=solo.currentTime||0;$('playerProgress').value=d?Math.round(t/d*1000):0;$('playerTime').textContent=fmtTime(t)+' / '+fmtTime(d);$('togglePlayback').textContent=solo.paused?'▶':'Ⅱ'}
+function syncPlayerUI(){const d=solo.duration||0,t=solo.currentTime||0;$('playerProgress').value=d?Math.round(t/d*1000):0;$('playerCurrent').textContent=fmtTime(t);$('playerDuration').textContent=fmtTime(d);$('playerTime').textContent=fmtTime(t)+' / '+fmtTime(d);$('togglePlayback').textContent=solo.paused?'▶':'Ⅱ'}
 function showPlayerControls(){if(playerLocked)return;playerRoot.classList.remove('controls-hidden');clearTimeout(playerHideTimer);if(!solo.paused){playerHideTimer=setTimeout(()=>playerRoot.classList.add('controls-hidden'),3200)}}
 function closeCinema(){clearTimeout(playerHideTimer);solo.pause();solo.removeAttribute('src');solo.load();playerRoot.classList.add('hidden');playerRoot.classList.remove('controls-hidden','controls-locked');playerLocked=false;activeMovie=null}
 playerRoot.addEventListener('pointermove',showPlayerControls);
