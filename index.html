@@ -887,6 +887,37 @@ footer{margin-top:35px}
   transform:translate(-50%,-50%)!important;
  }
 }
+
+/* Acabado final: acciones superiores perfectamente circulares y símbolos 10s más legibles */
+#player .cinema-top button{
+ box-sizing:border-box!important;
+ flex:0 0 44px!important;
+ width:44px!important;min-width:44px!important;max-width:44px!important;
+ height:44px!important;min-height:44px!important;max-height:44px!important;
+ aspect-ratio:1/1!important;
+ padding:0!important;
+ border-radius:50%!important;
+ display:inline-flex!important;
+ align-items:center!important;justify-content:center!important;
+ overflow:hidden!important;
+}
+#player .cinema-top button svg{
+ width:21px!important;height:21px!important;
+ flex:0 0 21px!important;
+}
+#player .cinema-center button:nth-child(1) svg,
+#player .cinema-center button:nth-child(3) svg{
+ width:27px!important;height:27px!important;
+}
+@media(max-width:600px){
+ #player .cinema-top button{
+  flex:0 0 36px!important;width:36px!important;min-width:36px!important;max-width:36px!important;
+  height:36px!important;min-height:36px!important;max-height:36px!important;
+ }
+ #player .cinema-top button svg{width:18px!important;height:18px!important;flex-basis:18px!important}
+ #player .cinema-center button:nth-child(1) svg,
+ #player .cinema-center button:nth-child(3) svg{width:25px!important;height:25px!important}
+}
 </style>
 </head>
 <body>
