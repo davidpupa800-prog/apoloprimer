@@ -776,6 +776,45 @@ footer{margin-top:35px}
   min-width:13px!important;flex:0 0 13px!important;
  }
 }
+
+/* Escala compacta de TODOS los controles del reproductor */
+@media (max-width: 900px){
+ #player .cinema-top{padding:12px 16px!important;min-height:64px!important}
+ #player .cinema-top button{
+  width:42px!important;height:42px!important;min-width:42px!important;
+  padding:0!important;border-radius:50%!important;
+ }
+ #player .cinema-top button svg{width:20px!important;height:20px!important}
+ #player .cinema-top .movie-title{font-size:17px!important}
+ #player .side-control{
+  width:76px!important;height:270px!important;max-height:30vh!important;
+  padding:10px 0!important;border-radius:28px!important
+ }
+ #player .side-control span svg{width:21px!important;height:21px!important}
+ #player .side-control input{height:190px!important;max-height:21vh!important;width:16px!important}
+ #player .side-brightness{left:16px!important}
+ #player .side-volume{right:16px!important}
+ #player .cinema-center{width:min(66vw,520px)!important;top:50%!important}
+ #player .cinema-center button{
+  flex-basis:58px!important;width:58px!important;height:58px!important;
+ }
+ #player .cinema-center button svg{width:25px!important;height:25px!important}
+ #player .cinema-center .big-play{
+  flex-basis:112px!important;width:112px!important;height:112px!important;
+  font-size:46px!important
+ }
+}
+@media (max-width:600px){
+ #player .cinema-top button{width:36px!important;height:36px!important;min-width:36px!important}
+ #player .cinema-top button svg{width:18px!important;height:18px!important}
+ #player .side-control{width:62px!important;height:220px!important;max-height:27vh!important}
+ #player .side-control input{height:150px!important;max-height:18vh!important;width:14px!important}
+ #player .side-brightness{left:10px!important}
+ #player .side-volume{right:10px!important}
+ #player .cinema-center{width:70vw!important}
+ #player .cinema-center button{flex-basis:48px!important;width:48px!important;height:48px!important}
+ #player .cinema-center .big-play{flex-basis:92px!important;width:92px!important;height:92px!important;font-size:38px!important}
+}
 </style>
 </head>
 <body>
