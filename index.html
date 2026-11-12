@@ -22,10 +22,12 @@ input,select{width:100%;padding:11px;border:1px solid #444;border-radius:4px;bac
 #player{position:fixed;inset:0;background:#000e;z-index:15;display:flex;align-items:center;justify-content:center;padding:18px}#player .modal-card{width:min(950px,100%)}#player video{width:100%;max-height:70vh;background:#000}
 footer{padding:28px 5%;border-top:1px solid #222;color:#777;font-size:12px}
 @media(max-width:800px){nav{display:none}.room-shell{grid-template-columns:1fr}.chat-panel{min-height:300px}.chat-messages{max-height:220px}}
+
+.profile-card{display:flex;align-items:center;gap:12px;background:#202020;border:1px solid #383838;padding:12px;border-radius:8px;margin:12px 0}.avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#e50914,#761016);display:grid;place-items:center;font-size:22px;font-weight:900;overflow:hidden;flex:none}.avatar img{width:100%;height:100%;object-fit:cover}.account-tabs{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}.account-tabs button.active{background:var(--red)}.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #333}.settings-row input[type=checkbox]{width:auto;margin:0;accent-color:var(--red)}
 </style>
 </head>
 <body>
-<header><div class="logo">APOLOPRIMER</div><nav><a href="#">Inicio</a><a href="#catalogo">Películas</a><a href="#salas">Salas privadas</a></nav><button class="right" id="authBtn">Entrar</button></header>
+<header><div class="logo">APOLOPRIMER</div><nav><a href="#">Inicio</a><a href="#catalogo">Películas</a><a href="#salas">Salas privadas</a></nav><div class="right" style="display:flex;gap:8px"><button class="secondary" id="profileBtn">Mi perfil</button><button id="authBtn">Entrar</button></div></header>
 <section class="hero"><div class="eyebrow">APOLOPRIMER PRESENTA</div><h1>Tu cine. Tu mundo.</h1><p>Descubre películas y comparte una función con tus amigos desde cualquier lugar.</p><button onclick="document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'})">Explorar películas</button></section>
 <main>
 <section class="section" id="catalogo"><h2>Películas</h2><div class="grid" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
@@ -52,6 +54,8 @@ footer{padding:28px 5%;border-top:1px solid #222;color:#777;font-size:12px}
 </main>
 <footer>© 2026 Apoloprimer · Publica únicamente películas que tengas derecho a distribuir.</footer>
 <div class="modal hidden" id="authModal"><div class="modal-card"><h2 id="authTitle">Entrar</h2><label>Correo electrónico<input id="authEmail" type="email" autocomplete="email"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password"></label><div class="uploadrow"><button id="authSubmit">Entrar</button><button class="secondary" id="authToggle">Crear cuenta</button><button class="secondary" id="authClose">Cerrar</button></div><p class="muted small" id="authStatus"></p></div></div>
+
+<div class="modal hidden" id="accountModal"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">Mi cuenta</h2><button class="secondary" id="accountClose">Cerrar</button></div><div class="account-tabs"><button class="active" id="profileTab">Perfil</button><button class="secondary" id="settingsTab">Ajustes</button></div><section id="profileSection"><div class="profile-card"><div class="avatar" id="profileAvatar">A</div><div><b id="profileEmail">Usuario</b><div class="muted small">Tu cuenta de Apoloprimer</div></div></div><label>Nombre visible<input id="profileName" maxlength="40" placeholder="Cómo te llamas"></label><label>Nombre de usuario<input id="profileUsername" maxlength="24" placeholder="tu_usuario"></label><label>Biografía<input id="profileBio" maxlength="120" placeholder="Cuéntanos algo sobre ti"></label><label>Foto de perfil (URL de imagen)<input id="profileAvatarUrl" type="url" placeholder="https://..."></label><div class="uploadrow"><button id="saveProfile">Guardar perfil</button></div><p class="muted small" id="profileStatus"></p></section><section id="settingsSection" class="hidden"><h3>Ajustes</h3><div class="settings-row"><span>Recibir novedades por correo</span><input id="settingEmails" type="checkbox"></div><div class="settings-row"><span>Idioma</span><b>Español</b></div><div class="settings-row"><span>Seguridad</span><span class="muted small">Contraseña protegida por Supabase</span></div><div class="uploadrow"><button id="saveSettings">Guardar ajustes</button><button class="secondary" id="signOutBtn">Cerrar sesión</button></div><p class="muted small" id="settingsStatus"></p></section></div></div>
 <div class="modal hidden" id="roomModal"><div class="modal-card"><h2 id="roomModalTitle">Crear sala</h2><label id="roomNameLabel">Nombre<input id="roomNameInput" placeholder="Noche de películas"></label><label id="roomCodeLabel" class="hidden">Código<input id="roomCodeInput" maxlength="8" placeholder="Código de invitación"></label><div class="uploadrow"><button id="roomModalSubmit">Continuar</button><button class="secondary" id="roomModalClose">Cancelar</button></div><p class="muted small" id="roomModalStatus"></p></div></div>
 <div id="player" class="hidden"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="playerTitle"></h3><button class="secondary" id="closePlayer">Cerrar</button></div><video id="soloPlayer" controls playsinline></video></div></div>
 <script type="module">
@@ -76,13 +80,27 @@ async function init(){
 async function refreshUser(){
  isAdmin=false;
  if(session){const {data}=await supabase.from('admins').select('user_id').eq('user_id',session.user.id).maybeSingle();isAdmin=!!data}
- $('authBtn').textContent=session?'Mi cuenta':'Entrar';
+ $('authBtn').textContent=session?'Cuenta':'Entrar';
+ $('profileBtn').classList.toggle('hidden',!session);
  $('adminPanel').classList.toggle('hidden',!isAdmin);
  if(session && isAdmin)$('authBtn').title='Administrador conectado';
+ if(session)populateAccount();
 }
+function populateAccount(){
+ const u=session.user,meta=u.user_metadata||{},name=meta.display_name||'',username=meta.username||'',bio=meta.bio||'',avatar=meta.avatar_url||'';
+ $('profileEmail').textContent=u.email||'Usuario';$('profileName').value=name;$('profileUsername').value=username;$('profileBio').value=bio;$('profileAvatarUrl').value=avatar;
+ $('profileAvatar').innerHTML=avatar?'<img alt="Foto de perfil" src="'+avatar.replace(/"/g,'&quot;')+'">':(name||u.email||'A').trim().charAt(0).toUpperCase();
+ $('settingEmails').checked=meta.email_updates!==false;
+}
+function openAccount(tab='profile'){if(!session){showAuth();return}populateAccount();showAccountTab(tab);$('accountModal').classList.remove('hidden')}
+function showAccountTab(tab){$('profileSection').classList.toggle('hidden',tab!=='profile');$('settingsSection').classList.toggle('hidden',tab!=='settings');$('profileTab').classList.toggle('active',tab==='profile');$('settingsTab').classList.toggle('active',tab==='settings');$('profileTab').classList.toggle('secondary',tab!=='profile');$('settingsTab').classList.toggle('secondary',tab!=='settings')}
+$('profileBtn').onclick=()=>openAccount('profile');$('accountClose').onclick=()=>$('accountModal').classList.add('hidden');$('profileTab').onclick=()=>showAccountTab('profile');$('settingsTab').onclick=()=>showAccountTab('settings');
+$('saveProfile').onclick=async()=>{if(!session)return;let username=$('profileUsername').value.trim().replace(/^@/,'');if(username&&!/^[a-zA-Z0-9_]{3,24}$/.test(username)){say('profileStatus','El usuario debe tener entre 3 y 24 caracteres: letras, números o _.');return}let avatar=$('profileAvatarUrl').value.trim();if(avatar&&!/^https:\/\//i.test(avatar)){say('profileStatus','La foto debe tener una dirección HTTPS válida.');return}const {data,error}=await supabase.auth.updateUser({data:{display_name:$('profileName').value.trim(),username,bio:$('profileBio').value.trim(),avatar_url:avatar}});if(error){say('profileStatus',error.message);return}session={...session,user:data.user};populateAccount();say('profileStatus','Perfil guardado correctamente.')};
+$('saveSettings').onclick=async()=>{const {data,error}=await supabase.auth.updateUser({data:{email_updates:$('settingEmails').checked}});if(error){say('settingsStatus',error.message);return}session={...session,user:data.user};say('settingsStatus','Ajustes guardados.')};
+$('signOutBtn').onclick=async()=>{await supabase.auth.signOut();$('accountModal').classList.add('hidden')};
 function showAuth(){authMode='login';$('authTitle').textContent='Entrar';$('authSubmit').textContent='Entrar';$('authToggle').textContent='Crear cuenta';$('authStatus').textContent='';$('authModal').classList.remove('hidden')}
 $('authBtn').onclick=()=>session?accountMenu():showAuth();
-async function accountMenu(){if(confirm('¿Quieres cerrar sesión?')){await supabase.auth.signOut()}}
+async function accountMenu(){openAccount('profile')}
 $('authToggle').onclick=()=>{authMode=authMode==='login'?'signup':'login';$('authTitle').textContent=authMode==='login'?'Entrar':'Crear cuenta';$('authSubmit').textContent=authMode==='login'?'Entrar':'Registrarme';$('authToggle').textContent=authMode==='login'?'Crear cuenta':'Ya tengo cuenta'};
 $('authClose').onclick=()=>$('authModal').classList.add('hidden');
 $('authSubmit').onclick=async()=>{if(!supabase)return;let email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||password.length<8){say('authStatus','Escribe un correo y una contraseña de al menos 8 caracteres.');return}let r=authMode==='login'?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password});say('authStatus',r.error?.message||'Listo. Revisa tu correo si se solicita confirmación.');if(!r.error && authMode==='login')$('authModal').classList.add('hidden')};
