@@ -879,6 +879,14 @@ footer{margin-top:35px}
  #player .cinema-center button:nth-child(3){width:48px!important;height:48px!important}
  #player .cinema-center .big-play{width:72px!important;height:72px!important}
 }
+
+/* Ajuste solicitado: los tres controles centrales a la altura de la marca blanca */
+@media (max-width:900px), (orientation:portrait){
+ #player .cinema-center{
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+ }
+}
 </style>
 </head>
 <body>
