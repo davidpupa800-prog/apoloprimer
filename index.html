@@ -211,6 +211,35 @@ footer{margin-top:35px}
  #player .cinema-toolbar{padding-top:12px}
  #player .cinema-toolbar button{height:44px}
 }
+
+/* Ajuste fino de cabecera y proporciones — revisión visual */
+#player .cinema-top{align-items:center;gap:clamp(10px,2vw,24px)}
+#player .cinema-heading{flex:1 1 auto;min-width:0;gap:clamp(10px,1.4vw,20px)}
+#player .cinema-titleblock{flex:0 1 auto;min-width:0;max-width:min(42vw,520px)}
+#player .cinema-titleline{display:flex;align-items:center;gap:12px;min-width:0}
+#player .cinema-titleline b{display:block;flex:0 1 auto;min-width:0;max-width:min(34vw,390px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#player .cinema-hd{flex:0 0 auto}
+#player .cinema-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#player .cinema-actions{flex:0 0 auto;gap:clamp(7px,.8vw,12px)}
+#player .cinema-actions button{flex:0 0 52px}
+#player .cinema-progress{grid-template-columns:auto minmax(0,1fr) auto}
+@media(max-width:760px){
+ #player .cinema-top{gap:6px}
+ #player .cinema-heading{gap:7px}
+ #player .cinema-titleblock{max-width:34vw}
+ #player .cinema-titleline{gap:6px}
+ #player .cinema-titleline b{max-width:22vw;font-size:15px}
+ #player .cinema-meta{font-size:9px;white-space:nowrap}
+ #player .cinema-actions{gap:3px}
+ #player .cinema-actions button{flex-basis:32px;width:32px;height:32px;padding:7px}
+ #player .cinema-actions svg{width:17px;height:17px}
+}
+@media(orientation:landscape) and (max-height:520px){
+ #player .cinema-top{align-items:center}
+ #player .cinema-titleblock{max-width:42vw}
+ #player .cinema-titleline b{max-width:32vw}
+}
+
 </style>
 </head>
 <body>
