@@ -1001,25 +1001,29 @@ footer{margin-top:35px}
 #player.video-stretched #soloPlayer{object-fit:fill!important}
 #player #stretchPlayer[aria-pressed="true"]{border-color:rgba(255,65,88,.9)!important;box-shadow:0 0 16px rgba(229,9,20,.38),inset 0 1px 1px rgba(255,255,255,.34)!important}
 
-/* Logotipo APOLOPRIMER: aparece letra por letra como la referencia */
-#apoloSplash{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .55s ease,visibility .55s ease}
+/* APOLOPRIMER — entrada épica, letra por letra */
+#apoloSplash{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .7s ease,visibility .7s ease}
 #apoloSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
-#apoloSplash .splash-stage{display:flex;align-items:center;justify-content:center;width:100%;min-height:100%;overflow:hidden}
-#apoloSplash .splash-word{display:flex;align-items:baseline;justify-content:center;white-space:nowrap;color:#e50914;font-family:"Arial Narrow","Roboto Condensed",Impact,sans-serif;font-size:clamp(52px,14vw,116px);font-stretch:condensed;font-weight:900;letter-spacing:-.045em;line-height:1;color:#E50914;text-shadow:0 0 14px rgba(229,9,20,.16)}
-#apoloSplash .splash-letter{display:inline-block;opacity:0;transform:scaleX(.35) scaleY(.92);transform-origin:center bottom;animation:apoloLetterIn .22s cubic-bezier(.2,.8,.2,1) forwards}
-#apoloSplash .splash-letter:first-child{font-size:1.12em;animation-delay:.12s}
-#apoloSplash .splash-letter:nth-child(2){animation-delay:.34s}
-#apoloSplash .splash-letter:nth-child(3){animation-delay:.49s}
-#apoloSplash .splash-letter:nth-child(4){animation-delay:.64s}
-#apoloSplash .splash-letter:nth-child(5){animation-delay:.79s}
-#apoloSplash .splash-letter:nth-child(6){animation-delay:.94s}
-#apoloSplash .splash-letter:nth-child(7){animation-delay:1.09s}
-#apoloSplash .splash-letter:nth-child(8){animation-delay:1.24s}
-#apoloSplash .splash-letter:nth-child(9){animation-delay:1.39s}
-#apoloSplash .splash-letter:nth-child(10){animation-delay:1.54s}
-#apoloSplash .splash-letter:nth-child(11){animation-delay:1.69s}
-@keyframes apoloLetterIn{0%{opacity:0;transform:scaleX(.35) scaleY(.92)}100%{opacity:1;transform:scaleX(1) scaleY(1)}}
-@media(prefers-reduced-motion:reduce){#apoloSplash .splash-letter{animation:none;opacity:1;transform:none}#apoloSplash{transition:none}}</style>
+#apoloSplash .splash-stage{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;width:100%;min-height:100%;overflow:hidden}
+#apoloSplash .splash-stage:before{content:"";position:absolute;z-index:-1;left:-65%;top:50%;width:48%;height:160%;background:linear-gradient(90deg,transparent,rgba(229,9,20,.12),rgba(255,30,48,.9),rgba(255,255,255,.95),rgba(229,9,20,.35),transparent);filter:blur(13px);transform:translateY(-50%) skewX(-20deg);opacity:0;animation:apoloRedSweep 1.15s cubic-bezier(.2,.7,.2,1) 1.95s forwards}
+#apoloSplash .splash-stage:after{content:"";position:absolute;z-index:-2;width:min(78vw,850px);height:190px;border-radius:50%;background:radial-gradient(ellipse,rgba(229,9,20,.22),rgba(150,0,12,.08) 42%,transparent 72%);filter:blur(24px);opacity:0;animation:apoloHalo 1.1s ease-out 2.15s forwards}
+#apoloSplash .splash-word{display:flex;align-items:baseline;justify-content:center;white-space:nowrap;color:#E50914;font-family:"Arial Narrow","Roboto Condensed",Impact,sans-serif;font-size:clamp(52px,14vw,116px);font-stretch:condensed;font-weight:900;letter-spacing:-.045em;line-height:1;text-shadow:0 0 14px rgba(229,9,20,.16);transform:perspective(800px)}
+#apoloSplash .splash-letter{display:inline-block;opacity:0;transform:translateY(24px) rotateX(-65deg) scale(.72);transform-origin:center bottom;filter:blur(9px);animation:apoloEpicLetter .48s cubic-bezier(.16,1,.3,1) forwards}
+#apoloSplash .splash-letter:first-child{font-size:1.12em;animation-delay:.18s}
+#apoloSplash .splash-letter:nth-child(2){animation-delay:.43s}
+#apoloSplash .splash-letter:nth-child(3){animation-delay:.62s}
+#apoloSplash .splash-letter:nth-child(4){animation-delay:.81s}
+#apoloSplash .splash-letter:nth-child(5){animation-delay:1s}
+#apoloSplash .splash-letter:nth-child(6){animation-delay:1.19s}
+#apoloSplash .splash-letter:nth-child(7){animation-delay:1.38s}
+#apoloSplash .splash-letter:nth-child(8){animation-delay:1.57s}
+#apoloSplash .splash-letter:nth-child(9){animation-delay:1.76s}
+#apoloSplash .splash-letter:nth-child(10){animation-delay:1.95s}
+#apoloSplash .splash-letter:nth-child(11){animation-delay:2.14s}
+@keyframes apoloEpicLetter{0%{opacity:0;transform:translateY(24px) rotateX(-65deg) scale(.72);filter:blur(9px);text-shadow:0 0 35px #E50914}65%{opacity:1;filter:blur(0);text-shadow:0 0 22px rgba(229,9,20,.65)}100%{opacity:1;transform:translateY(0) rotateX(0) scale(1);filter:blur(0);text-shadow:0 0 10px rgba(229,9,20,.2)}}
+@keyframes apoloRedSweep{0%{left:-65%;opacity:0}18%{opacity:1}100%{left:125%;opacity:0}}
+@keyframes apoloHalo{0%{opacity:0;transform:scale(.55)}45%{opacity:1}100%{opacity:.55;transform:scale(1.25)}}
+@media(prefers-reduced-motion:reduce){#apoloSplash .splash-letter{animation:none;opacity:1;transform:none;filter:none}#apoloSplash .splash-stage:before,#apoloSplash .splash-stage:after{display:none}#apoloSplash{transition:none}}</style>
 </head>
 <body>
 <div id="apoloSplash" role="status" aria-label="APOLOPRIMER">
@@ -1323,7 +1327,7 @@ function sendChat(){let t=$('chatInput').value.trim();if(!t||!roomChannel)return
 $('leaveRoomBtn').onclick=async()=>{if(roomChannel)await supabase.removeChannel(roomChannel);roomChannel=null;room=null;$('roomPlayer').pause();$('roomPlayer').removeAttribute('src');$('roomShell').classList.add('hidden')};
 // Mostrar la identidad de APOLOPRIMER al entrar y retirarla al terminar la animación.
 const apoloSplash=document.getElementById('apoloSplash');
-if(apoloSplash){window.setTimeout(()=>apoloSplash.classList.add('is-leaving'),3000);window.setTimeout(()=>apoloSplash.remove(),3550);}
+if(apoloSplash){window.setTimeout(()=>apoloSplash.classList.add('is-leaving'),3650);window.setTimeout(()=>apoloSplash.remove(),4350);}
 init();
 </script>
 </body></html>
