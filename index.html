@@ -72,6 +72,23 @@ main{padding:0 2.5% 60px}.stream-section{margin:20px 0 34px}.section-heading{dis
 footer{margin-top:35px}
 @media(min-width:900px){.movie-rail .movie{flex-basis:190px}.movie-rail .poster{height:275px}.stream-hero{min-height:570px}}
 @media(max-width:650px){.stream-header{height:64px;padding:0 4%;gap:10px}.stream-header .logo{font-size:18px}.brand-mark{font-size:29px}.stream-header nav{display:none}.header-actions .icon-action{display:none}.account-chip{max-width:155px;padding:5px 9px 5px 5px;gap:7px}.account-chip-avatar{width:34px;height:34px}.account-chip-name{font-size:13px}.stream-hero{min-height:500px;padding:35px 5% 56px}.hero-content h1{font-size:42px}.hero-content p{font-size:15px}.hero-meta{display:none}main{padding:0 4% 50px}.movie-rail .movie{flex-basis:145px}.movie-rail .poster{height:210px}.section-heading .muted{display:none}}
+
+#player{position:fixed;inset:0;background:#000;z-index:50;display:flex;align-items:center;justify-content:center;padding:0}
+#player .cinema-player{position:relative;width:100%;height:100%;background:#000;overflow:hidden;color:#fff}
+#player #soloPlayer{width:100%;height:100%;max-height:none;object-fit:contain;background:#000}
+.cinema-top,.cinema-center,.cinema-bottom{position:absolute;left:0;right:0;display:flex;align-items:center;z-index:2}
+.cinema-top{top:0;padding:max(16px,env(safe-area-inset-top)) 16px 16px;background:linear-gradient(#000c,transparent);justify-content:space-between;gap:10px}
+.cinema-top b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cinema-actions{display:flex;gap:8px}.cinema-actions button,.cinema-center button,.cinema-toolbar button{background:#222b;border:1px solid #7777;color:white;border-radius:24px;padding:9px 12px}
+.cinema-center{top:50%;transform:translateY(-50%);justify-content:center;gap:clamp(22px,8vw,90px);pointer-events:none}
+.cinema-center button{pointer-events:auto;background:#1119;border:0;font-size:18px}.cinema-center .big-play{font-size:30px;width:64px;height:64px;border-radius:50%}
+.cinema-bottom{bottom:0;display:block;padding:45px 16px max(18px,env(safe-area-inset-bottom));background:linear-gradient(transparent,#000e)}
+.cinema-progress{display:flex;align-items:center;gap:12px;font-size:12px}.cinema-progress input{flex:1;accent-color:#e50914;min-width:0}
+.cinema-toolbar{display:flex;gap:8px;overflow-x:auto;padding-top:12px;align-items:center}.cinema-toolbar button{white-space:nowrap;font-size:12px}
+.brightness-control{display:flex;align-items:center;gap:5px;white-space:nowrap}.brightness-control input{width:75px;accent-color:#e50914}
+.cinema-message{font-size:12px;color:#ddd;padding-top:6px;min-height:18px}
+#player.controls-locked .cinema-top,#player.controls-locked .cinema-bottom,#player.controls-locked .cinema-center{opacity:0;pointer-events:none}
+@media(orientation:portrait){.cinema-toolbar button{font-size:11px;padding:8px}.cinema-actions{gap:4px}.cinema-actions button{padding:8px}.cinema-center{gap:22px}}
 </style>
 </head>
 <body>
@@ -110,7 +127,13 @@ footer{margin-top:35px}
 
 <div class="modal hidden" id="accountModal"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">Mi cuenta</h2><button class="secondary" id="accountClose">Cerrar</button></div><div class="account-tabs"><button class="active" id="profileTab">Perfil</button><button class="secondary" id="settingsTab">Ajustes</button></div><section id="profileSection"><div class="profile-card"><div class="avatar" id="profileAvatar">A</div><div><b id="profileEmail">Usuario</b><div class="muted small">Tu cuenta de Apoloprimer</div></div></div><label>Nombre visible<input id="profileName" maxlength="40" placeholder="Cómo te llamas"></label><label>Nombre de usuario<input id="profileUsername" maxlength="24" placeholder="tu_usuario"></label><label>Biografía<input id="profileBio" maxlength="120" placeholder="Cuéntanos algo sobre ti"></label><label>Foto de perfil<input id="profileAvatarFile" type="file" accept="image/jpeg,image/png,image/webp"></label><div class="muted small">JPG, PNG o WebP · máximo 5 MB</div><div style="display:flex;align-items:center;gap:14px;margin-top:12px"><div class="avatar-preview" id="avatarCropPreview"><span style="display:grid;place-items:center;height:100%;color:#aaa">Vista previa</span></div><div class="crop-controls" style="flex:1"><label>Horizontal<input id="avatarX" type="range" min="0" max="100" value="50"></label><label>Vertical<input id="avatarY" type="range" min="0" max="100" value="50"></label></div></div><div class="muted small">Mueve los controles para centrar tu rostro o ajustar el encuadre.</div><div class="uploadrow"><button id="saveProfile">Guardar perfil</button></div><p class="muted small" id="profileStatus"></p></section><section id="settingsSection" class="hidden"><h3>Ajustes</h3><div class="settings-row"><span>Recibir novedades por correo</span><input id="settingEmails" type="checkbox"></div><div class="settings-row"><span>Idioma</span><b>Español</b></div><div class="settings-row"><span>Seguridad</span><span class="muted small">Contraseña protegida por Supabase</span></div><div class="uploadrow"><button id="saveSettings">Guardar ajustes</button><button class="secondary" id="signOutBtn">Cerrar sesión</button></div><p class="muted small" id="settingsStatus"></p></section></div></div>
 <div class="modal hidden" id="roomModal"><div class="modal-card"><h2 id="roomModalTitle">Crear sala</h2><label id="roomNameLabel">Nombre<input id="roomNameInput" placeholder="Noche de películas"></label><label id="roomCodeLabel" class="hidden">Código<input id="roomCodeInput" maxlength="8" placeholder="Código de invitación"></label><div class="uploadrow"><button id="roomModalSubmit">Continuar</button><button class="secondary" id="roomModalClose">Cancelar</button></div><p class="muted small" id="roomModalStatus"></p></div></div>
-<div id="player" class="hidden"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="playerTitle"></h3><button class="secondary" id="closePlayer">Cerrar</button></div><video id="soloPlayer" controls playsinline></video></div></div>
+<div id="player" class="hidden"><div class="cinema-player" id="cinemaPlayer">
+ <video id="soloPlayer" playsinline preload="metadata"></video>
+ <div class="cinema-top"><b id="playerTitle"></b><div class="cinema-actions"><button id="rateDown" title="No me gusta">👎</button><button id="rateUp" title="Me gusta">👍</button><button id="pipPlayer" title="Ventana flotante">▣</button><button id="lockPlayer" title="Bloquear controles">♙</button><button id="closePlayer" title="Cerrar">✕</button></div></div>
+ <div class="cinema-center"><button id="seekBack" title="Retroceder 10 segundos">↶ 10</button><button id="togglePlayback" class="big-play" title="Reproducir o pausar">Ⅱ</button><button id="seekForward" title="Avanzar 10 segundos">10 ↷</button></div>
+ <div class="cinema-bottom"><div class="cinema-progress"><input id="playerProgress" type="range" min="0" max="1000" value="0" aria-label="Progreso"><span id="playerTime">0:00 / 0:00</span></div>
+ <div class="cinema-toolbar"><label class="brightness-control">☼ <input id="playerBrightness" type="range" min="50" max="130" value="100" aria-label="Brillo"></label><button id="clipPlayer">▱ Recortar</button><button id="speedPlayer">Velocidad 1×</button><button id="episodesPlayer">Episodios</button><button id="audioPlayer">Audio y subtítulos</button><button id="nextPlayer">Próximo episodio ▷</button><button id="fullscreenPlayer">⛶ Pantalla completa</button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div></div>
+ </div></div>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -210,8 +233,32 @@ function updateFeatured(m){if(!m){$('featuredTitle').textContent='Tu cine. Tu mu
 }
 $('searchJump').onclick=()=>{showScreen('search');$('catalogSearch').focus()};
 
-function openMovie(m){$('playerTitle').textContent=m.title;$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden');$('soloPlayer').play().catch(()=>{})}
-$('closePlayer').onclick=()=>{$('soloPlayer').pause();$('soloPlayer').removeAttribute('src');$('player').classList.add('hidden')};
+
+let activeMovie=null,playerLocked=false;
+const solo=$('soloPlayer'),playerRoot=$('player');
+function playerSay(msg){$('playerMessage').textContent=msg}
+function fmtTime(s){if(!Number.isFinite(s))return '0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
+function syncPlayerUI(){const d=solo.duration||0,t=solo.currentTime||0;$('playerProgress').value=d?Math.round(t/d*1000):0;$('playerTime').textContent=fmtTime(t)+' / '+fmtTime(d);$('togglePlayback').textContent=solo.paused?'▶':'Ⅱ'}
+function closeCinema(){solo.pause();solo.removeAttribute('src');solo.load();playerRoot.classList.add('hidden');playerRoot.classList.remove('controls-locked');playerLocked=false;activeMovie=null}
+$('togglePlayback').onclick=()=>solo.paused?solo.play().catch(()=>playerSay('No se pudo iniciar la reproducción.')):solo.pause();
+$('seekBack').onclick=()=>solo.currentTime=Math.max(0,(solo.currentTime||0)-10);
+$('seekForward').onclick=()=>solo.currentTime=Math.min(solo.duration||Infinity,(solo.currentTime||0)+10);
+$('playerProgress').oninput=e=>{if(solo.duration)solo.currentTime=solo.duration*(Number(e.target.value)/1000)};
+solo.addEventListener('timeupdate',syncPlayerUI);solo.addEventListener('play',syncPlayerUI);solo.addEventListener('pause',syncPlayerUI);solo.addEventListener('loadedmetadata',syncPlayerUI);
+$('playerBrightness').oninput=e=>solo.style.filter='brightness('+e.target.value+'%)';
+$('speedPlayer').onclick=()=>{const speeds=[0.5,0.75,1,1.25,1.5,2],i=speeds.indexOf(solo.playbackRate),v=speeds[(i+1)%speeds.length];solo.playbackRate=v;$('speedPlayer').textContent='Velocidad '+v+'×'};
+$('pipPlayer').onclick=async()=>{try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else if(document.pictureInPictureEnabled)await solo.requestPictureInPicture();else playerSay('Este navegador no permite ventana flotante.')}catch(e){playerSay('No se pudo abrir la ventana flotante.')}};
+$('fullscreenPlayer').onclick=async()=>{try{if(!document.fullscreenElement)await playerRoot.requestFullscreen();else await document.exitFullscreen()}catch(e){playerSay('Pantalla completa no disponible en este navegador.')}};
+$('lockPlayer').onclick=()=>{playerLocked=!playerLocked;playerRoot.classList.toggle('controls-locked',playerLocked);playerSay(playerLocked?'Controles bloqueados. Toca el video para desbloquear.':'Controles desbloqueados.')};
+$('cinemaPlayer').addEventListener('click',e=>{if(playerLocked&&e.target===solo){playerLocked=false;playerRoot.classList.remove('controls-locked');playerSay('Controles desbloqueados.')}});
+function rateMovie(v){if(!activeMovie)return;localStorage.setItem('apoloRating:'+activeMovie.id,String(v));playerSay(v>0?'Marcaste que te gusta.':'Marcaste que no te gusta.')}
+$('rateUp').onclick=()=>rateMovie(1);$('rateDown').onclick=()=>rateMovie(-1);
+$('clipPlayer').onclick=()=>playerSay('Para recortar un fragmento necesitamos habilitar una herramienta de edición; la película original no se modificará.');
+$('episodesPlayer').onclick=()=>playerSay('Esta película no tiene episodios asociados.');
+$('nextPlayer').onclick=()=>playerSay('No hay un próximo episodio asociado a esta película.');
+$('audioPlayer').onclick=()=>{const tracks=solo.textTracks;if(!tracks||!tracks.length){playerSay('Este archivo no incluye pistas de subtítulos seleccionables.');return}let i=[...tracks].findIndex(t=>t.mode==='showing');tracks.forEach(t=>t.mode='disabled');const next=(i+1)%tracks.length;tracks[next].mode='showing';playerSay('Subtítulos: '+(tracks[next].label||tracks[next].language||'Pista '+(next+1)))};
+function openMovie(m){activeMovie=m;$('playerTitle').textContent=m.title;$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI()}
+$('closePlayer').onclick=closeCinema;
 $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
  let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0];if(!title||!vf){say('uploadStatus','Agrega título y archivo de video.');return}
