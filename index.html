@@ -135,7 +135,7 @@ async function refreshUser(){
  if(session){const {data}=await supabase.from('admins').select('user_id').eq('user_id',session.user.id).maybeSingle();isAdmin=!!data}
  updateHeaderAccount();
  $('adminPanel').classList.toggle('hidden',!isAdmin);
- if(session && isAdmin)$('authBtn').title='Administrador conectado';
+ if(session && isAdmin)$('accountChip').title='Administrador conectado';
  if(session)populateAccount();
 }
 function updateHeaderAccount(){
@@ -173,7 +173,6 @@ $('saveProfile').onclick=async()=>{if(!session)return;let username=$('profileUse
 $('saveSettings').onclick=async()=>{const {data,error}=await supabase.auth.updateUser({data:{email_updates:$('settingEmails').checked}});if(error){say('settingsStatus',error.message);return}session={...session,user:data.user};say('settingsStatus','Ajustes guardados.')};
 $('signOutBtn').onclick=async()=>{await supabase.auth.signOut();$('accountModal').classList.add('hidden')};
 function showAuth(){authMode='login';$('authTitle').textContent='Entrar';$('authSubmit').textContent='Entrar';$('authToggle').textContent='Crear cuenta';$('authStatus').textContent='';$('authModal').classList.remove('hidden')}
-$('authBtn').onclick=()=>session?accountMenu():showAuth();
 async function accountMenu(){openAccount('profile')}
 $('authToggle').onclick=()=>{authMode=authMode==='login'?'signup':'login';$('authTitle').textContent=authMode==='login'?'Entrar':'Crear cuenta';$('authSubmit').textContent=authMode==='login'?'Entrar':'Registrarme';$('authToggle').textContent=authMode==='login'?'Crear cuenta':'Ya tengo cuenta'};
 $('authClose').onclick=()=>$('authModal').classList.add('hidden');
