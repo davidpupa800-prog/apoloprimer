@@ -579,6 +579,21 @@ footer{margin-top:35px}
  .cinema-toolbar{gap:7px;padding-top:7px}
  .cinema-toolbar button{padding:8px 10px;font-size:11px}
 }
+
+/* Referencia oficial: alineación horizontal, cristal suave y controles táctiles */
+#player .cinema-center{top:43%!important;width:min(28vw,430px)!important;max-width:calc(100% - 250px)!important;justify-content:space-between!important;align-items:center!important}
+#player .side-control{top:43%!important;transform:translateY(-50%)!important}
+#player .cinema-center .big-play{
+ background:radial-gradient(circle at 34% 22%,rgba(255,255,255,.18),transparent 46%),linear-gradient(145deg,rgba(39,37,47,.72),rgba(10,10,18,.78))!important;
+ border:1.5px solid rgba(255,105,128,.82)!important;
+ box-shadow:0 0 0 4px rgba(229,9,20,.09),0 0 15px rgba(255,35,70,.34),0 0 30px rgba(229,9,20,.18),inset 0 0 18px rgba(229,9,20,.10),inset 0 1px rgba(255,255,255,.34)!important;
+}
+#player .cinema-center .big-play:hover{box-shadow:0 0 0 4px rgba(229,9,20,.12),0 0 20px rgba(255,35,70,.42),0 0 36px rgba(229,9,20,.22),inset 0 0 20px rgba(229,9,20,.13)!important}
+#player .cinema-center button:not(.big-play){background:linear-gradient(145deg,rgba(39,40,49,.72),rgba(8,9,16,.78))!important}
+#player .cinema-top,#player .cinema-center,#player .cinema-bottom,#player .side-control{transition:opacity .22s ease,visibility .22s ease!important}
+#player.controls-hidden .cinema-top,#player.controls-hidden .cinema-center,#player.controls-hidden .cinema-bottom,#player.controls-hidden .side-control{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+@media(max-width:760px){#player .cinema-center{width:min(44vw,300px)!important;max-width:calc(100% - 100px)!important;top:43%!important}#player .side-control{top:43%!important}}
+@media(orientation:landscape) and (max-height:600px){#player .cinema-center{width:min(28vw,330px)!important;max-width:calc(100% - 100px)!important;top:43%!important}#player .side-control{top:43%!important}}
 </style>
 </head>
 <body>
@@ -750,10 +765,8 @@ playerRoot.addEventListener('click',e=>{
  if(onControl){showPlayerControls();return}
  if(playerLocked){playerLocked=false;playerRoot.classList.remove('controls-locked');showPlayerControls();return}
  if(playerRoot.classList.contains('controls-hidden'))showPlayerControls();
- else if(!solo.paused){clearTimeout(playerHideTimer);playerRoot.classList.add('controls-hidden')}
- else showPlayerControls();
+ else {clearTimeout(playerHideTimer);playerRoot.classList.add('controls-hidden')}
 });
-solo.addEventListener('click',e=>{e.stopPropagation()});
 $('togglePlayback').onclick=()=>{if(solo.paused)solo.play().catch(()=>playerSay('No se pudo iniciar la reproducción.'));else solo.pause();showPlayerControls()};
 $('seekBack').onclick=()=>{solo.currentTime=Math.max(0,(solo.currentTime||0)-10);showPlayerControls()};
 $('seekForward').onclick=()=>{solo.currentTime=Math.min(solo.duration||Infinity,(solo.currentTime||0)+10);showPlayerControls()};
