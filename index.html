@@ -42,7 +42,7 @@ footer{padding:28px 5%;border-top:1px solid #222;color:#777;font-size:12px}
 <section class="section" id="salas"><div class="room-banner"><div><h2 style="margin:0">Salas privadas</h2><p class="muted" style="margin:5px 0 0">Crea una sala y comparte su código de invitación.</p></div><div class="uploadrow"><button id="createRoomBtn">＋ Crear sala</button><button class="secondary" id="joinRoomBtn">Unirme con código</button></div></div>
  <div class="room-shell hidden" id="roomShell">
   <div class="room-video"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><h3 id="roomName" style="margin:0">Sala</h3><div class="muted small">Código: <b id="roomCode"></b></div></div><button class="secondary" id="leaveRoomBtn">Salir</button></div>
-   <video id="roomPlayer" controls playsinline></video><div class="room-tools"><button id="playAllBtn">▶ Reproducir para todos</button><button class="secondary" id="pauseAllBtn">Ⅱ Pausar para todos</button><button class="secondary" id="backBtn">↶ 10 s</button><button class="secondary" id="forwardBtn">10 s ↷</button></div>
+   <video id="roomPlayer" playsinline></video><div class="room-tools"><button id="playAllBtn">▶ Reproducir para todos</button><button class="secondary" id="pauseAllBtn">Ⅱ Pausar para todos</button><button class="secondary" id="backBtn">↶ 10 s</button><button class="secondary" id="forwardBtn">10 s ↷</button></div>
    <p class="muted small" id="syncStatus">La sala se sincroniza en tiempo real.</p>
    <label>Película de la sala<select id="roomMovie"><option value="">Selecciona una película</option></select></label>
   </div>
@@ -122,7 +122,7 @@ $('roomModalSubmit').onclick=async()=>{
  $('roomModal').classList.add('hidden');
 };
 async function enterRoom(r){
- if(roomChannel)await supabase.removeChannel(roomChannel);room=r;$('roomName').textContent=r.name;$('roomCode').textContent=r.code;$('roomShell').classList.remove('hidden');$('chatMessages').innerHTML='';
+ if(roomChannel)await supabase.removeChannel(roomChannel);room=r;$('roomPlayer').controls=false;$('roomName').textContent=r.name;$('roomCode').textContent=r.code;$('roomShell').classList.remove('hidden');$('chatMessages').innerHTML='';
  roomChannel=supabase.channel('room-'+r.code,{config:{broadcast:{self:false},presence:{key:session.user.id}}});
  roomChannel.on('broadcast',{event:'chat'},({payload})=>addChat(payload.name,payload.text,false));
  roomChannel.on('broadcast',{event:'control'},({payload})=>applyControl(payload,false));
