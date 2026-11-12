@@ -423,6 +423,54 @@ footer{margin-top:35px}
  #player .cinema-toolbar button{height:40px!important;font-size:clamp(8px,1.7vh,11px)!important;padding:0 7px!important}
 }
 
+
+/* Acabado visual de referencia: cristal ahumado, transparencia y rojo neón */
+#player .cinema-player{background:#02030a!important}
+#player .cinema-top{background:linear-gradient(180deg,rgba(3,4,12,.48),rgba(3,4,12,.10) 72%,transparent)!important}
+#player .cinema-back,
+#player .cinema-actions button,
+#player .side-control,
+#player .cinema-center button,
+#player .cinema-progress,
+#player .cinema-toolbar button{
+ background-color:rgba(16,17,28,.36)!important;
+ -webkit-backdrop-filter:blur(22px) saturate(155%)!important;
+ backdrop-filter:blur(22px) saturate(155%)!important;
+ border-color:rgba(225,230,255,.25)!important;
+ box-shadow:0 8px 28px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.045)!important;
+}
+#player .cinema-back,
+#player .cinema-actions button,
+#player .cinema-center button,
+#player .cinema-toolbar button{
+ background-image:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.025) 48%,rgba(7,8,18,.30))!important;
+}
+#player .cinema-back{box-shadow:0 0 18px rgba(229,9,20,.28),inset 0 1px rgba(255,255,255,.24)!important}
+#player .cinema-actions button:hover,
+#player .cinema-back:hover,
+#player .cinema-toolbar button:hover{
+ border-color:rgba(255,75,101,.9)!important;
+ box-shadow:0 0 20px rgba(229,9,20,.48),0 7px 24px rgba(0,0,0,.38),inset 0 0 16px rgba(229,9,20,.13)!important;
+}
+#player .cinema-hd{background:rgba(65,0,14,.24)!important;color:#ff2948!important;border-color:#ed1834!important;text-shadow:0 0 10px rgba(255,25,62,.55)!important}
+#player .cinema-center button{border-color:rgba(255,255,255,.32)!important}
+#player .cinema-center .big-play{
+ background:radial-gradient(circle at 35% 22%,rgba(255,255,255,.20),transparent 43%),linear-gradient(145deg,rgba(65,20,34,.68),rgba(10,8,18,.62))!important;
+ border:1.5px solid rgba(255,91,116,.95)!important;
+ box-shadow:0 0 0 5px rgba(229,9,20,.14),0 0 18px rgba(255,18,58,.56),0 0 42px rgba(229,9,20,.34),inset 0 0 25px rgba(229,9,20,.23),inset 0 1px rgba(255,255,255,.35)!important;
+}
+#player .cinema-center .big-play:hover{box-shadow:0 0 0 6px rgba(229,9,20,.2),0 0 25px rgba(255,18,58,.78),0 0 52px rgba(229,9,20,.48),inset 0 0 30px rgba(229,9,20,.3)!important}
+#player .side-control{background:linear-gradient(180deg,rgba(31,31,46,.48),rgba(9,10,20,.38))!important;border-color:rgba(255,255,255,.24)!important}
+#player .side-control input{accent-color:#ff1744!important;filter:drop-shadow(0 0 5px rgba(255,0,48,.55))}
+#player .cinema-progress{background:linear-gradient(100deg,rgba(34,35,48,.48),rgba(10,11,20,.38))!important;border-color:rgba(255,255,255,.28)!important}
+#player .cinema-progress input{accent-color:#ff123f!important;filter:drop-shadow(0 0 6px rgba(255,0,48,.72))!important}
+#player .cinema-toolbar button{background-image:linear-gradient(155deg,rgba(255,255,255,.12),rgba(255,255,255,.025) 45%,rgba(8,9,18,.32))!important}
+#player .cinema-toolbar button:active,#player .cinema-actions button:active{background:linear-gradient(145deg,rgba(105,12,34,.62),rgba(16,9,20,.68))!important}
+#player .cinema-message{background:rgba(16,15,25,.72)!important;-webkit-backdrop-filter:blur(18px)!important;backdrop-filter:blur(18px)!important;border-color:rgba(255,255,255,.22)!important}
+@media(prefers-reduced-transparency:reduce){
+ #player .cinema-back,#player .cinema-actions button,#player .side-control,#player .cinema-center button,#player .cinema-progress,#player .cinema-toolbar button{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background-color:rgba(12,13,22,.9)!important}
+}
+
 </style>
 </head>
 <body>
