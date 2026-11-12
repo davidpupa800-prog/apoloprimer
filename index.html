@@ -598,6 +598,30 @@ footer{margin-top:35px}
 #player.controls-hidden .cinema-top,#player.controls-hidden .cinema-center,#player.controls-hidden .cinema-bottom,#player.controls-hidden .side-control{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 @media(max-width:760px){#player .cinema-center{width:min(58vw,390px)!important;max-width:calc(100% - 100px)!important;top:43%!important}#player .side-control{top:43%!important}}
 @media(orientation:landscape) and (max-height:600px){#player .cinema-center{width:min(42vw,430px)!important;max-width:calc(100% - 100px)!important;top:43%!important}#player .side-control{top:43%!important}}
+
+/* CRYSTAL GLASS — acabado translúcido real sobre el vídeo */
+#player .cinema-actions button,
+#player .cinema-center button:not(.big-play),
+#player .cinema-toolbar button,
+#player .cinema-back,
+#player .side-control,
+#player .cinema-progress{
+  background:rgba(25,29,43,.22)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(175%)!important;
+  backdrop-filter:blur(26px) saturate(175%)!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.20),inset 0 1px 1px rgba(255,255,255,.34),inset 0 -1px 1px rgba(255,255,255,.08)!important;
+}
+#player .cinema-center .big-play{
+  background:radial-gradient(circle at 32% 20%,rgba(255,255,255,.22),transparent 52%),rgba(25,28,40,.30)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(185%)!important;
+  backdrop-filter:blur(28px) saturate(185%)!important;
+  border:2px solid rgba(255,92,119,.82)!important;
+  box-shadow:0 0 0 4px rgba(229,9,20,.10),0 0 22px rgba(229,9,20,.24),inset 0 1px 2px rgba(255,255,255,.38),inset 0 -8px 18px rgba(229,9,20,.08)!important;
+}
+#player .side-control{background:rgba(25,29,43,.20)!important}
+#player .cinema-progress{background:rgba(25,29,43,.20)!important}
+#player .cinema-toolbar button:hover,#player .cinema-actions button:hover{background:rgba(70,75,95,.34)!important}
 </style>
 </head>
 <body>
