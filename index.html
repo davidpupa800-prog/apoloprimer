@@ -24,13 +24,46 @@ footer{padding:28px 5%;border-top:1px solid #222;color:#777;font-size:12px}
 @media(max-width:800px){nav{display:none}.room-shell{grid-template-columns:1fr}.chat-panel{min-height:300px}.chat-messages{max-height:220px}}
 
 .profile-card{display:flex;align-items:center;gap:12px;background:#202020;border:1px solid #383838;padding:12px;border-radius:8px;margin:12px 0}.avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#e50914,#761016);display:grid;place-items:center;font-size:22px;font-weight:900;overflow:hidden;flex:none}.avatar img{width:100%;height:100%;object-fit:cover;object-position:var(--avatar-x,50%) var(--avatar-y,50%)}.avatar-preview{width:110px;height:110px;border-radius:50%;overflow:hidden;background:#222;border:2px solid #555;flex:none}.avatar-preview img{width:100%;height:100%;object-fit:cover;object-position:var(--avatar-x,50%) var(--avatar-y,50%)}.crop-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}.crop-controls label{display:block}.crop-controls input{padding:0;accent-color:var(--red)}.account-tabs{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}.account-tabs button.active{background:var(--red)}.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #333}.settings-row input[type=checkbox]{width:auto;margin:0;accent-color:var(--red)}
+
+/* Apoloprimer streaming-inspired home */
+:root{--red:#e50914;--bg:#050505;--panel:#171717;--muted:#aaa;--line:#303030}
+body{background:#050505;font-family:Arial,sans-serif}
+.stream-header{height:72px;padding:0 4%;gap:30px;background:linear-gradient(180deg,#080808 0%,#080808ed 100%);border:0}
+.stream-header .logo{display:flex;align-items:center;gap:8px;font-size:23px;letter-spacing:-.8px;white-space:nowrap}
+.brand-mark{font-size:34px;color:#e50914;font-weight:900;line-height:1}
+.stream-header nav{display:flex;gap:22px}
+.stream-header nav a{font-size:14px;color:#ddd}.stream-header nav a.nav-active{color:#fff;font-weight:bold}
+.header-actions{display:flex;align-items:center;gap:9px}
+.header-actions .icon-action{font-size:27px;background:transparent;padding:5px 10px}
+.stream-hero{min-height:490px;position:relative;display:flex;align-items:flex-end;padding:55px 5% 60px;background:linear-gradient(90deg,#000 0%,#000c 35%,#0002 100%),linear-gradient(0deg,#050505 0%,transparent 48%),radial-gradient(ellipse at 70% 35%,#31535b,#101a20 45%,#090909 80%);background-size:cover;background-position:center;overflow:hidden}
+.stream-hero.has-poster{background-size:cover;background-position:center 28%}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(90deg,#000c 0%,#0007 42%,transparent 100%),linear-gradient(0deg,#050505 0%,transparent 55%)}
+.hero-content{position:relative;z-index:1;max-width:620px}
+.hero-content .eyebrow{font-size:12px;letter-spacing:3px;color:#eee;margin-bottom:12px}
+.hero-content h1{font-size:clamp(38px,6vw,66px);line-height:1.02;margin:0 0 15px;text-shadow:0 2px 15px #000}
+.hero-content p{font-size:17px;color:#eee;max-width:530px;margin:0 0 22px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}.hero-actions button{border-radius:7px;padding:13px 24px;font-size:16px}.hero-actions button:first-child{background:#fff;color:#111}.hero-meta{position:absolute;right:5%;bottom:70px;color:#eee;font-size:13px;z-index:1}
+main{padding:0 2.5% 60px}.stream-section{margin:20px 0 34px}.section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}.section-heading h2{font-size:21px;margin:0}
+.movie-rail{display:flex;gap:13px;overflow-x:auto;overflow-y:hidden;padding:2px 1px 14px;scroll-snap-type:x mandatory}
+.movie-rail .movie{flex:0 0 155px;scroll-snap-align:start;background:#171717;border-radius:5px;transition:transform .2s}
+.movie-rail .movie:hover{transform:scale(1.04);outline:0;z-index:2}
+.movie-rail .poster{height:225px;background-size:cover;background-position:center}
+.movie-rail .movie-info{padding:9px 10px 12px}.movie-rail .movie-info b{font-size:14px}
+.movie-rail .movie-info small{font-size:11px}
+.movie-rail .movie-info button{margin-top:9px;padding:6px 9px;font-size:11px;background:#333}
+#adminPanel{margin-top:35px}
+#salas{margin-top:45px}
+footer{margin-top:35px}
+@media(min-width:900px){.movie-rail .movie{flex-basis:190px}.movie-rail .poster{height:275px}.stream-hero{min-height:570px}}
+@media(max-width:650px){.stream-header{height:64px;padding:0 4%;gap:10px}.stream-header .logo{font-size:18px}.brand-mark{font-size:29px}.stream-header nav{display:none}.header-actions .icon-action{display:none}.stream-hero{min-height:500px;padding:35px 5% 56px}.hero-content h1{font-size:42px}.hero-content p{font-size:15px}.hero-meta{display:none}main{padding:0 4% 50px}.movie-rail .movie{flex-basis:145px}.movie-rail .poster{height:210px}.section-heading .muted{display:none}}
 </style>
 </head>
 <body>
-<header><div class="logo">APOLOPRIMER</div><nav><a href="#">Inicio</a><a href="#catalogo">Películas</a><a href="#salas">Salas privadas</a></nav><div class="right" style="display:flex;gap:8px"><button class="secondary" id="profileBtn">Mi perfil</button><button id="authBtn">Entrar</button></div></header>
-<section class="hero"><div class="eyebrow">APOLOPRIMER PRESENTA</div><h1>Tu cine. Tu mundo.</h1><p>Descubre películas y comparte una función con tus amigos desde cualquier lugar.</p><button onclick="document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'})">Explorar películas</button></section>
+<header class="stream-header"><div class="logo"><span class="brand-mark">A</span> APOLOPRIMER</div><nav><a class="nav-active" href="#">Inicio</a><a href="#catalogo">Películas</a><a href="#salas">Salas privadas</a></nav><div class="right header-actions"><button class="icon-action" id="searchJump" aria-label="Buscar">⌕</button><button class="secondary" id="profileBtn">Mi perfil</button><button id="authBtn">Entrar</button></div></header>
+<section class="stream-hero" id="featuredHero"><div class="hero-shade"></div><div class="hero-content"><div class="eyebrow">APOLOPRIMER ORIGINAL</div><h1 id="featuredTitle">Tu cine. Tu mundo.</h1><p id="featuredDescription">Descubre películas y comparte una función con tus amigos desde cualquier lugar.</p><div class="hero-actions"><button id="featuredPlay">▶ Reproducir</button><button class="secondary" id="featuredList">＋ Mi lista</button></div></div><div class="hero-meta">Películas · Series · Estrenos</div></section>
 <main>
-<section class="section" id="catalogo"><h2>Películas</h2><div class="grid" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
+<section class="section stream-section" id="catalogo"><div class="section-heading"><h2>Continuar viendo</h2><span class="muted small">Tu entretenimiento continúa aquí</span></div><div class="grid movie-rail" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
+<section class="section stream-section"><div class="section-heading"><h2>Mi lista</h2><span class="muted small">Tus favoritas</span></div><div class="grid movie-rail" id="myList"><div class="muted">Agrega películas a tu lista.</div></div></section>
 <section class="panel hidden" id="adminPanel">
  <h2>Panel de administración</h2><p class="muted small">Solo las cuentas autorizadas como administradoras pueden subir contenido.</p>
  <div class="formgrid">
@@ -112,10 +145,19 @@ async function loadMovies(){
  if(error){$('movies').textContent='No se pudo cargar el catálogo.';return}movies=data||[];renderMovies();
 }
 function renderMovies(){
- $('movies').innerHTML='';if(!movies.length){$('movies').innerHTML='<div class="muted">Todavía no hay películas. Vuelve pronto.</div>';return}
- movies.forEach(m=>{let c=document.createElement('article');c.className='movie';let poster=document.createElement('div');poster.className='poster';if(m.cover_url)poster.style.backgroundImage=`url("${m.cover_url}")`;else poster.textContent='APOLOPRIMER';let info=document.createElement('div');info.className='movie-info';let b=document.createElement('b');b.textContent=m.title;let s=document.createElement('small');s.textContent=`${m.category} · ${m.year||'—'}`;info.append(b,s);c.append(poster,info);c.onclick=()=>openMovie(m);$('movies').append(c)});
+ $('movies').innerHTML='';$('myList').innerHTML='';
+ if(!movies.length){$('movies').innerHTML='<div class="muted">Todavía no hay películas. Vuelve pronto.</div>';updateFeatured(null);return}
+ updateFeatured(movies[0]);
+ const saved=JSON.parse(localStorage.getItem('apoloMyList')||'[]');
+ movies.forEach(m=>{let c=document.createElement('article');c.className='movie';let poster=document.createElement('div');poster.className='poster';if(m.cover_url)poster.style.backgroundImage=`url("${m.cover_url}")`;else poster.textContent='APOLOPRIMER';let info=document.createElement('div');info.className='movie-info';let b=document.createElement('b');b.textContent=m.title;let s=document.createElement('small');s.textContent=`${m.category} · ${m.year||'—'}`;let add=document.createElement('button');add.className='secondary';add.textContent=saved.includes(String(m.id))?'✓ En mi lista':'＋ Mi lista';add.onclick=e=>{e.stopPropagation();let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]');const id=String(m.id);ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()};info.append(b,s,add);c.append(poster,info);c.onclick=()=>openMovie(m);$('movies').append(c);if(saved.includes(String(m.id))){const clone=c.cloneNode(true);clone.querySelector('button').onclick=()=>{let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]').filter(x=>x!==String(m.id));localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()};clone.onclick=()=>openMovie(m);$('myList').append(clone)}});
+ if(!$('myList').children.length)$('myList').innerHTML='<div class="muted">Pulsa «Mi lista» en una película para guardarla aquí.</div>';
  refreshRoomMovies();
 }
+function updateFeatured(m){if(!m){$('featuredTitle').textContent='Tu cine. Tu mundo.';$('featuredDescription').textContent='Descubre películas y comparte una función con tus amigos.';$('featuredHero').style.backgroundImage='';$('featuredHero').classList.remove('has-poster');$('featuredPlay').onclick=()=>document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'});$('featuredList').onclick=()=>{};return}
+ $('featuredTitle').textContent=m.title;$('featuredDescription').textContent=(m.category||'Película')+' · '+(m.year||'Disponible ahora')+' · Disfruta de esta película en Apoloprimer.';$('featuredHero').style.backgroundImage=m.cover_url?'linear-gradient(90deg,#000e 0%,#0008 45%,#0002 100%),linear-gradient(0deg,#050505,transparent 55%),url("'+m.cover_url+'")':'';$('featuredHero').classList.toggle('has-poster',!!m.cover_url);$('featuredPlay').onclick=()=>openMovie(m);$('featuredList').onclick=()=>{let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]');if(!ids.includes(String(m.id)))ids.push(String(m.id));localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()};
+}
+$('searchJump').onclick=()=>{const q=prompt('¿Qué película buscas?');if(!q)return;const m=movies.find(x=>x.title.toLowerCase().includes(q.toLowerCase()));if(m)openMovie(m);else alert('No encontramos esa película en el catálogo.')};
+
 function openMovie(m){$('playerTitle').textContent=m.title;$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden');$('soloPlayer').play().catch(()=>{})}
 $('closePlayer').onclick=()=>{$('soloPlayer').pause();$('soloPlayer').removeAttribute('src');$('player').classList.add('hidden')};
 $('uploadBtn').onclick=async()=>{
