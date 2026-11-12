@@ -918,6 +918,52 @@ footer{margin-top:35px}
  #player .cinema-center button:nth-child(1) svg,
  #player .cinema-center button:nth-child(3) svg{width:25px!important;height:25px!important}
 }
+
+/* Refuerzo para orientación vertical y horizontal: círculo real en cada acción superior */
+#player .cinema-top button,
+#player .cinema-top button.icon-btn,
+#player .cinema-top .icon-action{
+ box-sizing:border-box!important;
+ display:inline-flex!important;
+ flex:0 0 42px!important;
+ inline-size:42px!important;block-size:42px!important;
+ min-inline-size:42px!important;min-block-size:42px!important;
+ max-inline-size:42px!important;max-block-size:42px!important;
+ aspect-ratio:1/1!important;
+ padding:0!important;margin:0!important;
+ border-radius:50%!important;
+ align-items:center!important;justify-content:center!important;
+}
+#player .cinema-top button svg{width:20px!important;height:20px!important;flex:0 0 20px!important}
+#player .cinema-center button:nth-child(1) svg,
+#player .cinema-center button:nth-child(3) svg{
+ width:29px!important;height:29px!important;
+}
+@media(max-width:600px){
+ #player .cinema-top button,
+ #player .cinema-top button.icon-btn,
+ #player .cinema-top .icon-action{
+  flex:0 0 36px!important;
+  inline-size:36px!important;block-size:36px!important;
+  min-inline-size:36px!important;min-block-size:36px!important;
+  max-inline-size:36px!important;max-block-size:36px!important;
+  border-radius:50%!important;
+ }
+ #player .cinema-top button svg{width:18px!important;height:18px!important;flex-basis:18px!important}
+ #player .cinema-center button:nth-child(1) svg,
+ #player .cinema-center button:nth-child(3) svg{width:28px!important;height:28px!important}
+}
+@media(max-height:500px) and (orientation:landscape){
+ #player .cinema-top button,
+ #player .cinema-top button.icon-btn,
+ #player .cinema-top .icon-action{
+  flex:0 0 34px!important;
+  inline-size:34px!important;block-size:34px!important;
+  min-inline-size:34px!important;min-block-size:34px!important;
+  max-inline-size:34px!important;max-block-size:34px!important;
+  border-radius:50%!important;
+ }
+}
 </style>
 </head>
 <body>
