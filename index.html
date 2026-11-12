@@ -748,6 +748,19 @@ footer{margin-top:35px}
  #player .cinema-toolbar button svg{width:18px!important;height:18px!important;flex:0 0 18px!important}
  #player .cinema-toolbar button span{display:inline!important;white-space:nowrap!important}
 }
+
+/* Ajuste compacto de botones inferiores en móviles */
+@media (max-width:760px) and (orientation:portrait){
+ #player .cinema-toolbar{gap:7px!important;padding-top:8px!important}
+ #player .cinema-toolbar button{
+  height:40px!important;min-height:40px!important;
+  padding:0 11px!important;gap:6px!important;
+  font-size:10px!important;border-radius:22px!important;
+ }
+ #player .cinema-toolbar button svg{
+  width:15px!important;height:15px!important;flex-basis:15px!important;
+ }
+}
 </style>
 </head>
 <body>
