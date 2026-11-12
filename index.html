@@ -737,6 +737,17 @@ footer{margin-top:35px}
   #player .side-control{width:40px!important;min-width:40px!important;height:146px!important}
   #player .side-control input{height:88px!important;width:15px!important}
 }
+
+/* APOLOPRIMER: barra inferior móvil en una sola línea, sin botones partidos */
+@media (max-width:760px) and (orientation:portrait){
+ #player .cinema-bottom{left:0!important;right:0!important;bottom:0!important;padding:12px 12px calc(env(safe-area-inset-bottom) + 12px)!important;box-sizing:border-box!important;background:linear-gradient(0deg,rgba(0,0,0,.94),rgba(0,0,0,.68) 78%,transparent)!important}
+ #player .cinema-progress{width:100%!important;box-sizing:border-box!important;height:46px!important;margin:0!important;padding:0 12px!important}
+ #player .cinema-toolbar{display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;min-width:0!important;gap:9px!important;padding:10px 0 3px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity!important;-webkit-overflow-scrolling:touch!important;scrollbar-width:none!important}
+ #player .cinema-toolbar::-webkit-scrollbar{display:none!important}
+ #player .cinema-toolbar button{display:flex!important;flex:0 0 auto!important;width:auto!important;min-width:max-content!important;height:48px!important;min-height:48px!important;padding:0 15px!important;gap:8px!important;border-radius:26px!important;white-space:nowrap!important;font-size:12px!important;line-height:1!important;overflow:visible!important;scroll-snap-align:start!important}
+ #player .cinema-toolbar button svg{width:18px!important;height:18px!important;flex:0 0 18px!important}
+ #player .cinema-toolbar button span{display:inline!important;white-space:nowrap!important}
+}
 </style>
 </head>
 <body>
