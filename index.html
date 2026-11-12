@@ -691,6 +691,52 @@ footer{margin-top:35px}
  #player .side-control{top:39%!important;height:145px!important}
  #player .side-control input{height:86px!important}
 }
+
+/* HOTFIX: evitar que los controles centrales se salgan del reproductor en móvil */
+@media (max-width: 900px), (orientation: portrait) {
+  #player .cinema-center{
+    left:50%!important;right:auto!important;
+    top:43%!important;
+    width:calc(100% - 116px)!important;
+    max-width:440px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    transform:translate(-50%,-50%)!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:clamp(8px,3vw,22px)!important;
+    box-sizing:border-box!important;
+  }
+  #player .cinema-center button:not(.big-play){
+    flex:0 0 clamp(42px,12vw,58px)!important;
+    width:clamp(42px,12vw,58px)!important;
+    min-width:0!important;height:clamp(42px,12vw,58px)!important;
+    min-height:0!important;padding:0!important;margin:0!important;
+    border-radius:50%!important;display:grid!important;place-items:center!important;
+  }
+  #player .cinema-center .big-play{
+    flex:0 0 clamp(76px,21vw,96px)!important;
+    width:clamp(76px,21vw,96px)!important;
+    min-width:0!important;height:clamp(76px,21vw,96px)!important;
+    min-height:0!important;padding:0!important;margin:0!important;
+    border-radius:50%!important;display:grid!important;place-items:center!important;
+    font-size:34px!important;
+  }
+  #player .cinema-center button svg{width:55%!important;height:55%!important}
+  #player .side-control{z-index:5!important;top:43%!important;transform:translateY(-50%)!important}
+  #player .side-brightness{left:7px!important}
+  #player .side-volume{right:7px!important}
+}
+@media (max-width:430px) and (orientation:portrait){
+  #player .cinema-center{width:calc(100% - 104px)!important;gap:7px!important}
+  #player .cinema-center button:not(.big-play){flex-basis:44px!important;width:44px!important;height:44px!important}
+  #player .cinema-center .big-play{flex-basis:78px!important;width:78px!important;height:78px!important;font-size:30px!important}
+  #player .side-control{width:40px!important;min-width:40px!important;height:146px!important}
+  #player .side-control input{height:88px!important;width:15px!important}
+}
 </style>
 </head>
 <body>
