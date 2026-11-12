@@ -985,6 +985,17 @@ footer{margin-top:35px}
  object-position:center center!important;
 }
 #player .cinema-player{width:100vw!important;height:100dvh!important}
+
+/* Corrección definitiva de encuadre: el elemento de video cubre el viewport completo */
+#player .cinema-player{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;overflow:hidden!important}
+#player #soloPlayer{
+ position:absolute!important;inset:0!important;display:block!important;
+ width:100vw!important;height:100vh!important;height:100dvh!important;
+ min-width:100vw!important;min-height:100vh!important;min-height:100dvh!important;
+ max-width:none!important;max-height:none!important;
+ object-fit:cover!important;object-position:50% 50%!important;
+ margin:0!important;padding:0!important;
+}
 </style>
 </head>
 <body>
