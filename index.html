@@ -1001,22 +1001,29 @@ footer{margin-top:35px}
 #player.video-stretched #soloPlayer{object-fit:fill!important}
 #player #stretchPlayer[aria-pressed="true"]{border-color:rgba(255,65,88,.9)!important;box-shadow:0 0 16px rgba(229,9,20,.38),inset 0 1px 1px rgba(255,255,255,.34)!important}
 
-/* Bienvenida cinematográfica: letras reveladas de izquierda a derecha */
-#apoloSplash{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease}
+/* Logotipo APOLOPRIMER: aparece letra por letra como la referencia */
+#apoloSplash{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .55s ease,visibility .55s ease}
 #apoloSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
-#apoloSplash .splash-stage{position:relative;display:grid;place-items:center;width:100%;min-height:100%;overflow:hidden}
-#apoloSplash .splash-word{position:relative;display:inline-block;padding:0 .08em;color:#e50914;font-family:Inter,"Helvetica Neue",Arial,sans-serif;font-size:clamp(27px,7.2vw,82px);font-weight:900;letter-spacing:-.045em;white-space:nowrap;line-height:1;text-shadow:0 0 12px rgba(229,9,20,.28),0 0 32px rgba(229,9,20,.18);opacity:0;clip-path:inset(0 100% 0 0);transform:scale(1.035);filter:blur(2px);animation:apoloNetflixReveal 2.05s cubic-bezier(.2,.7,.2,1) .22s forwards}
-#apoloSplash .splash-a{display:inline;font-size:inherit;margin:0}
-#apoloSplash .splash-light{position:absolute;left:0;top:50%;width:clamp(34px,8vw,90px);height:125%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95) 45%,#ff2438 58%,transparent);filter:blur(9px);opacity:0;transform:translate(-120%,-50%) skewX(-18deg);animation:apoloNetflixSweep 1.8s cubic-bezier(.25,.65,.2,1) .25s forwards;pointer-events:none}
-#apoloSplash .splash-beam{position:absolute;left:50%;top:50%;width:2px;height:clamp(45px,10vw,100px);background:linear-gradient(180deg,transparent,#e50914,#ff5264,transparent);box-shadow:0 0 22px #e50914;opacity:0;transform:translate(-50%,-50%) scaleY(.1);animation:apoloNetflixFlash .75s ease-out .05s forwards}
-@keyframes apoloNetflixReveal{0%{opacity:0;clip-path:inset(0 100% 0 0);transform:scale(1.035);filter:blur(2px)}18%{opacity:1}78%{clip-path:inset(0 0 0 0);filter:blur(0)}100%{opacity:1;clip-path:inset(0 0 0 0);transform:scale(1);filter:blur(0)}}
-@keyframes apoloNetflixSweep{0%{opacity:0;transform:translate(-120%,-50%) skewX(-18deg)}20%{opacity:.95}78%{opacity:.8}100%{opacity:0;transform:translate(1150%,-50%) skewX(-18deg)}}
-@keyframes apoloNetflixFlash{0%{opacity:0;transform:translate(-50%,-50%) scaleY(.1)}35%{opacity:.9}100%{opacity:0;transform:translate(-50%,-50%) scaleY(1.7)}}
-@media(prefers-reduced-motion:reduce){#apoloSplash .splash-word{animation:none;clip-path:none;transform:none;opacity:1;filter:none}#apoloSplash .splash-light,#apoloSplash .splash-beam{display:none}#apoloSplash{transition:none}}</style>
+#apoloSplash .splash-stage{display:flex;align-items:center;justify-content:center;width:100%;min-height:100%;overflow:hidden}
+#apoloSplash .splash-word{display:flex;align-items:baseline;justify-content:center;white-space:nowrap;color:#e50914;font-family:"Arial Narrow","Roboto Condensed",Impact,sans-serif;font-size:clamp(34px,9vw,66px);font-stretch:condensed;font-weight:900;letter-spacing:-.035em;line-height:1;text-shadow:none}
+#apoloSplash .splash-letter{display:inline-block;opacity:0;transform:scaleX(.35) scaleY(.92);transform-origin:center bottom;animation:apoloLetterIn .22s cubic-bezier(.2,.8,.2,1) forwards}
+#apoloSplash .splash-letter:first-child{font-size:1.12em;animation-delay:.12s}
+#apoloSplash .splash-letter:nth-child(2){animation-delay:.34s}
+#apoloSplash .splash-letter:nth-child(3){animation-delay:.49s}
+#apoloSplash .splash-letter:nth-child(4){animation-delay:.64s}
+#apoloSplash .splash-letter:nth-child(5){animation-delay:.79s}
+#apoloSplash .splash-letter:nth-child(6){animation-delay:.94s}
+#apoloSplash .splash-letter:nth-child(7){animation-delay:1.09s}
+#apoloSplash .splash-letter:nth-child(8){animation-delay:1.24s}
+#apoloSplash .splash-letter:nth-child(9){animation-delay:1.39s}
+#apoloSplash .splash-letter:nth-child(10){animation-delay:1.54s}
+#apoloSplash .splash-letter:nth-child(11){animation-delay:1.69s}
+@keyframes apoloLetterIn{0%{opacity:0;transform:scaleX(.35) scaleY(.92)}100%{opacity:1;transform:scaleX(1) scaleY(1)}}
+@media(prefers-reduced-motion:reduce){#apoloSplash .splash-letter{animation:none;opacity:1;transform:none}#apoloSplash{transition:none}}</style>
 </head>
 <body>
 <div id="apoloSplash" role="status" aria-label="APOLOPRIMER">
- <div class="splash-stage"><div class="splash-beam"></div><div class="splash-word"><span class="splash-a">APOLOPRIMER</span></div><div class="splash-light"></div></div>
+ <div class="splash-stage"><div class="splash-word"><span class="splash-letter">A</span><span class="splash-letter">P</span><span class="splash-letter">O</span><span class="splash-letter">L</span><span class="splash-letter">O</span><span class="splash-letter">P</span><span class="splash-letter">R</span><span class="splash-letter">I</span><span class="splash-letter">M</span><span class="splash-letter">E</span><span class="splash-letter">R</span></div></div>
 </div>
 <header class="stream-header"><div class="logo"><span class="brand-mark">A</span> APOLOPRIMER</div><nav class="top-nav"><a class="nav-active" href="#" data-go="home">Inicio</a><a href="#" data-go="explore">Explorar</a><a href="#" data-go="search">Buscar</a><a href="#" data-go="mylist">Mi lista</a><a href="#" data-go="downloads">Descargas</a><a href="#" data-go="rooms">Salas</a></nav><div class="right header-actions"><button class="icon-action" id="searchJump" aria-label="Buscar">⌕</button><button class="account-chip" id="accountChip" type="button" aria-label="Abrir cuenta"><span class="account-chip-avatar" id="headerAvatar">A</span><span class="account-chip-name" id="headerAccountName">Entrar</span><span class="account-chip-chevron">⌄</span></button></div></header>
 <section id="featuredHero" class="stream-hero app-screen" data-screen="home"><div class="hero-shade"></div><div class="hero-content"><div class="eyebrow">APOLOPRIMER ORIGINAL</div><h1 id="featuredTitle">Tu cine. Tu mundo.</h1><p id="featuredDescription">Descubre películas y comparte una función con tus amigos desde cualquier lugar.</p><div class="hero-actions"><button id="featuredPlay">▶ Reproducir</button><button class="secondary" id="featuredList">＋ Mi lista</button></div></div><div class="hero-meta">Películas · Series · Estrenos</div></section>
@@ -1316,7 +1323,7 @@ function sendChat(){let t=$('chatInput').value.trim();if(!t||!roomChannel)return
 $('leaveRoomBtn').onclick=async()=>{if(roomChannel)await supabase.removeChannel(roomChannel);roomChannel=null;room=null;$('roomPlayer').pause();$('roomPlayer').removeAttribute('src');$('roomShell').classList.add('hidden')};
 // Mostrar la identidad de APOLOPRIMER al entrar y retirarla al terminar la animación.
 const apoloSplash=document.getElementById('apoloSplash');
-if(apoloSplash){window.setTimeout(()=>apoloSplash.classList.add('is-leaving'),2700);window.setTimeout(()=>apoloSplash.remove(),3350);}
+if(apoloSplash){window.setTimeout(()=>apoloSplash.classList.add('is-leaving'),3000);window.setTimeout(()=>apoloSplash.remove(),3550);}
 init();
 </script>
 </body></html>
