@@ -90,43 +90,63 @@ footer{margin-top:35px}
 #player.controls-locked .cinema-top,#player.controls-locked .cinema-bottom,#player.controls-locked .cinema-center{opacity:0;pointer-events:none}
 @media(orientation:portrait){.cinema-toolbar button{font-size:11px;padding:8px}.cinema-actions{gap:4px}.cinema-actions button{padding:8px}.cinema-center{gap:22px}}
 
-/* APOLOPRIMER — Premium red neon glass cinema */
-#player{position:fixed;inset:0;background:#020204;z-index:50;padding:0;display:flex;align-items:center;justify-content:center}
-#player .cinema-player{position:relative;width:100%;height:100%;min-height:100dvh;background:#020204;overflow:hidden;color:#fff;isolation:isolate}
-#player .cinema-player:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 42%,rgba(0,0,0,.24) 100%)}
-#player #soloPlayer{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:contain;background:#020204;filter:brightness(100%);cursor:pointer}
-.cinema-top,.cinema-center,.cinema-bottom{position:absolute;z-index:3;transition:opacity .28s ease,transform .28s ease;pointer-events:auto}
-.cinema-top{top:0;left:0;right:0;min-height:82px;padding:max(18px,env(safe-area-inset-top)) clamp(16px,4vw,54px) 16px;background:linear-gradient(180deg,rgba(0,0,0,.92),rgba(0,0,0,.42) 72%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px}
-.cinema-top b{font-size:clamp(18px,2vw,25px);font-weight:750;letter-spacing:.2px;text-shadow:0 2px 18px #000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* APOLOPRIMER — opción 3: cine inmersivo rojo neón */
+#player{position:fixed;inset:0;z-index:50;background:#020205;padding:0;display:flex;align-items:center;justify-content:center}
+#player .cinema-player{position:relative;width:100%;height:100%;height:100dvh;overflow:hidden;background:#020205;color:#fff;isolation:isolate}
+#player .cinema-player:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 48%,rgba(0,0,0,.28) 100%)}
+#player #soloPlayer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#020205;filter:brightness(100%);cursor:pointer;z-index:0}
+.cinema-top,.cinema-center,.cinema-bottom,.side-control{position:absolute;z-index:4;transition:opacity .28s ease,transform .28s ease}
+.cinema-top{top:0;left:0;right:0;min-height:92px;padding:max(20px,env(safe-area-inset-top)) clamp(18px,3.2vw,48px) 18px;background:linear-gradient(180deg,rgba(0,0,0,.88),rgba(0,0,0,.28) 78%,transparent);display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.cinema-heading{display:flex;align-items:center;gap:16px;min-width:0}
+.cinema-back{width:54px;height:54px;border-radius:50%;border:1px solid #ffffff55;color:white;background:#15151bc9;font-size:36px;line-height:1;box-shadow:0 0 18px #e5091444;cursor:pointer}
+.cinema-titleblock{min-width:0}.cinema-titleline{display:flex;align-items:center;gap:12px}.cinema-titleline b{font-size:clamp(20px,2.2vw,29px);font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 12px #000}
+.cinema-hd{border:1px solid #ed1834;color:#ff3149;border-radius:5px;padding:2px 8px;font-weight:800;font-size:13px;box-shadow:0 0 12px #e5091444}
+.cinema-meta{font-size:14px;color:#eee;margin-top:3px;text-shadow:0 2px 8px #000}
 .cinema-actions{display:flex;gap:10px;align-items:center}
-.cinema-actions button,.cinema-center button,.cinema-toolbar button{border:1px solid rgba(255,255,255,.22);color:#fff;background:linear-gradient(145deg,rgba(45,45,52,.76),rgba(12,12,16,.78));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 5px 22px #0009,inset 0 1px 0 #ffffff18;cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .2s ease,box-shadow .2s ease}
-.cinema-actions button{width:48px;height:48px;border-radius:50%;font-size:18px;display:grid;place-items:center}
-.cinema-actions button:hover,.cinema-center button:hover,.cinema-toolbar button:hover{background:linear-gradient(145deg,rgba(229,9,20,.92),rgba(100,0,12,.9));border-color:#ff4250;box-shadow:0 0 18px #e5091466,inset 0 1px 0 #ffffff35;transform:translateY(-2px)}
-.cinema-center{left:0;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:clamp(28px,8vw,110px);pointer-events:none}
-.cinema-center button{pointer-events:auto;border-radius:50%;width:72px;height:72px;font-size:20px;font-weight:750}
-.cinema-center .big-play{width:94px;height:94px;font-size:34px;background:linear-gradient(145deg,rgba(35,35,42,.88),rgba(8,8,12,.88));border:1px solid rgba(255,75,85,.65);box-shadow:0 0 0 5px rgba(229,9,20,.12),0 0 30px rgba(229,9,20,.32),inset 0 1px 0 #ffffff35}
-.cinema-bottom{left:0;right:0;bottom:0;padding:58px clamp(16px,4vw,54px) max(22px,env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(0,0,0,.98),rgba(0,0,0,.78) 58%,transparent)}
-.cinema-progress{display:flex;align-items:center;gap:15px;font-size:13px;font-weight:650;text-shadow:0 1px 8px #000}
-.cinema-progress input{flex:1;min-width:0;height:6px;accent-color:#f20d27;cursor:pointer;filter:drop-shadow(0 0 5px #e5091466)}
-.cinema-toolbar{display:flex;align-items:center;gap:10px;overflow-x:auto;padding:18px 0 4px;scrollbar-width:none}
+.cinema-actions button,.cinema-center button,.cinema-toolbar button{border:1px solid rgba(255,255,255,.25);color:#fff;background:linear-gradient(145deg,rgba(38,38,46,.78),rgba(8,8,13,.78));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 5px 20px #0009,inset 0 1px 0 #ffffff22;cursor:pointer;transition:.2s}
+.cinema-actions button{width:52px;height:52px;border-radius:50%;font-size:24px;display:grid;place-items:center}
+.cinema-actions button:hover,.cinema-back:hover,.cinema-center button:hover,.cinema-toolbar button:hover{border-color:#ff5362;box-shadow:0 0 20px #e5091477,inset 0 0 14px #e5091422;transform:translateY(-2px)}
+.cinema-center{left:0;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:clamp(45px,10vw,150px);pointer-events:none}
+.cinema-center button{pointer-events:auto;width:76px;height:76px;border-radius:50%;font-size:29px;display:flex;align-items:center;justify-content:center;gap:3px}
+.cinema-center button small{font-size:17px;font-weight:700}
+.cinema-center .big-play{width:112px;height:112px;font-size:42px;background:linear-gradient(145deg,rgba(35,35,43,.92),rgba(5,5,10,.92));border:1px solid #ff5b6b;box-shadow:0 0 0 5px #e5091420,0 0 32px #e5091477,inset 0 1px 0 #ffffff44}
+.side-control{top:50%;transform:translateY(-50%);width:58px;height:208px;border:1px solid #ffffff3d;border-radius:32px;background:linear-gradient(180deg,#24242dcc,#08080bdc);backdrop-filter:blur(18px);display:flex;flex-direction:column;align-items:center;justify-content:space-around;padding:14px 0;box-shadow:0 5px 22px #0009,0 0 18px #e5091422}
+.side-control span{font-size:21px;text-shadow:0 1px 8px #000}
+.side-control input{appearance:slider-vertical;-webkit-appearance:slider-vertical;width:22px;height:135px;accent-color:#f20d35;cursor:pointer}
+.side-brightness{left:clamp(18px,3vw,42px)}.side-volume{right:clamp(18px,3vw,42px)}
+.cinema-bottom{left:0;right:0;bottom:0;padding:26px clamp(22px,3vw,48px) max(22px,env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(0,0,0,.96),rgba(0,0,0,.55) 75%,transparent)}
+.cinema-progress{height:52px;border:1px solid #ffffff36;border-radius:28px;background:linear-gradient(100deg,#24242aa8,#0a0a0da8);backdrop-filter:blur(16px);display:flex;align-items:center;gap:18px;padding:0 20px;font-size:13px;font-weight:700;text-shadow:0 1px 8px #000}
+.cinema-progress input{flex:1;min-width:0;accent-color:#f20d35;height:7px;cursor:pointer;filter:drop-shadow(0 0 5px #e5091466)}
+.cinema-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:18px;overflow-x:auto;scrollbar-width:none}
 .cinema-toolbar::-webkit-scrollbar{display:none}
-.cinema-toolbar button{white-space:nowrap;border-radius:24px;padding:13px 18px;font-size:13px;font-weight:750;letter-spacing:.1px}
-.brightness-control,.volume-control{display:flex;align-items:center;gap:8px;color:#fff;white-space:nowrap;padding:0 5px;text-shadow:0 1px 8px #000}
-.brightness-control input,.volume-control input{width:76px;accent-color:#f20d27;cursor:pointer}
-.cinema-message{font-size:12px;color:#eee;padding-top:8px;min-height:22px;text-shadow:0 1px 5px #000}
-#player.controls-hidden .cinema-top,#player.controls-hidden .cinema-center,#player.controls-hidden .cinema-bottom{opacity:0;pointer-events:none}
-#player.controls-hidden .cinema-top{transform:translateY(-14px)}
-#player.controls-hidden .cinema-bottom{transform:translateY(14px)}
+.cinema-toolbar button{flex:1 0 auto;white-space:nowrap;border-radius:28px;padding:14px 18px;font-size:14px;font-weight:750;display:flex;align-items:center;justify-content:center;gap:10px}
+.cinema-toolbar button:hover{background:linear-gradient(145deg,#4b111cdd,#111116ee)}
+.cinema-message{font-size:12px;color:#eee;padding-top:7px;min-height:18px;text-shadow:0 1px 5px #000}
+#player.controls-hidden .cinema-top,#player.controls-hidden .cinema-center,#player.controls-hidden .cinema-bottom,#player.controls-hidden .side-control{opacity:0;pointer-events:none}
+#player.controls-hidden .cinema-top{transform:translateY(-14px)}#player.controls-hidden .cinema-bottom{transform:translateY(18px)}
 #player.controls-hidden .cinema-center{transform:translateY(calc(-50% + 8px))}
-#player.controls-hidden{cursor:none}
-#player.controls-locked .cinema-top,#player.controls-locked .cinema-bottom,#player.controls-locked .cinema-center{opacity:0;pointer-events:none}
+#player.controls-locked .cinema-top,#player.controls-locked .cinema-bottom,#player.controls-locked .cinema-center,#player.controls-locked .side-control{opacity:0;pointer-events:none}
 @media(max-width:700px){
- .cinema-top{min-height:62px;gap:8px;padding-left:14px;padding-right:14px}
- .cinema-actions{gap:5px}.cinema-actions button{width:38px;height:38px;font-size:15px}
- .cinema-center{gap:22px}.cinema-center button{width:54px;height:54px;font-size:15px}.cinema-center .big-play{width:70px;height:70px;font-size:27px}
- .cinema-bottom{padding:45px 14px max(18px,env(safe-area-inset-bottom))}
- .cinema-toolbar{gap:7px;padding-top:12px}.cinema-toolbar button{padding:10px 13px;font-size:11px}
- .brightness-control input,.volume-control input{width:54px}.cinema-progress{font-size:11px;gap:8px}
+ .cinema-top{min-height:70px;padding-left:12px;padding-right:12px;gap:7px}
+ .cinema-heading{gap:8px}.cinema-back{width:38px;height:38px;font-size:28px}
+ .cinema-titleline b{font-size:17px}.cinema-meta{font-size:11px}
+ .cinema-actions{gap:4px}.cinema-actions button{width:35px;height:35px;font-size:17px}
+ .cinema-center{gap:24px}.cinema-center button{width:48px;height:48px;font-size:21px}.cinema-center .big-play{width:70px;height:70px;font-size:29px}
+ .side-control{width:38px;height:142px;padding:8px 0}.side-control span{font-size:16px}.side-control input{height:85px;width:18px}
+ .side-brightness{left:8px}.side-volume{right:8px}
+ .cinema-bottom{padding:18px 10px max(14px,env(safe-area-inset-bottom))}
+ .cinema-progress{height:40px;padding:0 11px;gap:8px;font-size:10px}
+ .cinema-toolbar{justify-content:flex-start;gap:7px;padding-top:11px}
+ .cinema-toolbar button{padding:10px 12px;font-size:11px;gap:6px}
+ .cinema-toolbar button span{display:inline}
+}
+@media(orientation:landscape) and (max-height:500px){
+ .cinema-top{min-height:58px;padding-top:8px;padding-bottom:8px}
+ .cinema-back,.cinema-actions button{width:38px;height:38px}
+ .cinema-center button{width:52px;height:52px}.cinema-center .big-play{width:72px;height:72px}
+ .side-control{height:125px;width:42px}.side-control input{height:72px}
+ .cinema-bottom{padding-top:12px;padding-bottom:12px}.cinema-progress{height:34px}
+ .cinema-toolbar{padding-top:8px}.cinema-toolbar button{padding:8px 12px}
 }</style>
 </head>
 <body>
@@ -167,10 +187,16 @@ footer{margin-top:35px}
 <div class="modal hidden" id="roomModal"><div class="modal-card"><h2 id="roomModalTitle">Crear sala</h2><label id="roomNameLabel">Nombre<input id="roomNameInput" placeholder="Noche de películas"></label><label id="roomCodeLabel" class="hidden">Código<input id="roomCodeInput" maxlength="8" placeholder="Código de invitación"></label><div class="uploadrow"><button id="roomModalSubmit">Continuar</button><button class="secondary" id="roomModalClose">Cancelar</button></div><p class="muted small" id="roomModalStatus"></p></div></div>
 <div id="player" class="hidden"><div class="cinema-player" id="cinemaPlayer">
  <video id="soloPlayer" playsinline preload="metadata"></video>
- <div class="cinema-top"><b id="playerTitle"></b><div class="cinema-actions"><button id="rateDown" title="No me gusta">👎</button><button id="rateUp" title="Me gusta">👍</button><button id="pipPlayer" title="Ventana flotante">▣</button><button id="lockPlayer" title="Bloquear controles">♙</button><button id="closePlayer" title="Cerrar">✕</button></div></div>
- <div class="cinema-center"><button id="seekBack" title="Retroceder 10 segundos">↶ 10</button><button id="togglePlayback" class="big-play" title="Reproducir o pausar">Ⅱ</button><button id="seekForward" title="Avanzar 10 segundos">10 ↷</button></div>
- <div class="cinema-bottom"><div class="cinema-progress"><input id="playerProgress" type="range" min="0" max="1000" value="0" aria-label="Progreso"><span id="playerTime">0:00 / 0:00</span></div>
- <div class="cinema-toolbar"><label class="brightness-control">☼ <input id="playerBrightness" type="range" min="50" max="130" value="100" aria-label="Brillo"></label><label class="volume-control">◖)) <input id="playerVolume" type="range" min="0" max="100" value="100" aria-label="Volumen"></label><button id="clipPlayer">▱ Recortar</button><button id="speedPlayer">Velocidad 1×</button><button id="episodesPlayer">Episodios</button><button id="audioPlayer">Audio y subtítulos</button><button id="nextPlayer">Próximo episodio ▷</button><button id="fullscreenPlayer">⛶ Pantalla completa</button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div></div>
+ <header class="cinema-top">
+  <div class="cinema-heading"><button id="backPlayer" class="cinema-back" title="Volver">‹</button><div class="cinema-titleblock"><div class="cinema-titleline"><b id="playerTitle"></b><span class="cinema-hd">HD</span></div><div id="playerMeta" class="cinema-meta"></div></div></div>
+  <div class="cinema-actions"><button id="rateDown" title="No me gusta">♧</button><button id="rateUp" title="Me gusta">♡</button><button id="pipPlayer" title="Ventana flotante">▣</button><button id="lockPlayer" title="Bloquear controles">♙</button><button id="closePlayer" title="Cerrar">✕</button></div>
+ </header>
+ <label class="side-control side-brightness" title="Brillo"><span>☼</span><input id="playerBrightness" type="range" min="50" max="130" value="100" aria-label="Brillo"></label>
+ <label class="side-control side-volume" title="Volumen"><span>◖))</span><input id="playerVolume" type="range" min="0" max="100" value="100" aria-label="Volumen"></label>
+ <div class="cinema-center"><button id="seekBack" title="Retroceder 10 segundos">↶<small>10</small></button><button id="togglePlayback" class="big-play" title="Reproducir o pausar">Ⅱ</button><button id="seekForward" title="Avanzar 10 segundos">↷<small>10</small></button></div>
+ <div class="cinema-bottom"><div class="cinema-progress"><span id="playerTime">0:00 / 0:00</span><input id="playerProgress" type="range" min="0" max="1000" value="0" aria-label="Progreso"></div>
+  <div class="cinema-toolbar"><button id="clipPlayer">▱ <span>Recortar</span></button><button id="speedPlayer">◴ <span>Velocidad 1×</span></button><button id="episodesPlayer">◇ <span>Episodios</span></button><button id="audioPlayer">▤ <span>Audio y subtítulos</span></button><button id="nextPlayer">▷ <span>Próximo episodio</span></button><button id="fullscreenPlayer">⛶ <span>Pantalla completa</span></button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div>
+ </div>
  </div></div>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -299,8 +325,8 @@ $('clipPlayer').onclick=()=>playerSay('Para recortar un fragmento necesitamos ha
 $('episodesPlayer').onclick=()=>playerSay('Esta película no tiene episodios asociados.');
 $('nextPlayer').onclick=()=>playerSay('No hay un próximo episodio asociado a esta película.');
 $('audioPlayer').onclick=()=>{const tracks=solo.textTracks;if(!tracks||!tracks.length){playerSay('Este archivo no incluye pistas de subtítulos seleccionables.');return}let i=[...tracks].findIndex(t=>t.mode==='showing');tracks.forEach(t=>t.mode='disabled');const next=(i+1)%tracks.length;tracks[next].mode='showing';playerSay('Subtítulos: '+(tracks[next].label||tracks[next].language||'Pista '+(next+1)))};
-function openMovie(m){activeMovie=m;$('playerTitle').textContent=m.title;$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden','controls-hidden','controls-locked');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI();showPlayerControls()}
-$('closePlayer').onclick=closeCinema;
+function openMovie(m){activeMovie=m;$('playerTitle').textContent=m.title;$('playerMeta').textContent=[m.year||'',m.category||''].filter(Boolean).join('  •  ');$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden','controls-hidden','controls-locked');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI();showPlayerControls()}
+$('closePlayer').onclick=closeCinema;$('backPlayer').onclick=closeCinema;
 $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
  let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0];if(!title||!vf){say('uploadStatus','Agrega título y archivo de video.');return}
