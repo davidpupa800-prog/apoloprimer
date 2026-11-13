@@ -17,7 +17,7 @@ main{padding:0 5% 60px}.section{margin:32px 0}.section h2{font-size:21px;margin:
 .panel{background:#151515;border:1px solid var(--line);border-radius:8px;padding:18px;margin:22px 0}.hidden{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 input,select{width:100%;padding:11px;border:1px solid #444;border-radius:4px;background:#222;color:white;margin-top:6px}label{font-size:13px;color:#ccc}
 .uploadrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:14px}.muted{color:#aaa}.small{font-size:12px}
-.room-shell{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:14px;margin-top:16px}.room-video,.chat-panel{background:#151515;border:1px solid #333;border-radius:8px;overflow:hidden}.room-video{padding:14px}.room-video video{width:100%;max-height:58vh;background:#000;border-radius:5px}.room-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.chat-panel{display:flex;flex-direction:column;min-height:420px}.chat-head{padding:14px;border-bottom:1px solid #333;font-weight:bold}.chat-messages{padding:12px;display:flex;flex-direction:column;gap:9px;flex:1;max-height:360px;overflow:auto}.chat-msg{background:#242424;border-radius:7px;padding:8px 10px;font-size:13px;overflow-wrap:anywhere}.chat-msg b{color:#ff7379;display:block}.chat-compose{display:flex;gap:6px;padding:10px;border-top:1px solid #333}.chat-compose input{margin:0;min-width:0}.room-banner{background:linear-gradient(120deg,#241014,#101010);border:1px solid #482126;border-radius:8px;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.room-shell{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:14px;margin-top:16px}.room-video,.chat-panel{background:#151515;border:1px solid #333;border-radius:8px;overflow:hidden}.room-video{padding:14px}.room-video video{display:block;width:100%;max-height:58vh;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:8px;cursor:pointer;transition:box-shadow .2s}.room-video video:hover{box-shadow:0 0 0 1px #e50914,0 0 22px #e5091433}.room-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.chat-panel{display:flex;flex-direction:column;min-height:420px}.chat-head{padding:14px;border-bottom:1px solid #333;font-weight:bold}.chat-messages{padding:12px;display:flex;flex-direction:column;gap:9px;flex:1;max-height:360px;overflow:auto}.chat-msg{background:#242424;border-radius:7px;padding:8px 10px;font-size:13px;overflow-wrap:anywhere}.chat-msg b{color:#ff7379;display:block}.chat-compose{display:flex;gap:6px;padding:10px;border-top:1px solid #333}.chat-compose input{margin:0;min-width:0}.room-banner{background:linear-gradient(120deg,#241014,#101010);border:1px solid #482126;border-radius:8px;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 .modal{position:fixed;inset:0;background:#000d;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}.modal-card{width:min(440px,100%);background:#171717;border:1px solid #444;border-radius:10px;padding:20px}
 #player{position:fixed;inset:0;background:#000e;z-index:15;display:flex;align-items:center;justify-content:center;padding:18px}#player .modal-card{width:min(950px,100%)}#player video{width:100%;max-height:70vh;background:#000}
 footer{padding:28px 5%;border-top:1px solid #222;color:#777;font-size:12px}
@@ -1048,7 +1048,7 @@ footer{margin-top:35px}
 <section class="section app-screen" data-screen="rooms" id="salas"><div class="room-banner"><div><h2 style="margin:0">Salas privadas</h2><p class="muted" style="margin:5px 0 0">Crea una sala y comparte su código de invitación.</p></div><div class="uploadrow"><button id="createRoomBtn">＋ Crear sala</button><button class="secondary" id="joinRoomBtn">Unirme con código</button></div></div>
  <div class="room-shell hidden" id="roomShell">
   <div class="room-video"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><h3 id="roomName" style="margin:0">Sala</h3><div class="muted small">Código: <b id="roomCode"></b></div></div><button class="secondary" id="leaveRoomBtn">Salir</button></div>
-   <video id="roomPlayer" playsinline></video><div class="room-tools"><button id="playAllBtn">▶ Reproducir para todos</button><button class="secondary" id="pauseAllBtn">Ⅱ Pausar para todos</button><button class="secondary" id="backBtn">↶ 10 s</button><button class="secondary" id="forwardBtn">10 s ↷</button></div>
+   <video id="roomPlayer" playsinline title="Toca para abrir el reproductor de cine" aria-label="Abrir reproductor de cine"></video><div class="room-tools"><button id="playAllBtn">▶ Reproducir para todos</button><button class="secondary" id="pauseAllBtn">Ⅱ Pausar para todos</button><button class="secondary" id="backBtn">↶ 10 s</button><button class="secondary" id="forwardBtn">10 s ↷</button><button class="secondary" id="openRoomCinemaBtn">⛶ Reproductor de cine</button></div>
    <p class="muted small" id="syncStatus">La sala se sincroniza en tiempo real.</p>
    <label>Película de la sala<select id="roomMovie"><option value="">Selecciona una película</option></select></label>
   </div>
@@ -1182,13 +1182,13 @@ function updateFeatured(m){if(!m){$('featuredTitle').textContent='Tu cine. Tu mu
 $('searchJump').onclick=()=>{showScreen('search');$('catalogSearch').focus()};
 
 
-let activeMovie=null,playerLocked=false,playerHideTimer=null;
+let activeMovie=null,playerLocked=false,playerHideTimer=null,roomCinemaActive=false;
 const solo=$('soloPlayer'),playerRoot=$('player');
 function playerSay(msg){$('playerMessage').textContent=msg;showPlayerControls()}
 function fmtTime(s){if(!Number.isFinite(s))return '0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function syncPlayerUI(){const d=solo.duration||0,t=solo.currentTime||0;$('playerProgress').value=d?Math.round(t/d*1000):0;$('playerCurrent').textContent=fmtTime(t);$('playerDuration').textContent=fmtTime(d);$('playerTime').textContent=fmtTime(t)+' / '+fmtTime(d);$('togglePlayback').textContent=solo.paused?'▶':'Ⅱ'}
 function showPlayerControls(){if(playerLocked)return;playerRoot.classList.remove('controls-hidden');clearTimeout(playerHideTimer);if(!solo.paused){playerHideTimer=setTimeout(()=>playerRoot.classList.add('controls-hidden'),3200)}}
-function closeCinema(){clearTimeout(playerHideTimer);solo.pause();solo.removeAttribute('src');solo.load();playerRoot.classList.add('hidden');playerRoot.classList.remove('controls-hidden','controls-locked');playerLocked=false;activeMovie=null}
+function closeCinema(){clearTimeout(playerHideTimer);if(roomCinemaActive){const preview=$('roomPlayer'),url=solo.currentSrc||solo.src,time=solo.currentTime||0,playing=!solo.paused;roomCinemaActive=false;solo.pause();if(url&&preview.dataset.url!==url){preview.src=url;preview.dataset.url=url}try{preview.currentTime=time}catch{}if(playing)preview.play().catch(()=>{});else preview.pause()}else solo.pause();solo.removeAttribute('src');solo.load();playerRoot.classList.add('hidden');playerRoot.classList.remove('controls-hidden','controls-locked');playerLocked=false;activeMovie=null;$('playerProgress').disabled=false}
 playerRoot.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')showPlayerControls()});
 playerRoot.addEventListener('click',e=>{
  const onControl=e.target.closest('button,input');
@@ -1197,10 +1197,10 @@ playerRoot.addEventListener('click',e=>{
  if(playerRoot.classList.contains('controls-hidden'))showPlayerControls();
  else {clearTimeout(playerHideTimer);playerRoot.classList.add('controls-hidden')}
 });
-$('togglePlayback').onclick=()=>{if(solo.paused)solo.play().catch(()=>playerSay('No se pudo iniciar la reproducción.'));else solo.pause();showPlayerControls()};
-$('seekBack').onclick=()=>{solo.currentTime=Math.max(0,(solo.currentTime||0)-10);showPlayerControls()};
-$('seekForward').onclick=()=>{solo.currentTime=Math.min(solo.duration||Infinity,(solo.currentTime||0)+10);showPlayerControls()};
-$('playerProgress').oninput=e=>{if(solo.duration)solo.currentTime=solo.duration*(Number(e.target.value)/1000);showPlayerControls()};
+$('togglePlayback').onclick=()=>{if(roomCinemaActive)control(solo.paused?'play':'pause');else if(solo.paused)solo.play().catch(()=>playerSay('No se pudo iniciar la reproducción.'));else solo.pause();showPlayerControls()};
+$('seekBack').onclick=()=>{if(roomCinemaActive)seek(-10);else solo.currentTime=Math.max(0,(solo.currentTime||0)-10);showPlayerControls()};
+$('seekForward').onclick=()=>{if(roomCinemaActive)seek(10);else solo.currentTime=Math.min(solo.duration||Infinity,(solo.currentTime||0)+10);showPlayerControls()};
+$('playerProgress').oninput=e=>{if(solo.duration)solo.currentTime=solo.duration*(Number(e.target.value)/1000);showPlayerControls()};$('playerProgress').onchange=()=>{if(!roomCinemaActive)return;if(!canControl()){playerSay('Solo quien creó la sala puede controlar la película.');syncPlayerUI();return}applyControl({action:solo.paused?'pause':'play',time:solo.currentTime,video_url:solo.currentSrc||solo.src})};
 solo.addEventListener('timeupdate',syncPlayerUI);solo.addEventListener('play',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('pause',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('loadedmetadata',syncPlayerUI);
 $('playerBrightness').oninput=e=>{solo.style.filter='brightness('+e.target.value+'%)';showPlayerControls()};
 $('playerVolume').oninput=e=>{solo.volume=Math.max(0,Math.min(1,Number(e.target.value)/100));showPlayerControls()};
@@ -1222,7 +1222,9 @@ $('clipPlayer').onclick=()=>playerSay('Para recortar un fragmento necesitamos ha
 $('episodesPlayer').onclick=()=>playerSay('Esta película no tiene episodios asociados.');
 $('nextPlayer').onclick=()=>playerSay('No hay un próximo episodio asociado a esta película.');
 $('audioPlayer').onclick=()=>{const tracks=solo.textTracks;if(!tracks||!tracks.length){playerSay('Este archivo no incluye pistas de subtítulos seleccionables.');return}let i=[...tracks].findIndex(t=>t.mode==='showing');tracks.forEach(t=>t.mode='disabled');const next=(i+1)%tracks.length;tracks[next].mode='showing';playerSay('Subtítulos: '+(tracks[next].label||tracks[next].language||'Pista '+(next+1)))};
-function openMovie(m){activeMovie=m;$('playerTitle').textContent=m.title;$('playerMeta').textContent=[m.year||'',m.category||''].filter(Boolean).join('  •  ');$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden','controls-hidden','controls-locked');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI();showPlayerControls()}
+function openMovie(m){roomCinemaActive=false;$('playerProgress').disabled=false;activeMovie=m;$('playerTitle').textContent=m.title;$('playerMeta').textContent=[m.year||'',m.category||''].filter(Boolean).join('  •  ');$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden','controls-hidden','controls-locked');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI();showPlayerControls()}
+function openRoomCinema(){const preview=$('roomPlayer'),url=preview.currentSrc||preview.src;if(!room||!url){say('syncStatus','Selecciona una película para abrir el reproductor.');return}const wasPlaying=!preview.paused,time=preview.currentTime||0,m=movies.find(x=>x.id===$('roomMovie').value)||movies.find(x=>x.video_url===url);roomCinemaActive=true;activeMovie=m||null;$('playerTitle').textContent=m?.title||room.name;$('playerMeta').textContent=m?[m.year||'',m.category||''].filter(Boolean).join('  •  '):'Reproducción sincronizada en sala';playerRoot.classList.remove('hidden','controls-hidden','controls-locked');playerLocked=false;$('playerBrightness').value=100;solo.style.filter='brightness(100%)';$('playerProgress').disabled=!canControl();solo.pause();solo.src=url;solo.dataset.url=url;preview.pause();const start=()=>{if(!roomCinemaActive)return;try{solo.currentTime=Math.min(time,solo.duration||time)}catch{}syncPlayerUI();if(wasPlaying)solo.play().catch(()=>playerSay('Pulsa reproducir para comenzar.'))};if(solo.readyState>=1)start();else solo.addEventListener('loadedmetadata',start,{once:true});syncPlayerUI();showPlayerControls()}
+$('roomPlayer').onclick=openRoomCinema;$('openRoomCinemaBtn').onclick=openRoomCinema;
 $('closePlayer').onclick=closeCinema;$('backPlayer').onclick=closeCinema;
 $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
@@ -1309,15 +1311,16 @@ async function enterRoom(r){
 }
 function canControl(){return !!room && room.owner_id===session.user.id}
 function applyControl(p,broadcast=true){
- let v=$('roomPlayer');if(p.video_url && v.dataset.url!==p.video_url){v.src=p.video_url;v.dataset.url=p.video_url}
+ let v=roomCinemaActive?solo:$('roomPlayer');if(p.video_url&&v.dataset.url!==p.video_url){v.src=p.video_url;v.dataset.url=p.video_url}
  if(Number.isFinite(p.time)){try{v.currentTime=p.time}catch{}}
+ if(roomCinemaActive){const preview=$('roomPlayer');if(p.video_url&&preview.dataset.url!==p.video_url){preview.src=p.video_url;preview.dataset.url=p.video_url}if(Number.isFinite(p.time)){try{preview.currentTime=p.time}catch{}}preview.pause()}
  if(p.action==='play')v.play().catch(()=>{});else if(p.action==='pause')v.pause();
  if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'control',payload:p});
 }
-function control(action){if(!canControl()){say('syncStatus','Solo quien creó la sala puede controlar la película.');return}let v=$('roomPlayer');applyControl({action,time:v.currentTime||0,video_url:v.currentSrc||v.src})}
+function control(action){if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');else say('syncStatus','Solo quien creó la sala puede controlar la película.');return}let v=roomCinemaActive?solo:$('roomPlayer');applyControl({action,time:v.currentTime||0,video_url:v.currentSrc||v.src})}
 $('playAllBtn').onclick=()=>control('play');$('pauseAllBtn').onclick=()=>control('pause');
 $('backBtn').onclick=()=>seek(-10);$('forwardBtn').onclick=()=>seek(10);
-function seek(delta){if(!canControl())return;let v=$('roomPlayer');v.currentTime=Math.max(0,v.currentTime+delta);applyControl({action:'pause',time:v.currentTime,video_url:v.currentSrc||v.src})}
+function seek(delta){if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');return}let v=roomCinemaActive?solo:$('roomPlayer');v.currentTime=Math.max(0,v.currentTime+delta);applyControl({action:'pause',time:v.currentTime,video_url:v.currentSrc||v.src})}
 $('roomMovie').onchange=()=>{if(!canControl())return;let m=movies.find(x=>x.id===$('roomMovie').value);if(!m)return;let v=$('roomPlayer');v.src=m.video_url;v.dataset.url=m.video_url;applyControl({action:'pause',time:0,video_url:m.video_url})};
 function addChat(name,text,broadcast=true){let d=document.createElement('div');d.className='chat-msg';let b=document.createElement('b');b.textContent=name;let t=document.createElement('span');t.textContent=text;d.append(b,t);$('chatMessages').append(d);$('chatMessages').scrollTop=$('chatMessages').scrollHeight;if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'chat',payload:{name,text}})}
 $('sendChatBtn').onclick=sendChat;$('chatInput').onkeydown=e=>{if(e.key==='Enter')sendChat()};
