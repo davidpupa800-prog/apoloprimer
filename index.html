@@ -1048,7 +1048,7 @@ footer{margin-top:35px}
 <section class="section app-screen" data-screen="rooms" id="salas"><div class="room-banner"><div><h2 style="margin:0">Salas privadas</h2><p class="muted" style="margin:5px 0 0">Crea una sala y comparte su código de invitación.</p></div><div class="uploadrow"><button id="createRoomBtn">＋ Crear sala</button><button class="secondary" id="joinRoomBtn">Unirme con código</button></div></div>
  <div class="room-shell hidden" id="roomShell">
   <div class="room-video"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><h3 id="roomName" style="margin:0">Sala</h3><div class="muted small">Código: <b id="roomCode"></b></div></div><button class="secondary" id="leaveRoomBtn">Salir</button></div>
-   <video id="roomPlayer" playsinline title="Toca para abrir el reproductor de cine" aria-label="Abrir reproductor de cine"></video><div class="room-tools"><button id="playAllBtn">▶ Reproducir para todos</button><button class="secondary" id="pauseAllBtn">Ⅱ Pausar para todos</button><button class="secondary" id="backBtn">↶ 10 s</button><button class="secondary" id="forwardBtn">10 s ↷</button><button class="secondary" id="openRoomCinemaBtn">⛶ Reproductor de cine</button></div>
+   <video id="roomPlayer" playsinline title="Toca para abrir el reproductor de cine" aria-label="Abrir reproductor de cine"></video>
    <p class="muted small" id="syncStatus">La sala se sincroniza en tiempo real.</p>
    <label>Película de la sala<select id="roomMovie"><option value="">Selecciona una película</option></select></label>
   </div>
@@ -1224,7 +1224,7 @@ $('nextPlayer').onclick=()=>playerSay('No hay un próximo episodio asociado a es
 $('audioPlayer').onclick=()=>{const tracks=solo.textTracks;if(!tracks||!tracks.length){playerSay('Este archivo no incluye pistas de subtítulos seleccionables.');return}let i=[...tracks].findIndex(t=>t.mode==='showing');tracks.forEach(t=>t.mode='disabled');const next=(i+1)%tracks.length;tracks[next].mode='showing';playerSay('Subtítulos: '+(tracks[next].label||tracks[next].language||'Pista '+(next+1)))};
 function openMovie(m){roomCinemaActive=false;$('playerProgress').disabled=false;activeMovie=m;$('playerTitle').textContent=m.title;$('playerMeta').textContent=[m.year||'',m.category||''].filter(Boolean).join('  •  ');$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden','controls-hidden','controls-locked');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI();showPlayerControls()}
 function openRoomCinema(){const preview=$('roomPlayer'),url=preview.currentSrc||preview.src;if(!room||!url){say('syncStatus','Selecciona una película para abrir el reproductor.');return}const wasPlaying=!preview.paused,time=preview.currentTime||0,m=movies.find(x=>x.id===$('roomMovie').value)||movies.find(x=>x.video_url===url);roomCinemaActive=true;activeMovie=m||null;$('playerTitle').textContent=m?.title||room.name;$('playerMeta').textContent=m?[m.year||'',m.category||''].filter(Boolean).join('  •  '):'Reproducción sincronizada en sala';playerRoot.classList.remove('hidden','controls-hidden','controls-locked');playerLocked=false;$('playerBrightness').value=100;solo.style.filter='brightness(100%)';$('playerProgress').disabled=!canControl();solo.pause();solo.src=url;solo.dataset.url=url;preview.pause();const start=()=>{if(!roomCinemaActive)return;try{solo.currentTime=Math.min(time,solo.duration||time)}catch{}syncPlayerUI();if(wasPlaying)solo.play().catch(()=>playerSay('Pulsa reproducir para comenzar.'))};if(solo.readyState>=1)start();else solo.addEventListener('loadedmetadata',start,{once:true});syncPlayerUI();showPlayerControls()}
-$('roomPlayer').onclick=openRoomCinema;$('openRoomCinemaBtn').onclick=openRoomCinema;
+$('roomPlayer').onclick=openRoomCinema;
 $('closePlayer').onclick=closeCinema;$('backPlayer').onclick=closeCinema;
 $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
@@ -1311,17 +1311,16 @@ async function enterRoom(r){
 }
 function canControl(){return !!room && room.owner_id===session.user.id}
 function applyControl(p,broadcast=true){
- let v=roomCinemaActive?solo:$('roomPlayer');if(p.video_url&&v.dataset.url!==p.video_url){v.src=p.video_url;v.dataset.url=p.video_url}
+ let v=roomCinemaActive?solo:$('roomPlayer'),videoChanged=!!p.video_url&&v.dataset.url!==p.video_url;if(videoChanged){v.src=p.video_url;v.dataset.url=p.video_url}
  if(Number.isFinite(p.time)){try{v.currentTime=p.time}catch{}}
  if(roomCinemaActive){const preview=$('roomPlayer');if(p.video_url&&preview.dataset.url!==p.video_url){preview.src=p.video_url;preview.dataset.url=p.video_url}if(Number.isFinite(p.time)){try{preview.currentTime=p.time}catch{}}preview.pause()}
  if(p.action==='play')v.play().catch(()=>{});else if(p.action==='pause')v.pause();
  if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'control',payload:p});
+ if(videoChanged&&!roomCinemaActive)openRoomCinema();
 }
 function control(action){if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');else say('syncStatus','Solo quien creó la sala puede controlar la película.');return}let v=roomCinemaActive?solo:$('roomPlayer');applyControl({action,time:v.currentTime||0,video_url:v.currentSrc||v.src})}
-$('playAllBtn').onclick=()=>control('play');$('pauseAllBtn').onclick=()=>control('pause');
-$('backBtn').onclick=()=>seek(-10);$('forwardBtn').onclick=()=>seek(10);
 function seek(delta){if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');return}let v=roomCinemaActive?solo:$('roomPlayer');v.currentTime=Math.max(0,v.currentTime+delta);applyControl({action:'pause',time:v.currentTime,video_url:v.currentSrc||v.src})}
-$('roomMovie').onchange=()=>{if(!canControl())return;let m=movies.find(x=>x.id===$('roomMovie').value);if(!m)return;let v=$('roomPlayer');v.src=m.video_url;v.dataset.url=m.video_url;applyControl({action:'pause',time:0,video_url:m.video_url})};
+$('roomMovie').onchange=()=>{if(!canControl())return;let m=movies.find(x=>x.id===$('roomMovie').value);if(!m)return;let v=$('roomPlayer');v.src=m.video_url;v.dataset.url=m.video_url;applyControl({action:'pause',time:0,video_url:m.video_url});openRoomCinema()};
 function addChat(name,text,broadcast=true){let d=document.createElement('div');d.className='chat-msg';let b=document.createElement('b');b.textContent=name;let t=document.createElement('span');t.textContent=text;d.append(b,t);$('chatMessages').append(d);$('chatMessages').scrollTop=$('chatMessages').scrollHeight;if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'chat',payload:{name,text}})}
 $('sendChatBtn').onclick=sendChat;$('chatInput').onkeydown=e=>{if(e.key==='Enter')sendChat()};
 function sendChat(){let t=$('chatInput').value.trim();if(!t||!roomChannel)return;addChat(session.user.email?.split('@')[0]||'Invitado',t);$('chatInput').value=''}
