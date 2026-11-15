@@ -1144,16 +1144,12 @@ footer{margin-top:35px}
     left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;
     width:auto!important;height:84px!important;box-sizing:border-box!important;
     padding:8px!important;margin:0!important;overflow:hidden!important;
-    background:
-      radial-gradient(ellipse at 18% 110%,rgba(210,30,0,.19),transparent 42%),
-      radial-gradient(ellipse at 88% -10%,rgba(255,75,0,.14),transparent 38%),
-      repeating-linear-gradient(132deg,transparent 0 31px,rgba(255,55,12,.12) 32px,transparent 34px 62px),
-      linear-gradient(145deg,#211b19 0%,#0c0b0b 48%,#19100e 100%)!important;
+    background-image:url('/lava-nav.svg')!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;background-color:#090909!important;
     border:1px solid rgba(145,91,75,.62)!important;border-radius:27px!important;
     box-shadow:0 0 0 1px rgba(0,0,0,.8),0 0 17px rgba(160,25,0,.15),0 10px 32px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,210,180,.12)!important;
     backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;
   }
-  body .bottom-nav:before{
+  body .bottom-nav:before{display:none!important;
     content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
     background:
       linear-gradient(118deg,transparent 14%,rgba(255,72,12,.18) 14.3%,transparent 15%,transparent 57%,rgba(255,40,0,.13) 57.4%,transparent 58%),
