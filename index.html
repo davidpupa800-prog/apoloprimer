@@ -1134,29 +1134,39 @@ footer{margin-top:35px}
 
 .poster-search-panel{margin:22px 0;padding:16px;border:1px solid #3a3032;border-radius:14px;background:#111}.poster-search-panel h3{margin:0 0 6px}.poster-search-panel .uploadrow{display:flex;gap:9px;flex-wrap:wrap}.poster-search-panel select,.poster-search-panel input{min-width:180px;flex:1}.poster-search-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:12px;margin-top:14px}.poster-search-result{min-width:0;background:#1b1b1b;border:1px solid #373737;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:7px}.poster-search-result img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;background:#222}.poster-search-result b{font-size:13px;line-height:1.3}.poster-search-result small{color:#aaa}.poster-search-result button{width:100%;font-size:12px;padding:8px 5px}@media(max-width:600px){.poster-search-panel .uploadrow>*{width:100%;min-width:0}.poster-search-results{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* Mobile navigation redesign: clean cinematic pill tabs */
+/* Mobile navigation: circular icon dock */
 @media(max-width:650px){
-  main{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+  main{padding-bottom:calc(108px + env(safe-area-inset-bottom))}
   .bottom-nav{
-    position:fixed;z-index:50;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));
-    display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;
-    align-items:center;padding:7px 6px;
-    background:rgba(8,8,9,.97);border:1px solid #29292d;border-radius:19px;
-    box-shadow:0 9px 28px rgba(0,0,0,.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    position:fixed;z-index:50;left:0;right:0;bottom:0;
+    display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;
+    align-items:center;padding:9px 5px calc(9px + env(safe-area-inset-bottom));
+    background:rgba(10,10,11,.98);border:0;border-top:1px solid #29292d;border-radius:18px 18px 0 0;
+    box-shadow:0 -8px 28px rgba(0,0,0,.5);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   }
   .bottom-nav button{
-    min-width:0;width:100%;height:58px;padding:5px 1px 4px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-    border:0;border-radius:13px;background:transparent;color:#85858d;
-    font-size:clamp(8px,2.45vw,10px);font-weight:600;line-height:1.1;
-    white-space:nowrap;overflow:hidden;transition:background .18s ease,color .18s ease,transform .18s ease;
+    min-width:0;width:100%;height:70px;padding:2px 0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    border:0;border-radius:12px;background:transparent;color:#929299;
+    font-size:clamp(8px,2.5vw,10px);font-weight:600;line-height:1.1;
+    white-space:nowrap;overflow:hidden;transition:color .2s ease,transform .2s ease;
     -webkit-tap-highlight-color:transparent;
   }
-  .bottom-nav button span{width:28px;height:27px;display:grid;place-items:center;font-size:22px;line-height:1;color:inherit}
-  .bottom-nav button.active{color:#ff3541;background:#251014;box-shadow:inset 0 -2px 0 #e50914}
-  .bottom-nav button:active{transform:scale(.92);background:#351015}
+  .bottom-nav button span{
+    width:39px;height:39px;display:grid;place-items:center;border-radius:50%;
+    border:1px solid #48484e;background:#202023;color:#d0d0d5;
+    font-size:22px;line-height:1;box-shadow:0 2px 7px rgba(0,0,0,.3);
+    transition:all .2s ease;
+  }
+  .bottom-nav button.active{color:#ff4550;background:transparent}
+  .bottom-nav button.active span{
+    color:#fff;background:#e50914;border:1px solid #ff6870;
+    box-shadow:0 0 0 4px rgba(229,9,20,.13),0 4px 14px rgba(229,9,20,.35);
+    transform:translateY(-3px);
+  }
+  .bottom-nav button:active span{transform:scale(.9)}
   .bottom-nav button:focus-visible{outline:2px solid #ff5962;outline-offset:1px}
-  footer{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+  footer{padding-bottom:calc(108px + env(safe-area-inset-bottom))}
 }
 @media(min-width:651px){.bottom-nav{display:none}}
 
@@ -1195,7 +1205,7 @@ footer{margin-top:35px}
  </div>
 </section>
 </main>
-<nav class="bottom-nav" aria-label="Navegación principal"><button class="active" data-go="home"><span>⌂</span>Inicio</button><button data-go="explore"><span>✧</span>Explorar</button><button data-go="downloads"><span>↓</span>Descargas</button><button data-go="mylist"><span>♡</span>Mi lista</button><button data-go="rooms"><span>▣</span>Salas</button><button id="bottomProfile"><span>◉</span>Perfil</button></nav>
+<nav class="bottom-nav" aria-label="Navegación principal"><button class="active" data-go="home"><span>⌂</span>Inicio</button><button data-go="explore"><span>✦</span>Explorar</button><button data-go="downloads"><span>⇩</span>Descargas</button><button data-go="mylist"><span>♥</span>Mi lista</button><button data-go="rooms"><span>▤</span>Salas</button><button id="bottomProfile"><span>●</span>Perfil</button></nav>
 <footer>© 2026 Apoloprimer · Publica únicamente películas que tengas derecho a distribuir.</footer>
 <div class="modal hidden" id="authModal"><div class="modal-card"><h2 id="authTitle">Entrar</h2><label>Correo electrónico<input id="authEmail" type="email" autocomplete="email"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password"></label><div class="uploadrow"><button id="authSubmit">Entrar</button><button class="secondary" id="authToggle">Crear cuenta</button><button class="secondary" id="authClose">Cerrar</button></div><p class="muted small" id="authStatus"></p></div></div>
 
