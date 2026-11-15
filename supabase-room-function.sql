@@ -17,7 +17,8 @@ set search_path = public
 as $$
   select r.id, r.code, r.name, r.owner_id, r.active, r.created_at
   from public.rooms as r
-  where r.code = upper(trim(p_code))
+  where upper(regexp_replace(r.code, '[^A-Za-z0-9]', '', 'g')) =
+        upper(regexp_replace(trim(p_code), '[^A-Za-z0-9]', '', 'g'))
     and r.active = true
   limit 1;
 $$;
