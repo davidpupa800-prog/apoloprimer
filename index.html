@@ -1428,7 +1428,8 @@ async function sendRoomState(){
  const payload={action:current.paused?'pause':'play',time:current.currentTime||0,video_url:url,movie_id:movieId||movie?.id||null,sentAt:Date.now()};
  await roomChannel.send({type:'broadcast',event:'room_state',payload});
 }
-function canControl(){return !!room && room.owner_id===session.user.id}
+function canControl(){return !!room && !!session?.user?.id}
+function isRoomOwner(){return !!room && room.owner_id===session.user.id}
 function applyControl(p,broadcast=true){
  if(!room)return;
  const preview=$('roomPlayer');
@@ -1453,12 +1454,12 @@ function applyControl(p,broadcast=true){
  if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'control',payload:{...p,video_url:url,movie_id:movie?.id||p.movie_id||null,sentAt:Date.now()}});
 }
 function control(action){
- if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');else say('syncStatus','Solo quien creó la sala puede controlar la película.');return}
+ if(!canControl())return
  const v=roomCinemaActive?solo:$('roomPlayer');
  applyControl({action,time:v.currentTime||0,video_url:v.currentSrc||v.src,movie_id:$('roomMovie').value||null});
 }
 function seek(delta){
- if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');else say('syncStatus','Solo quien creó la sala puede controlar la película.');return}
+ if(!canControl())return
  const v=roomCinemaActive?solo:$('roomPlayer');
  v.currentTime=Math.max(0,Math.min(v.duration||Infinity,(v.currentTime||0)+delta));
  applyControl({action:v.paused?'pause':'play',time:v.currentTime,video_url:v.currentSrc||v.src,movie_id:$('roomMovie').value||null});
