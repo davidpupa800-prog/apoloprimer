@@ -1061,7 +1061,7 @@ footer{margin-top:35px}
 <div class="modal hidden" id="authModal"><div class="modal-card"><h2 id="authTitle">Entrar</h2><label>Correo electrónico<input id="authEmail" type="email" autocomplete="email"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password"></label><div class="uploadrow"><button id="authSubmit">Entrar</button><button class="secondary" id="authToggle">Crear cuenta</button><button class="secondary" id="authClose">Cerrar</button></div><p class="muted small" id="authStatus"></p></div></div>
 
 <div class="modal hidden" id="accountModal"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">Mi cuenta</h2><button class="secondary" id="accountClose">Cerrar</button></div><div class="account-tabs"><button class="active" id="profileTab">Perfil</button><button class="secondary" id="settingsTab">Ajustes</button></div><section id="profileSection"><div class="profile-card"><div class="avatar" id="profileAvatar">A</div><div><b id="profileEmail">Usuario</b><div class="muted small">Tu cuenta de Apoloprimer</div></div></div><label>Nombre visible<input id="profileName" maxlength="40" placeholder="Cómo te llamas"></label><label>Nombre de usuario<input id="profileUsername" maxlength="24" placeholder="tu_usuario"></label><label>Biografía<input id="profileBio" maxlength="120" placeholder="Cuéntanos algo sobre ti"></label><label>Foto de perfil<input id="profileAvatarFile" type="file" accept="image/jpeg,image/png,image/webp"></label><div class="muted small">JPG, PNG o WebP · máximo 5 MB</div><div style="display:flex;align-items:center;gap:14px;margin-top:12px"><div class="avatar-preview" id="avatarCropPreview"><span style="display:grid;place-items:center;height:100%;color:#aaa">Vista previa</span></div><div class="crop-controls" style="flex:1"><label>Horizontal<input id="avatarX" type="range" min="0" max="100" value="50"></label><label>Vertical<input id="avatarY" type="range" min="0" max="100" value="50"></label></div></div><div class="muted small">Mueve los controles para centrar tu rostro o ajustar el encuadre.</div><div class="uploadrow"><button id="saveProfile">Guardar perfil</button></div><p class="muted small" id="profileStatus"></p></section><section id="settingsSection" class="hidden"><h3>Ajustes</h3><div class="settings-row"><span>Recibir novedades por correo</span><input id="settingEmails" type="checkbox"></div><div class="settings-row"><span>Idioma</span><b>Español</b></div><div class="settings-row"><span>Seguridad</span><span class="muted small">Contraseña protegida por Supabase</span></div><div class="uploadrow"><button id="saveSettings">Guardar ajustes</button><button class="secondary" id="signOutBtn">Cerrar sesión</button></div><p class="muted small" id="settingsStatus"></p></section></div></div>
-<div class="modal hidden" id="roomModal"><div class="modal-card"><h2 id="roomModalTitle">Crear sala</h2><label id="roomNameLabel">Nombre<input id="roomNameInput" placeholder="Noche de películas"></label><label id="roomCodeLabel" class="hidden">Código<input id="roomCodeInput" maxlength="8" placeholder="Código de invitación"></label><div class="uploadrow"><button id="roomModalSubmit">Continuar</button><button class="secondary" id="roomModalClose">Cancelar</button></div><p class="muted small" id="roomModalStatus"></p></div></div>
+<div class="modal hidden" id="roomModal"><div class="modal-card"><h2 id="roomModalTitle">Crear sala</h2><label id="roomNameLabel">Nombre<input id="roomNameInput" placeholder="Noche de películas"></label><label id="roomCodeLabel" class="hidden">Código de invitación<input id="roomCodeInput" type="text" maxlength="12" minlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Ej. A7K9PX"></label><div class="uploadrow"><button id="roomModalSubmit">Continuar</button><button class="secondary" id="roomModalClose">Cancelar</button></div><p class="muted small" id="roomModalStatus"></p></div></div>
 <div id="player" class="hidden"><div class="cinema-player" id="cinemaPlayer">
  <video id="soloPlayer" playsinline preload="metadata"></video>
  <header class="cinema-top">
@@ -1291,13 +1291,62 @@ $('uploadBtn').onclick=async()=>{
 
 };
 function refreshRoomMovies(){let s=$('roomMovie');s.innerHTML='<option value="">Selecciona una película</option>';movies.forEach(m=>{let o=document.createElement('option');o.value=m.id;o.textContent=m.title;s.append(o)})}
-let roomMode='create';$('createRoomBtn').onclick=()=>openRoomModal('create');$('joinRoomBtn').onclick=()=>openRoomModal('join');
-function openRoomModal(mode){if(!session){showAuth();return}roomMode=mode;$('roomModalTitle').textContent=mode==='create'?'Crear sala privada':'Unirme a una sala';$('roomNameLabel').classList.toggle('hidden',mode==='join');$('roomCodeLabel').classList.toggle('hidden',mode==='create');$('roomModalStatus').textContent='';$('roomModal').classList.remove('hidden')}
+let roomMode='create';
+const ROOM_CODE_ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function generateRoomCode(){
+ const bytes=new Uint8Array(6);
+ crypto.getRandomValues(bytes);
+ return Array.from(bytes,b=>ROOM_CODE_ALPHABET[b%ROOM_CODE_ALPHABET.length]).join('');
+}
+$('createRoomBtn').onclick=()=>openRoomModal('create');$('joinRoomBtn').onclick=()=>openRoomModal('join');
+function openRoomModal(mode){
+ if(!session){showAuth();return}
+ roomMode=mode;
+ $('roomModalTitle').textContent=mode==='create'?'Crear sala privada':'Unirme a una sala';
+ $('roomNameLabel').classList.toggle('hidden',mode==='join');
+ $('roomCodeLabel').classList.toggle('hidden',mode==='create');
+ $('roomModalStatus').textContent='';
+ $('roomCodeInput').value='';
+ $('roomModalSubmit').disabled=false;
+ $('roomModal').classList.remove('hidden');
+}
 $('roomModalClose').onclick=()=>$('roomModal').classList.add('hidden');
+$('roomCodeInput').addEventListener('input',()=>{
+ const input=$('roomCodeInput');
+ input.value=input.value.toUpperCase().replace(/[^A-Z0-9 -]/g,'').slice(0,12);
+});
 $('roomModalSubmit').onclick=async()=>{
- if(roomMode==='create'){let name=$('roomNameInput').value.trim()||'Sala de películas',code=crypto.randomUUID().replaceAll('-','').slice(0,12).toUpperCase();let r=await supabase.from('rooms').insert({code,name,owner_id:session.user.id}).select().single();if(r.error){say('roomModalStatus',r.error.message);return}enterRoom(r.data)}
- else{let code=$('roomCodeInput').value.trim().toUpperCase();let r=await supabase.rpc('find_room_by_code',{p_code:code});let found=Array.isArray(r.data)?r.data[0]:r.data;if(r.error||!found){say('roomModalStatus','No encontramos esa sala. Revisa el código.');return}enterRoom(found)}
- $('roomModal').classList.add('hidden');
+ const button=$('roomModalSubmit');
+ button.disabled=true;
+ $('roomModalStatus').textContent=roomMode==='create'?'Creando una sala…':'Buscando la sala…';
+ try{
+  if(roomMode==='create'){
+   const name=$('roomNameInput').value.trim()||'Sala de películas';
+   let created=null;
+   for(let attempt=0;attempt<8;attempt++){
+    const code=generateRoomCode();
+    const result=await supabase.from('rooms').insert({code,name,owner_id:session.user.id}).select().single();
+    if(!result.error){created=result.data;break}
+    if(result.error.code!=='23505')throw new Error(result.error.message||'No se pudo crear la sala.');
+   }
+   if(!created)throw new Error('No se pudo generar un código único. Inténtalo de nuevo.');
+   $('roomCodeInput').value='';
+   enterRoom(created);
+  }else{
+   const code=$('roomCodeInput').value.trim().toUpperCase().replace(/[\s-]/g,'');
+   if(code.length<6||code.length>12)throw new Error('El código debe tener entre 6 y 12 caracteres.');
+   const result=await supabase.rpc('find_room_by_code',{p_code:code});
+   const found=Array.isArray(result.data)?result.data[0]:result.data;
+   if(result.error)throw new Error('No se pudo consultar la sala: '+result.error.message);
+   if(!found)throw new Error('No encontramos esa sala. Revisa el código e inténtalo otra vez.');
+   enterRoom(found);
+  }
+  $('roomModal').classList.add('hidden');
+ }catch(error){
+  say('roomModalStatus',error.message||'Ocurrió un error con la sala.');
+ }finally{
+  button.disabled=false;
+ }
 };
 async function enterRoom(r){
  showScreen('rooms');
