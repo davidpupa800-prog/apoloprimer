@@ -1402,24 +1402,24 @@ async function enterRoom(r){
  roomChannel=supabase.channel('room-'+r.code,{config:{broadcast:{self:false},presence:{key:session.user.id}}});
  roomChannel.on('broadcast',{event:'chat'},({payload})=>addChat(payload.name,payload.text,false));
  roomChannel.on('broadcast',{event:'control'},({payload})=>applyControl(payload,false));
- roomChannel.on('broadcast',{event:'request_state'},async({payload})=>{if(canControl())await sendRoomState()});
+ roomChannel.on('broadcast',{event:'request_state'},async({payload})=>{if(isRoomOwner())await sendRoomState()});
  roomChannel.on('broadcast',{event:'room_state'},({payload})=>applyControl(payload,false));
  roomChannel.on('presence',{event:'sync'},()=>{
   say('syncStatus','Participantes conectados: '+Object.keys(roomChannel.presenceState()).length);
-  if(canControl())sendRoomState();
+  if(isRoomOwner())sendRoomState();
  });
  roomChannel.subscribe(async status=>{
   if(status==='SUBSCRIBED'){
    await roomChannel.track({name:session.user.email?.split('@')[0]||'Invitado'});
    say('syncStatus','Sala conectada. Sincronizando película y reproducción…');
-   if(!canControl())roomChannel.send({type:'broadcast',event:'request_state',payload:{user_id:session.user.id}});
+   if(!isRoomOwner())roomChannel.send({type:'broadcast',event:'request_state',payload:{user_id:session.user.id}});
    else await sendRoomState();
   }
  });
  $('salas').scrollIntoView({behavior:'smooth'});
 }
 async function sendRoomState(){
- if(!canControl()||!roomChannel)return;
+ if(!isRoomOwner()||!roomChannel)return;
  const current=roomCinemaActive?solo:$('roomPlayer');
  const movieId=$('roomMovie').value||'';
  const movie=movies.find(x=>String(x.id)===String(movieId));
@@ -1464,7 +1464,7 @@ function seek(delta){
  v.currentTime=Math.max(0,Math.min(v.duration||Infinity,(v.currentTime||0)+delta));
  applyControl({action:v.paused?'pause':'play',time:v.currentTime,video_url:v.currentSrc||v.src,movie_id:$('roomMovie').value||null});
 }
-$('roomMovie').onchange=()=>{if(!canControl())return;let m=movies.find(x=>String(x.id)===String($('roomMovie').value));if(!m)return;let v=$('roomPlayer');v.pause();v.src=m.video_url;v.dataset.url=m.video_url;v.load();applyControl({action:'pause',time:0,video_url:m.video_url,movie_id:m.id});openRoomCinema()};
+$('roomMovie').onchange=()=>{if(!isRoomOwner())return;let m=movies.find(x=>String(x.id)===String($('roomMovie').value));if(!m)return;let v=$('roomPlayer');v.pause();v.src=m.video_url;v.dataset.url=m.video_url;v.load();applyControl({action:'pause',time:0,video_url:m.video_url,movie_id:m.id});openRoomCinema()};
 function addChat(name,text,broadcast=true){let d=document.createElement('div');d.className='chat-msg';let b=document.createElement('b');b.textContent=name;let t=document.createElement('span');t.textContent=text;d.append(b,t);$('chatMessages').append(d);$('chatMessages').scrollTop=$('chatMessages').scrollHeight;if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'chat',payload:{name,text}})}
 $('sendChatBtn').onclick=sendChat;$('chatInput').onkeydown=e=>{if(e.key==='Enter')sendChat()};
 function sendChat(){let t=$('chatInput').value.trim();if(!t||!roomChannel)return;addChat(session.user.email?.split('@')[0]||'Invitado',t);$('chatInput').value=''}
