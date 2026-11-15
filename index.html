@@ -1129,6 +1129,8 @@ footer{margin-top:35px}
 /* Hard override for the actual profile badge element */
 #adminVerifiedV.admin-verified-v{width:22px!important;height:22px!important;min-width:22px!important;max-width:22px!important;min-height:22px!important;max-height:22px!important;flex:0 0 22px!important;object-fit:contain!important;display:inline-block!important;transform:none!important;padding:0!important;margin:0 0 0 3px!important;border:0!important;border-radius:0!important;background:transparent!important;filter:drop-shadow(0 0 2px #ffd34a)!important}
 @media(max-width:760px){#adminVerifiedV.admin-verified-v{width:22px!important;height:22px!important;min-width:22px!important;max-width:22px!important;flex-basis:22px!important}}
+
+.movie-poster-preview-wrap{display:flex;flex-direction:column;gap:8px;margin:14px 0}.movie-poster-preview{width:150px;aspect-ratio:2/3;object-fit:cover;border-radius:12px;border:1px solid #6b252b;box-shadow:0 8px 28px #0009}.movie-poster-preview[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -1146,12 +1148,12 @@ footer{margin-top:35px}
 <section class="panel hidden app-screen" data-screen="home" id="adminPanel">
  <h2>Panel de administración</h2><p class="muted small">Solo las cuentas autorizadas como administradoras pueden subir contenido.</p>
  <div class="formgrid">
-  <label>Título<input id="movieTitle" placeholder="Nombre de la película"></label>
+  <label>Título<input id="movieTitle" placeholder="Se detectará desde el nombre del archivo"></label>
   <label>Categoría<select id="movieCategory"><option>Acción</option><option>Terror</option><option>Romance</option><option>Comedia</option><option>Drama</option><option>Ciencia ficción</option><option>Documental</option></select></label>
-  <label>Año<input id="movieYear" type="number" placeholder="2026"></label>
-  <label>Portada<input id="movieCover" type="file" accept="image/*"></label>
+  <label>Año<input id="movieYear" type="number" placeholder="Se detectará si aparece en el nombre"></label>
+  <label>Portada personalizada (opcional)<input id="movieCover" type="file" accept="image/jpeg,image/png,image/webp"></label>
   <label>Video<input id="movieVideo" type="file" accept="video/mp4,video/webm,video/quicktime"></label>
- </div><div class="uploadrow"><button id="uploadBtn">Subir película</button><button id="optimizeMoviesBtn" class="secondary" type="button">Optimizar videos existentes</button><span class="muted small" id="uploadStatus"></span></div>
+ </div><div class="movie-poster-preview-wrap"><div class="muted small">Póster automático de la película</div><img id="moviePosterPreview" class="movie-poster-preview" alt="Vista previa del póster generado" hidden><div id="moviePosterHint" class="muted small">Al elegir el video, Apoloprimer preparará una portada cinematográfica. Puedes reemplazarla arriba.</div></div><div class="uploadrow"><button id="uploadBtn">Subir película</button><button id="optimizeMoviesBtn" class="secondary" type="button">Optimizar videos existentes</button><span class="muted small" id="uploadStatus"></span></div>
 </section>
 <section class="section app-screen" data-screen="rooms" id="salas"><div class="room-banner"><div><h2 style="margin:0">Salas privadas</h2><p class="muted" style="margin:5px 0 0">Crea una sala y comparte su código de invitación.</p></div><div class="uploadrow"><button id="createRoomBtn">＋ Crear sala</button><button class="secondary" id="joinRoomBtn">Unirme con código</button></div></div>
  <div class="room-shell hidden" id="roomShell">
@@ -1438,9 +1440,15 @@ $('optimizeMoviesBtn').onclick=async()=>{
  }catch(error){say('uploadStatus',error.message||'No se pudo completar la optimización.')}
  finally{button.disabled=false}
 };
+function cleanMovieFilename(name){return name.replace(/\\.[^.]+$/,'').replace(/\\b(1080p|720p|2160p|4k|bluray|blu.?ray|web.?dl|hdrip|hdtv|x264|x265|hevc|aac|dual audio|latino|spanish|english)\\b/gi,' ').replace(/[._-]+/g,' ').replace(/\\s+/g,' ').trim()}
+function inferMovieCategory(title){const t=title.toLowerCase();const rules=[['Terror',/horror|terror|scary|haunt|demon|devil|ghost|zombie|exorc|nightmare|scream|insidious|conjuring|annabelle/],['Romance',/romance|love|amor|wedding|boda|kiss|beso|valentine/],['Comedia',/comedy|comedia|funny|joke|vacation|vacaciones/],['Ciencia ficción',/sci.?fi|science fiction|space|alien|robot|future|matrix|dune|star wars|interstellar/],['Documental',/documentary|documental/],['Acción',/action|accion|war|guerra|fight|mission|avengers|john wick|fast.?furious/],['Drama',/drama|life|vida|father|madre|padre|story|historia/]];return (rules.find(x=>x[1].test(t))||[null])[0]||'Drama'}
+async function makeCinematicPoster(file,title,category,year){const W=600,H=900,canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');let frame=false;const video=document.createElement('video');video.muted=true;video.playsInline=true;video.preload='auto';video.src=URL.createObjectURL(file);try{await new Promise((resolve,reject)=>{video.onloadeddata=resolve;video.onerror=reject;setTimeout(()=>reject(new Error('poster timeout')),12000)});const target=Math.min(Math.max(2,(video.duration||20)*.32),Math.max(2,(video.duration||20)-1));video.currentTime=target;await new Promise((resolve,reject)=>{video.onseeked=resolve;setTimeout(()=>reject(new Error('seek timeout')),5000)});const sw=video.videoWidth,sh=video.videoHeight;if(sw&&sh){const scale=Math.max(W/sw,H/sh),dw=sw*scale,dh=sh*scale;ctx.drawImage(video,(W-dw)/2,(H-dh)/2,dw,dh);frame=true}}catch(e){}finally{URL.revokeObjectURL(video.src);video.remove()}if(!frame){const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#41070d');g.addColorStop(.55,'#100d12');g.addColorStop(1,'#020204');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle='#e50914';ctx.globalAlpha=.22;ctx.beginPath();ctx.arc(440,270,190,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
+const shade=ctx.createLinearGradient(0,0,0,H);shade.addColorStop(0,'rgba(0,0,0,.08)');shade.addColorStop(.48,'rgba(0,0,0,.08)');shade.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=shade;ctx.fillRect(0,0,W,H);ctx.fillStyle='#e50914';ctx.fillRect(42,54,8,54);ctx.fillStyle='#fff';ctx.font='700 25px Arial';ctx.letterSpacing='5px';ctx.fillText('APOLOPRIMER ORIGINAL',68,88);ctx.letterSpacing='0px';ctx.shadowColor='#000';ctx.shadowBlur=18;let size=title.length>25?42:title.length>17?50:60;ctx.font='900 '+size+'px Arial';const words=title.split(' ');let lines=[],line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>W-84&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);let y=H-245;lines.slice(0,3).forEach(s=>{ctx.fillText(s,42,y);y+=size+8});ctx.shadowBlur=0;ctx.fillStyle='#ff3342';ctx.font='700 23px Arial';ctx.fillText((category||'Película').toUpperCase(),44,y+25);ctx.fillStyle='#ddd';ctx.font='22px Arial';ctx.fillText('APOLOPRIMER  ·  '+(year||'ESTRENO'),44,y+65);return await new Promise(resolve=>canvas.toBlob(b=>resolve(b?new File([b],(title||'poster').replace(/[^a-z0-9]/gi,'_')+'.webp',{type:'image/webp'}):null),'image/webp',.88))}
+$('movieVideo').addEventListener('change',async()=>{const file=$('movieVideo').files[0];if(!file)return;const raw=cleanMovieFilename(file.name);if(!$('movieTitle').value.trim())$('movieTitle').value=raw;if(!$('movieYear').value){const y=file.name.match(/(?:19|20)\\d{2}/);if(y)$('movieYear').value=y[0]}const inferred=inferMovieCategory(raw);$('movieCategory').value=inferred;say('uploadStatus','Preparando póster cinematográfico…');try{const poster=await makeCinematicPoster(file,$('movieTitle').value,$('movieCategory').value,$('movieYear').value);if(poster){window.apoloGeneratedPoster=poster;const img=$('moviePosterPreview');img.src=URL.createObjectURL(poster);img.hidden=false;$('moviePosterHint').textContent='Póster listo. Si prefieres una portada oficial, puedes seleccionarla arriba.'}else $('moviePosterHint').textContent='No se pudo generar la portada automática; selecciona una imagen.'}catch(e){$('moviePosterHint').textContent='No se pudo generar la portada automática; selecciona una imagen.'}say('uploadStatus','Datos detectados. Revisa el título y la categoría antes de subir.')});
+$('movieCover').addEventListener('change',()=>{const f=$('movieCover').files[0];if(!f)return;window.apoloGeneratedPoster=null;const img=$('moviePosterPreview');img.src=URL.createObjectURL(f);img.hidden=false;$('moviePosterHint').textContent='Se utilizará la portada que seleccionaste.'});
 $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
- let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0];if(!title||!vf){say('uploadStatus','Agrega título y archivo de video.');return}
+ let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0]||window.apoloGeneratedPoster||null;if(!title||!vf){say('uploadStatus','Selecciona el video. El título se completa automáticamente, pero puedes editarlo.');return}if(!cf){say('uploadStatus','No se pudo crear la portada. Selecciona una imagen manualmente.');return}
  if(vf.size>2*1024*1024*1024){say('uploadStatus','El video supera el límite recomendado de 2 GB.');return}
  say('uploadStatus','Preparando subida segura a Cloudflare R2…');
  const safe=s=>s.replace(/[^a-z0-9._-]/gi,'_');
@@ -1497,7 +1505,7 @@ $('uploadBtn').onclick=async()=>{
   });
   if(ins.error)throw new Error(ins.error.message);
   say('uploadStatus','Película publicada correctamente en R2.');
-  $('movieTitle').value='';$('movieVideo').value='';$('movieCover').value='';
+  $('movieTitle').value='';$('movieVideo').value='';$('movieCover').value='';window.apoloGeneratedPoster=null;$('moviePosterPreview').hidden=true;$('moviePosterPreview').removeAttribute('src');$('moviePosterHint').textContent='Al elegir el video, Apoloprimer preparará una portada cinematográfica. Puedes reemplazarla arriba.';
   await loadMovies();
  }catch(error){say('uploadStatus',error.message||'Error al subir el archivo.')}
 
