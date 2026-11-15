@@ -1602,7 +1602,7 @@ function renderSearchResults(){
 
 let homeSelectedCategory='Todos';
 function homeCategoryParts(value){
- return String(value||'').split(/\\s*[\\/,|]\\s*/).map(x=>x.trim()).filter(Boolean);
+ return String(value||'').split(/[\/,|]/).map(x=>x.trim()).filter(Boolean);
 }
 function refreshHomeCategoryMenu(){
  const menu=$('homeCategoryMenu');if(!menu)return;
