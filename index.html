@@ -1611,6 +1611,21 @@ if(apoloSplash&&apoloSplashVideo){
 init();
 </script>
 <script>
+/* Respaldo independiente: nunca dejar la pantalla de introducción bloqueando la aplicación. */
+(function(){
+ const removeIntro=()=>{
+  const intro=document.getElementById('apoloSplash');
+  if(!intro)return;
+  intro.classList.add('is-leaving');
+  window.setTimeout(()=>intro.remove(),250);
+ };
+ const video=document.getElementById('apoloSplashVideo');
+ if(video){video.addEventListener('ended',removeIntro,{once:true});video.addEventListener('error',removeIntro,{once:true});}
+ window.setTimeout(removeIntro,2200);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')removeIntro()},{once:true});
+})();
+</script>
+<script>
 /* Safari/iOS: bloquea los gestos de pellizco para ampliar la página. */
 (function(){
   const stopPageZoom = event => { event.preventDefault(); };
