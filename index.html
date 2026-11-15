@@ -1203,7 +1203,16 @@ playerRoot.addEventListener('click',e=>{
 $('togglePlayback').onclick=()=>{if(roomCinemaActive)control(solo.paused?'play':'pause');else if(solo.paused)solo.play().catch(()=>playerSay('No se pudo iniciar la reproducción.'));else solo.pause();showPlayerControls()};
 $('seekBack').onclick=()=>{if(roomCinemaActive)seek(-10);else solo.currentTime=Math.max(0,(solo.currentTime||0)-10);showPlayerControls()};
 $('seekForward').onclick=()=>{if(roomCinemaActive)seek(10);else solo.currentTime=Math.min(solo.duration||Infinity,(solo.currentTime||0)+10);showPlayerControls()};
-$('playerProgress').oninput=e=>{if(solo.duration)solo.currentTime=solo.duration*(Number(e.target.value)/1000);showPlayerControls()};$('playerProgress').onchange=()=>{if(!roomCinemaActive)return;if(!canControl()){playerSay('Solo quien creó la sala puede controlar la película.');syncPlayerUI();return}applyControl({action:solo.paused?'pause':'play',time:solo.currentTime,video_url:solo.currentSrc||solo.src})};
+$('playerProgress').oninput=e=>{
+ if(roomCinemaActive&&!canControl()){syncPlayerUI();return}
+ if(solo.duration)solo.currentTime=solo.duration*(Number(e.target.value)/1000);
+ showPlayerControls();
+};
+$('playerProgress').onchange=()=>{
+ if(!roomCinemaActive)return;
+ if(!canControl()){playerSay('Solo quien creó la sala puede controlar la película.');syncPlayerUI();return}
+ applyControl({action:solo.paused?'pause':'play',time:solo.currentTime,video_url:solo.currentSrc||solo.src});
+};
 solo.addEventListener('timeupdate',syncPlayerUI);solo.addEventListener('play',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('pause',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('loadedmetadata',syncPlayerUI);
 $('playerBrightness').oninput=e=>{solo.style.filter='brightness('+e.target.value+'%)';showPlayerControls()};
 $('playerVolume').oninput=e=>{solo.volume=Math.max(0,Math.min(1,Number(e.target.value)/100));showPlayerControls()};
@@ -1357,21 +1366,53 @@ async function enterRoom(r){
  roomChannel=supabase.channel('room-'+r.code,{config:{broadcast:{self:false},presence:{key:session.user.id}}});
  roomChannel.on('broadcast',{event:'chat'},({payload})=>addChat(payload.name,payload.text,false));
  roomChannel.on('broadcast',{event:'control'},({payload})=>applyControl(payload,false));
- roomChannel.on('presence',{event:'sync'},()=>say('syncStatus','Participantes conectados: '+Object.keys(roomChannel.presenceState()).length));
+ roomChannel.on('presence',{event:'sync'},()=>{
+  say('syncStatus','Participantes conectados: '+Object.keys(roomChannel.presenceState()).length);
+  if(canControl()){
+   const current=roomCinemaActive?solo:$('roomPlayer');
+   const url=current.currentSrc||current.src||current.dataset.url;
+   if(url)roomChannel.send({type:'broadcast',event:'control',payload:{action:current.paused?'pause':'play',time:current.currentTime||0,video_url:url,sentAt:Date.now()}});
+  }
+ });
  roomChannel.subscribe(async status=>{if(status==='SUBSCRIBED'){await roomChannel.track({name:session.user.email?.split('@')[0]||'Invitado'});say('syncStatus','Sala conectada. Los controles los maneja el creador.')}});
  $('salas').scrollIntoView({behavior:'smooth'});
 }
 function canControl(){return !!room && room.owner_id===session.user.id}
 function applyControl(p,broadcast=true){
- let v=roomCinemaActive?solo:$('roomPlayer'),videoChanged=!!p.video_url&&v.dataset.url!==p.video_url;if(videoChanged){v.src=p.video_url;v.dataset.url=p.video_url}
- if(Number.isFinite(p.time)){try{v.currentTime=p.time}catch{}}
- if(roomCinemaActive){const preview=$('roomPlayer');if(p.video_url&&preview.dataset.url!==p.video_url){preview.src=p.video_url;preview.dataset.url=p.video_url}if(Number.isFinite(p.time)){try{preview.currentTime=p.time}catch{}}preview.pause()}
- if(p.action==='play')v.play().catch(()=>{});else if(p.action==='pause')v.pause();
- if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'control',payload:p});
- if(videoChanged&&!roomCinemaActive)openRoomCinema();
+ if(!room)return;
+ const preview=$('roomPlayer');
+ const url=p.video_url||preview.dataset.url||preview.currentSrc||preview.src;
+ const targets=[preview];
+ if(roomCinemaActive&&solo!==preview)targets.push(solo);
+ const elapsed=p.action==='play'&&Number.isFinite(p.sentAt)?Math.max(0,(Date.now()-p.sentAt)/1000):0;
+ targets.forEach(v=>{
+  if(url&&v.dataset.url!==url){v.src=url;v.dataset.url=url;v.load()}
+  const syncPlayback=()=>{
+   if(Number.isFinite(p.time)){
+    const targetTime=Math.max(0,p.time+elapsed);
+    try{if(Math.abs((v.currentTime||0)-targetTime)>0.65)v.currentTime=targetTime}catch{}
+   }
+   if(p.action==='play')v.play().catch(()=>{});
+   else if(p.action==='pause')v.pause();
+  };
+  if(v.readyState>=1)syncPlayback();
+  else if(url) v.addEventListener('loadedmetadata',syncPlayback,{once:true});
+ });
+ if(broadcast&&roomChannel){
+  roomChannel.send({type:'broadcast',event:'control',payload:{...p,video_url:url,sentAt:Date.now()}});
+ }
 }
-function control(action){if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');else say('syncStatus','Solo quien creó la sala puede controlar la película.');return}let v=roomCinemaActive?solo:$('roomPlayer');applyControl({action,time:v.currentTime||0,video_url:v.currentSrc||v.src})}
-function seek(delta){if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');return}let v=roomCinemaActive?solo:$('roomPlayer');v.currentTime=Math.max(0,v.currentTime+delta);applyControl({action:'pause',time:v.currentTime,video_url:v.currentSrc||v.src})}
+function control(action){
+ if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');else say('syncStatus','Solo quien creó la sala puede controlar la película.');return}
+ const v=roomCinemaActive?solo:$('roomPlayer');
+ applyControl({action,time:v.currentTime||0,video_url:v.currentSrc||v.src});
+}
+function seek(delta){
+ if(!canControl()){if(roomCinemaActive)playerSay('Solo quien creó la sala puede controlar la película.');else say('syncStatus','Solo quien creó la sala puede controlar la película.');return}
+ const v=roomCinemaActive?solo:$('roomPlayer');
+ v.currentTime=Math.max(0,Math.min(v.duration||Infinity,(v.currentTime||0)+delta));
+ applyControl({action:v.paused?'pause':'play',time:v.currentTime,video_url:v.currentSrc||v.src});
+}
 $('roomMovie').onchange=()=>{if(!canControl())return;let m=movies.find(x=>x.id===$('roomMovie').value);if(!m)return;let v=$('roomPlayer');v.src=m.video_url;v.dataset.url=m.video_url;applyControl({action:'pause',time:0,video_url:m.video_url});openRoomCinema()};
 function addChat(name,text,broadcast=true){let d=document.createElement('div');d.className='chat-msg';let b=document.createElement('b');b.textContent=name;let t=document.createElement('span');t.textContent=text;d.append(b,t);$('chatMessages').append(d);$('chatMessages').scrollTop=$('chatMessages').scrollHeight;if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'chat',payload:{name,text}})}
 $('sendChatBtn').onclick=sendChat;$('chatInput').onkeydown=e=>{if(e.key==='Enter')sendChat()};
