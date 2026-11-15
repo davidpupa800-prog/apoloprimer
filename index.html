@@ -1194,6 +1194,15 @@ footer{margin-top:35px}
 #featuredTitle.movie-font-0,#featuredTitle.movie-font-4,#featuredTitle.movie-font-7{font-style:italic!important}
 #featuredTitle.movie-font-3{letter-spacing:-.06em!important}
 
+
+/* Ajuste de escala: títulos más discretos y proporcionados */
+.movie-card-title{font-size:14px!important;line-height:1.2!important}
+#featuredTitle{font-size:clamp(27px,5vw,43px)!important;line-height:1.08!important;max-width:760px}
+@media(max-width:600px){
+ .movie-card-title{font-size:13px!important}
+ #featuredTitle{font-size:clamp(25px,7vw,34px)!important;line-height:1.1!important}
+}
+
 </style>
 </head>
 <body>
