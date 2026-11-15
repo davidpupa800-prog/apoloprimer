@@ -1051,7 +1051,7 @@ footer{margin-top:35px}
 <section class="section app-screen" data-screen="rooms" id="salas"><div class="room-banner"><div><h2 style="margin:0">Salas privadas</h2><p class="muted" style="margin:5px 0 0">Crea una sala y comparte su código de invitación.</p></div><div class="uploadrow"><button id="createRoomBtn">＋ Crear sala</button><button class="secondary" id="joinRoomBtn">Unirme con código</button></div></div>
  <div class="room-shell hidden" id="roomShell">
   <div class="room-video"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><h3 id="roomName" style="margin:0">Sala</h3><div class="muted small">Código: <b id="roomCode"></b></div></div><button class="secondary" id="leaveRoomBtn">Salir</button></div>
-   <video id="roomPlayer" playsinline title="Toca para abrir el reproductor de cine" aria-label="Abrir reproductor de cine"></video>
+   <video id="roomPlayer" playsinline preload="auto" title="Toca para abrir el reproductor de cine" aria-label="Abrir reproductor de cine"></video>
    <p class="muted small" id="syncStatus">La sala se sincroniza en tiempo real.</p>
    <label>Película de la sala<select id="roomMovie"><option value="">Selecciona una película</option></select></label>
   </div>
@@ -1066,7 +1066,7 @@ footer{margin-top:35px}
 <div class="modal hidden" id="accountModal"><div class="modal-card"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">Mi cuenta</h2><button class="secondary" id="accountClose">Cerrar</button></div><div class="account-tabs"><button class="active" id="profileTab">Perfil</button><button class="secondary" id="settingsTab">Ajustes</button></div><section id="profileSection"><div class="profile-card"><div class="avatar" id="profileAvatar">A</div><div><b id="profileEmail">Usuario</b><div class="muted small">Tu cuenta de Apoloprimer</div></div></div><label>Nombre visible<input id="profileName" maxlength="40" placeholder="Cómo te llamas"></label><label>Nombre de usuario<input id="profileUsername" maxlength="24" placeholder="tu_usuario"></label><label>Biografía<input id="profileBio" maxlength="120" placeholder="Cuéntanos algo sobre ti"></label><label>Foto de perfil<input id="profileAvatarFile" type="file" accept="image/jpeg,image/png,image/webp"></label><div class="muted small">JPG, PNG o WebP · máximo 5 MB</div><div style="display:flex;align-items:center;gap:14px;margin-top:12px"><div class="avatar-preview" id="avatarCropPreview"><span style="display:grid;place-items:center;height:100%;color:#aaa">Vista previa</span></div><div class="crop-controls" style="flex:1"><label>Horizontal<input id="avatarX" type="range" min="0" max="100" value="50"></label><label>Vertical<input id="avatarY" type="range" min="0" max="100" value="50"></label></div></div><div class="muted small">Mueve los controles para centrar tu rostro o ajustar el encuadre.</div><div class="uploadrow"><button id="saveProfile">Guardar perfil</button></div><p class="muted small" id="profileStatus"></p></section><section id="settingsSection" class="hidden"><h3>Ajustes</h3><div class="settings-row"><span>Recibir novedades por correo</span><input id="settingEmails" type="checkbox"></div><div class="settings-row"><span>Idioma</span><b>Español</b></div><div class="settings-row"><span>Seguridad</span><span class="muted small">Contraseña protegida por Supabase</span></div><div class="uploadrow"><button id="saveSettings">Guardar ajustes</button><button class="secondary" id="signOutBtn">Cerrar sesión</button></div><p class="muted small" id="settingsStatus"></p></section></div></div>
 <div class="modal hidden" id="roomModal"><div class="modal-card"><h2 id="roomModalTitle">Crear sala</h2><label id="roomNameLabel">Nombre<input id="roomNameInput" placeholder="Noche de películas"></label><label id="roomCodeLabel" class="hidden">Código de invitación<input id="roomCodeInput" type="text" maxlength="12" minlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Ej. A7K9PX"></label><div class="uploadrow"><button id="roomModalSubmit">Continuar</button><button class="secondary" id="roomModalClose">Cancelar</button></div><p class="muted small" id="roomModalStatus"></p></div></div>
 <div id="player" class="hidden"><div class="cinema-player" id="cinemaPlayer">
- <video id="soloPlayer" playsinline preload="metadata"></video>
+ <video id="soloPlayer" playsinline preload="auto" webkit-playsinline></video>
  <header class="cinema-top">
   <div class="cinema-heading"><button id="backPlayer" class="cinema-back" title="Volver"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><div class="cinema-titleblock"><div class="cinema-titleline"><b id="playerTitle"></b><span class="cinema-hd">HD</span></div><div id="playerMeta" class="cinema-meta"></div></div></div>
   <div class="cinema-actions">
@@ -1214,6 +1214,27 @@ $('playerProgress').onchange=()=>{
  applyControl({action:solo.paused?'pause':'play',time:solo.currentTime,video_url:solo.currentSrc||solo.src});
 };
 solo.addEventListener('timeupdate',syncPlayerUI);solo.addEventListener('play',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('pause',()=>{syncPlayerUI();showPlayerControls()});solo.addEventListener('loadedmetadata',syncPlayerUI);
+let playbackRecoveryAttempts=0,playbackRecoveryTimer=null;
+function clearPlaybackRecovery(){clearTimeout(playbackRecoveryTimer);playbackRecoveryTimer=null;playbackRecoveryAttempts=0}
+solo.addEventListener('loadstart',clearPlaybackRecovery);
+solo.addEventListener('playing',()=>{clearPlaybackRecovery();$('playerMessage').textContent='';syncPlayerUI()});
+solo.addEventListener('waiting',()=>{if(!solo.paused)playerSay('Cargando… la conexión está preparando el video.')});
+solo.addEventListener('stalled',()=>{
+ if(solo.paused||playbackRecoveryTimer)return;
+ playbackRecoveryTimer=setTimeout(()=>{
+  playbackRecoveryTimer=null;
+  if(solo.paused||solo.readyState>=3||playbackRecoveryAttempts>=2)return;
+  playbackRecoveryAttempts++;
+  const position=solo.currentTime||0;
+  try{solo.currentTime=position+0.08}catch{}
+  solo.play().catch(()=>{});
+ },7000);
+});
+solo.addEventListener('error',()=>{
+ const errors={2:'Se interrumpió la conexión al video.',3:'El formato o la codificación del video no se pudo reproducir.',4:'El formato del video no es compatible.'};
+ playerSay(errors[solo.error?.code]||'No se pudo cargar el video. Comprueba tu conexión e inténtalo de nuevo.');
+});
+
 $('playerBrightness').oninput=e=>{solo.style.filter='brightness('+e.target.value+'%)';showPlayerControls()};
 $('playerVolume').oninput=e=>{solo.volume=Math.max(0,Math.min(1,Number(e.target.value)/100));showPlayerControls()};
 $('speedPlayer').onclick=()=>{const speeds=[0.5,0.75,1,1.25,1.5,2],i=speeds.indexOf(solo.playbackRate),v=speeds[(i+1)%speeds.length];solo.playbackRate=v;$('speedPlayer').textContent='Velocidad '+v+'×';showPlayerControls()};
