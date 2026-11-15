@@ -1747,11 +1747,82 @@ $('applyKnownPostersBtn').onclick=async()=>{if(!isAdmin){say('uploadStatus','Sol
 function cleanMovieFilename(name){return name.replace(/\.[^.]+$/,'').replace(/\b(1080p|720p|2160p|4k|bluray|blu.?ray|web.?dl|hdrip|hdtv|x264|x265|hevc|aac|dual audio|latino|spanish|english)\b/gi,' ').replace(/[._-]+/g,' ').replace(/\s+/g,' ').trim()}
 function inferMovieCategory(title){const t=title.toLowerCase();const rules=[['Terror',/horror|terror|scary|haunt|demon|devil|ghost|zombie|exorc|nightmare|scream|insidious|conjuring|annabelle/],['Romance',/romance|love|amor|wedding|boda|kiss|beso|valentine/],['Comedia',/comedy|comedia|funny|joke|vacation|vacaciones/],['Ciencia ficción',/sci.?fi|science fiction|space|alien|robot|future|matrix|dune|star wars|interstellar/],['Documental',/documentary|documental/],['Acción',/action|accion|war|guerra|fight|mission|avengers|john wick|fast.?furious/],['Drama',/drama|life|vida|father|madre|padre|story|historia/]];return (rules.find(x=>x[1].test(t))||[null])[0]||'Drama'}
 async function makeCinematicPoster(file,title,category,year){const W=600,H=900,canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');let frame=false;const video=document.createElement('video');video.muted=true;video.playsInline=true;video.preload='auto';const objectUrl=URL.createObjectURL(file);try{await new Promise((resolve,reject)=>{video.onloadeddata=resolve;video.onerror=reject;setTimeout(()=>reject(new Error('poster timeout')),12000);video.src=objectUrl;video.load()});const target=Math.min(Math.max(2,(video.duration||20)*.32),Math.max(2,(video.duration||20)-1));await new Promise((resolve,reject)=>{video.onseeked=resolve;setTimeout(()=>reject(new Error('seek timeout')),5000);video.currentTime=target});const sw=video.videoWidth,sh=video.videoHeight;if(sw&&sh){const scale=Math.max(W/sw,H/sh),dw=sw*scale,dh=sh*scale;ctx.drawImage(video,(W-dw)/2,(H-dh)/2,dw,dh);frame=true}}catch(e){}finally{URL.revokeObjectURL(objectUrl);video.remove()}if(!frame){const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#41070d');g.addColorStop(.55,'#100d12');g.addColorStop(1,'#020204');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle='#e50914';ctx.globalAlpha=.22;ctx.beginPath();ctx.arc(440,270,190,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}const shade=ctx.createLinearGradient(0,0,0,H);shade.addColorStop(0,'rgba(0,0,0,.08)');shade.addColorStop(.48,'rgba(0,0,0,.08)');shade.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=shade;ctx.fillRect(0,0,W,H);ctx.fillStyle='#e50914';ctx.fillRect(42,54,8,54);ctx.fillStyle='#fff';ctx.font='700 25px Arial';ctx.letterSpacing='5px';ctx.fillText('APOLOPRIMER ORIGINAL',68,88);ctx.letterSpacing='0px';ctx.shadowColor='#000';ctx.shadowBlur=18;const size=title.length>25?42:title.length>17?50:60;ctx.font='900 '+size+'px Arial';const words=title.split(' ');let lines=[],line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>W-84&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);let y=H-245;lines.slice(0,3).forEach(s=>{ctx.fillText(s,42,y);y+=size+8});ctx.shadowBlur=0;ctx.fillStyle='#ff3342';ctx.font='700 23px Arial';ctx.fillText((category||'Película').toUpperCase(),44,y+25);ctx.fillStyle='#ddd';ctx.font='22px Arial';ctx.fillText('APOLOPRIMER  ·  '+(year||'ESTRENO'),44,y+65);return await new Promise(resolve=>canvas.toBlob(b=>resolve(b?new File([b],(title||'poster').replace(/[^a-z0-9]/gi,'_')+'.webp',{type:'image/webp'}):null),'image/webp',.88))}
-$('movieVideo').addEventListener('change',async()=>{const file=$('movieVideo').files[0];if(!file)return;const raw=cleanMovieFilename(file.name);if(!$('movieTitle').value.trim())$('movieTitle').value=raw;if(!$('movieYear').value){const y=file.name.match(/(?:19|20)\d{2}/);if(y)$('movieYear').value=y[0]}const inferred=inferMovieCategory(raw);$('movieCategory').value=inferred;say('uploadStatus','Preparando póster cinematográfico…');try{const poster=await makeCinematicPoster(file,$('movieTitle').value,$('movieCategory').value,$('movieYear').value);if(poster){window.apoloGeneratedPoster=poster;const img=$('moviePosterPreview');img.src=URL.createObjectURL(poster);img.hidden=false;$('moviePosterHint').textContent='Póster listo. Si prefieres una portada oficial, puedes seleccionarla arriba.'}else $('moviePosterHint').textContent='No se pudo generar la portada automática; selecciona una imagen.'}catch(e){$('moviePosterHint').textContent='No se pudo generar la portada automática; selecciona una imagen.'}say('uploadStatus','Datos detectados. Revisa el título y la categoría antes de subir.')});
-$('movieCover').addEventListener('change',()=>{const f=$('movieCover').files[0];if(!f)return;window.apoloGeneratedPoster=null;const img=$('moviePosterPreview');img.src=URL.createObjectURL(f);img.hidden=false;$('moviePosterHint').textContent='Se utilizará la portada que seleccionaste.'});
+async function lookupMovieMetadata(query){
+ const response=await fetch('https://api.streamx.qzz.io/search?q='+encodeURIComponent(query)+'&type=movie');
+ if(!response.ok)throw new Error('Buscador de películas no disponible ('+response.status+').');
+ const payload=await response.json();
+ const results=Array.isArray(payload.metas)?payload.metas:Array.isArray(payload.results)?payload.results:[];
+ if(!results.length)return null;
+ const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+ const q=norm(query);
+ const ranked=results.map(item=>{
+  const name=item.name||item.title||'';
+  const n=norm(name);
+  const year=String(item.releaseInfo||item.year||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||'';
+  let score=n===q?100:n.startsWith(q)||q.startsWith(n)?75:n.includes(q)||q.includes(n)?55:0;
+  const tokens=q.split(' ').filter(t=>t.length>2);
+  score+=tokens.filter(t=>n.includes(t)).length*4;
+  return {item,score,year};
+ }).sort((a,b)=>b.score-a.score);
+ const best=ranked[0];
+ if(!best||best.score<28)return null;
+ const item=best.item;
+ const poster=item.poster||item.poster_url||item.cover_url||'';
+ const genres=Array.isArray(item.genres)?item.genres:Array.isArray(item.genre)?item.genre:typeof item.genres==='string'?item.genres.split(/[\/,|]/):[];
+ return {title:item.name||item.title||query,year:best.year,poster,genres:genres.map(x=>String(x).trim()).filter(Boolean)};
+}
+function setMovieCategoryOptions(genres){
+ const select=$('movieCategory');
+ const values=genres.length?genres:[inferMovieCategory($('movieTitle').value)];
+ const value=values.join(' / ');
+ let option=[...select.options].find(x=>x.value===value);
+ if(!option){option=document.createElement('option');option.value=value;option.textContent=value;select.append(option)}
+ select.value=value;
+}
+$('movieVideo').addEventListener('change',async()=>{
+ const file=$('movieVideo').files[0];if(!file)return;
+ window.apoloRemotePosterUrl=null;window.apoloGeneratedPoster=null;
+ const raw=cleanMovieFilename(file.name);
+ if(!$('movieTitle').value.trim())$('movieTitle').value=raw;
+ if(!$('movieYear').value){const y=file.name.match(/\b(?:19|20)\d{2}\b/);if(y)$('movieYear').value=y[0]}
+ setMovieCategoryOptions([]);
+ say('uploadStatus','Detectando título, año, género y portada oficial…');
+ $('moviePosterHint').textContent='Buscando información y póster oficial…';
+ try{
+  const metadata=await lookupMovieMetadata($('movieTitle').value.trim()||raw);
+  if(metadata){
+   $('movieTitle').value=metadata.title;
+   if(metadata.year)$('movieYear').value=metadata.year;
+   if(metadata.genres.length)setMovieCategoryOptions(metadata.genres);
+   if(metadata.poster){
+    window.apoloRemotePosterUrl=metadata.poster;
+    const img=$('moviePosterPreview');img.src=metadata.poster;img.hidden=false;
+    img.onerror=()=>{$('moviePosterHint').textContent='No se pudo cargar la portada oficial; se generará una portada alternativa.';window.apoloRemotePosterUrl=null};
+    $('moviePosterHint').textContent='Datos y portada oficial detectados. Puedes corregir cualquier dato antes de publicar.';
+   }
+   say('uploadStatus','Datos encontrados: revisa el título, año y categoría antes de subir.');
+  }else{
+   $('moviePosterHint').textContent='No se encontró una ficha exacta. Se preparará una portada con una imagen del video; revisa los datos.';
+   setMovieCategoryOptions([]);
+   say('uploadStatus','No encontré una ficha exacta. Se usarán los datos del nombre del archivo; puedes editarlos.');
+  }
+ }catch(error){
+  $('moviePosterHint').textContent='No se pudo consultar el catálogo externo. Se preparará una portada alternativa.';
+  setMovieCategoryOptions([]);
+  say('uploadStatus','No se pudo consultar el catálogo externo. Puedes completar los datos manualmente.');
+ }
+ if(!window.apoloRemotePosterUrl){
+  try{
+   const poster=await makeCinematicPoster(file,$('movieTitle').value,$('movieCategory').value,$('movieYear').value);
+   if(poster){window.apoloGeneratedPoster=poster;const img=$('moviePosterPreview');img.src=URL.createObjectURL(poster);img.hidden=false;$('moviePosterHint').textContent='Portada creada desde el video. Puedes elegir una portada oficial manualmente.'}
+   else $('moviePosterHint').textContent='No se pudo generar la portada automática; selecciona una imagen.';
+  }catch(e){$('moviePosterHint').textContent='No se pudo generar la portada automática; selecciona una imagen.'}
+ }
+});
+$('movieCover').addEventListener('change',()=>{const f=$('movieCover').files[0];if(!f)return;window.apoloRemotePosterUrl=null;window.apoloGeneratedPoster=null;const img=$('moviePosterPreview');img.src=URL.createObjectURL(f);img.hidden=false;$('moviePosterHint').textContent='Se utilizará la portada que seleccionaste.'});
 $('uploadBtn').onclick=async()=>{
  if(!isAdmin){say('uploadStatus','Solo el administrador puede subir.');return}
- let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0]||window.apoloGeneratedPoster||null;if(!title||!vf){say('uploadStatus','Selecciona el video. El título se completa automáticamente, pero puedes editarlo.');return}if(!cf){say('uploadStatus','No se pudo crear la portada. Selecciona una imagen manualmente.');return}
+ let title=$('movieTitle').value.trim(),vf=$('movieVideo').files[0],cf=$('movieCover').files[0]||window.apoloGeneratedPoster||null,remotePoster=window.apoloRemotePosterUrl||null;if(!title||!vf){say('uploadStatus','Selecciona el video. El título se completa automáticamente, pero puedes editarlo.');return}if(!cf&&!remotePoster){say('uploadStatus','No se pudo crear la portada. Selecciona una imagen manualmente.');return}
  if(vf.size>2*1024*1024*1024){say('uploadStatus','El video supera el límite recomendado de 2 GB.');return}
  say('uploadStatus','Preparando subida segura a Cloudflare R2…');
  const safe=s=>s.replace(/[^a-z0-9._-]/gi,'_');
@@ -1804,11 +1875,11 @@ $('uploadBtn').onclick=async()=>{
   say('uploadStatus','Guardando información de la película…');
   const ins=await supabase.from('movies').insert({
    title,category:$('movieCategory').value,year:Number($('movieYear').value)||null,
-   video_url:video.playbackUrl,video_path:video.key,cover_url:cover?.playbackUrl||null,owner_id:session.user.id
+   video_url:video.playbackUrl,video_path:video.key,cover_url:cover?.playbackUrl||remotePoster||null,owner_id:session.user.id
   });
   if(ins.error)throw new Error(ins.error.message);
   say('uploadStatus','Película publicada correctamente en R2.');
-  $('movieTitle').value='';$('movieVideo').value='';$('movieCover').value='';window.apoloGeneratedPoster=null;$('moviePosterPreview').hidden=true;$('moviePosterPreview').removeAttribute('src');$('moviePosterHint').textContent='Al elegir el video, Apoloprimer preparará una portada cinematográfica. Puedes reemplazarla arriba.';
+  $('movieTitle').value='';$('movieVideo').value='';$('movieCover').value='';window.apoloGeneratedPoster=null;window.apoloRemotePosterUrl=null;$('moviePosterPreview').hidden=true;$('moviePosterPreview').removeAttribute('src');$('moviePosterHint').textContent='Al elegir el video, Apoloprimer preparará una portada cinematográfica. Puedes reemplazarla arriba.';
   await loadMovies();
  }catch(error){say('uploadStatus',error.message||'Error al subir el archivo.')}
 
