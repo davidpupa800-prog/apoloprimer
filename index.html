@@ -1360,6 +1360,16 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
  .hero-meta{bottom:82px!important}
 }
 
+
+/* Selector de categorías desplegable estilo Netflix en cristal */
+.home-category-wrap{position:absolute;z-index:8;left:clamp(18px,5%,76px);bottom:28px}
+.home-category-trigger{display:flex;align-items:center;gap:18px;min-width:185px;justify-content:space-between;padding:13px 20px;color:#fff;font-size:16px;font-weight:700;background:linear-gradient(125deg,rgba(255,255,255,.2),rgba(255,255,255,.055) 45%,rgba(15,15,18,.48)),rgba(25,25,27,.48);border:1px solid rgba(255,255,255,.42);border-radius:22px;box-shadow:0 8px 28px rgba(0,0,0,.32),inset 0 1px 1px rgba(255,255,255,.3);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%)}
+.home-category-menu{position:absolute;left:0;bottom:calc(100% + 10px);display:grid;grid-template-columns:repeat(2,minmax(125px,1fr));gap:5px;width:max-content;min-width:280px;max-width:min(420px,calc(100vw - 36px));max-height: min(360px,55vh);overflow:auto;padding:10px;background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.04)),rgba(18,18,20,.78);border:1px solid rgba(255,255,255,.34);border-radius:20px;box-shadow:0 12px 36px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.24);backdrop-filter:blur(26px) saturate(165%);-webkit-backdrop-filter:blur(26px) saturate(165%)}
+.home-category-menu.hidden{display:none!important}
+.home-category-menu button{padding:10px 13px;text-align:left;color:#f4f4f4;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);border-radius:12px;font-size:13px;font-weight:600}
+.home-category-menu button.active{background:linear-gradient(135deg,rgba(229,9,20,.88),rgba(135,0,12,.82));border-color:rgba(255,210,210,.5);box-shadow:0 0 12px rgba(229,9,20,.25)}
+@media(max-width:650px){.home-category-wrap{left:16px;bottom:25px}.home-category-trigger{min-width:164px;padding:11px 16px;font-size:14px;border-radius:18px}.home-category-menu{min-width:260px;max-width:calc(100vw - 32px);grid-template-columns:repeat(2,minmax(0,1fr));max-height:48vh}}
+
 </style>
 </head>
 <body>
@@ -1368,14 +1378,11 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
 </div>
 <header class="stream-header"><div class="logo"><span class="brand-mark">A</span> APOLOPRIMER</div><nav class="top-nav"><a class="nav-active" href="#" data-go="home">Inicio</a><a href="#" data-go="explore">Explorar</a><a href="#" data-go="search">Buscar</a><a href="#" data-go="mylist">Mi lista</a><a href="#" data-go="downloads">Descargas</a><a href="#" data-go="rooms">Salas</a></nav><div class="right header-actions"><button class="icon-action" id="searchJump" aria-label="Buscar">⌕</button><button class="account-chip" id="accountChip" type="button" aria-label="Abrir cuenta"><span class="account-chip-avatar" id="headerAvatar">A</span><span class="account-chip-name" id="headerAccountName">Entrar</span><span class="account-chip-chevron">⌄</span></button></div></header>
 <section id="featuredHero" class="stream-hero app-screen" data-screen="home"><video id="featuredPreviewVideo" class="featured-preview-video" muted playsinline preload="none" aria-hidden="true"></video><div class="hero-shade"></div><div class="hero-content"><div class="eyebrow">APOLOPRIMER ORIGINAL</div><h1 id="featuredTitle">Tu cine. Tu mundo.</h1><p id="featuredDescription">Descubre películas y comparte una función con tus amigos desde cualquier lugar.</p><div class="hero-actions"><button id="featuredPlay">▶ Reproducir</button><button class="secondary" id="featuredList">＋ Mi lista</button></div></div><div class="hero-meta">Películas · Series · Estrenos</div>
-<div class="home-category-glass" id="homeCategoryGlass" aria-label="Categorías de películas">
- <button class="active" type="button" data-home-category="Todos">Todos</button>
- <button type="button" data-home-category="Acción">Acción</button>
- <button type="button" data-home-category="Terror">Terror</button>
- <button type="button" data-home-category="Comedia">Comedia</button>
- <button type="button" data-home-category="Drama">Drama</button>
- <button type="button" data-home-category="Romance">Romance</button>
- <button type="button" data-home-category="Ciencia ficción">Ciencia ficción</button>
+<div class="home-category-wrap" id="homeCategoryWrap">
+ <button class="home-category-trigger" id="homeCategoryTrigger" type="button" aria-haspopup="true" aria-expanded="false">Categorías <span aria-hidden="true">▾</span></button>
+ <div class="home-category-menu hidden" id="homeCategoryMenu" role="menu" aria-label="Elegir categoría">
+  <button class="active" type="button" data-home-category="Todos" role="menuitem">Todos</button>
+ </div>
 </div></section>
 <main>
 <section class="section stream-section app-screen" id="catalogo" data-screen="home"><div class="section-heading"><h2>Continuar viendo</h2><span class="muted small">Tu entretenimiento continúa aquí</span></div><div class="grid movie-rail" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
@@ -1561,7 +1568,7 @@ $('authClose').onclick=()=>$('authModal').classList.add('hidden');
 $('authSubmit').onclick=async()=>{if(!supabase)return;let email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||password.length<8){say('authStatus','Escribe un correo y una contraseña de al menos 8 caracteres.');return}let r=authMode==='login'?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password});say('authStatus',r.error?.message||'Listo. Revisa tu correo si se solicita confirmación.');if(!r.error && authMode==='login')$('authModal').classList.add('hidden')};
 async function loadMovies(){
  const {data,error}=await supabase.from('movies').select('*').order('created_at',{ascending:false});
- if(error){$('movies').textContent='No se pudo cargar el catálogo.';return}movies=data||[];renderMovies();refreshPosterMovieSelect();
+ if(error){$('movies').textContent='No se pudo cargar el catálogo.';return}movies=data||[];renderMovies();refreshHomeCategoryMenu();refreshPosterMovieSelect();
 }
 
 // Tipografía individual y estable para cada película del catálogo
@@ -1593,15 +1600,44 @@ function renderSearchResults(){
  list.forEach(m=>{const card=document.createElement('article');card.className='movie';const p=document.createElement('div');p.className='poster';if(m.cover_url)p.style.backgroundImage='url("'+m.cover_url+'")';else p.textContent='APOLOPRIMER';const info=document.createElement('div');info.className='movie-info';const b=document.createElement('b');b.className='movie-card-title '+movieFontClass(m);b.textContent=m.title;info.append(b);card.append(p,info);card.onclick=()=>openMovie(m);box.append(card)});
 }
 
-document.querySelectorAll('#homeCategoryGlass [data-home-category]').forEach(btn=>btn.addEventListener('click',()=>{
- const category=btn.dataset.homeCategory;
- document.querySelectorAll('#homeCategoryGlass [data-home-category]').forEach(x=>x.classList.toggle('active',x===btn));
- const cards=[...document.querySelectorAll('#movies > .movie')];
- cards.forEach(card=>{
-  const meta=card.querySelector('.movie-info small')?.textContent||'';
-  card.style.display=category==='Todos'||meta.toLocaleLowerCase().startsWith(category.toLocaleLowerCase())?'':'none';
+let homeSelectedCategory='Todos';
+function homeCategoryParts(value){
+ return String(value||'').split(/\\s*[\\/,|]\\s*/).map(x=>x.trim()).filter(Boolean);
+}
+function refreshHomeCategoryMenu(){
+ const menu=$('homeCategoryMenu');if(!menu)return;
+ const categories=[...new Set(movies.flatMap(m=>homeCategoryParts(m.category)))].sort((a,b)=>a.localeCompare(b,'es'));
+ const all=['Todos',...categories];
+ menu.innerHTML='';
+ all.forEach(category=>{
+  const option=document.createElement('button');option.type='button';option.dataset.homeCategory=category;option.setAttribute('role','menuitem');option.textContent=category;
+  option.classList.toggle('active',category===homeSelectedCategory);
+  option.addEventListener('click',()=>{
+   homeSelectedCategory=category;
+   $('homeCategoryTrigger').innerHTML=category==='Todos'?'Categorías <span aria-hidden="true">▾</span>':category+' <span aria-hidden="true">▾</span>';
+   menu.classList.add('hidden');$('homeCategoryTrigger').setAttribute('aria-expanded','false');
+   menu.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.homeCategory===category));
+   filterHomeMovies(category);
+  });
+  menu.append(option);
  });
-}));
+ if(!categories.includes(homeSelectedCategory))homeSelectedCategory='Todos';
+ $('homeCategoryTrigger').innerHTML=homeSelectedCategory==='Todos'?'Categorías <span aria-hidden="true">▾</span>':homeSelectedCategory+' <span aria-hidden="true">▾</span>';
+}
+function filterHomeMovies(category){
+ document.querySelectorAll('#movies > .movie').forEach((card,index)=>{
+  const movie=movies[index];
+  const matches=category==='Todos'||homeCategoryParts(movie?.category).some(x=>x.toLocaleLowerCase('es')===category.toLocaleLowerCase('es'));
+  card.style.display=matches?'':'none';
+ });
+}
+$('homeCategoryTrigger')?.addEventListener('click',()=>{
+ const menu=$('homeCategoryMenu');const opening=menu.classList.contains('hidden');
+ menu.classList.toggle('hidden',!opening);$('homeCategoryTrigger').setAttribute('aria-expanded',String(opening));
+});
+document.addEventListener('click',e=>{
+ if(!$('homeCategoryWrap')?.contains(e.target)){ $('homeCategoryMenu')?.classList.add('hidden');$('homeCategoryTrigger')?.setAttribute('aria-expanded','false');}
+});
 document.querySelectorAll('#categoryPills button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('#categoryPills button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');renderExploreMovies(btn.dataset.category)}));
 $('catalogSearch')?.addEventListener('input',renderSearchResults);
 
