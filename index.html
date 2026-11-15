@@ -1704,7 +1704,11 @@ $('roomModalSubmit').onclick=async()=>{
   }
   $('roomModal').classList.add('hidden');
  }catch(error){
-  say('roomModalStatus',error.message||'Ocurrió un error con la sala.');
+  const raw=String(error?.message||error||'');
+  const network=/load failed|failed to fetch|networkerror|network request failed/i.test(raw);
+  say('roomModalStatus',network
+   ?'No se pudo conectar con Supabase. Comprueba que ambos teléfonos tengan internet y vuelve a intentarlo. Si continúa, revisaremos la conexión del proyecto.'
+   :(raw||'Ocurrió un error con la sala.'));
  }finally{
   button.disabled=false;
  }
@@ -1724,10 +1728,14 @@ async function enterRoom(r){
  });
  roomChannel.subscribe(async status=>{
   if(status==='SUBSCRIBED'){
-   await roomChannel.track({name:session.user.email?.split('@')[0]||'Invitado'});
-   say('syncStatus','Sala conectada. Sincronizando película y reproducción…');
-   if(!isRoomOwner())roomChannel.send({type:'broadcast',event:'request_state',payload:{user_id:session.user.id}});
-   else await sendRoomState();
+   try{
+    await roomChannel.track({name:session.user.email?.split('@')[0]||'Invitado'});
+    say('syncStatus','Sala conectada. Sincronizando película y reproducción…');
+    if(!isRoomOwner())await roomChannel.send({type:'broadcast',event:'request_state',payload:{user_id:session.user.id}});
+    else await sendRoomState();
+   }catch(error){say('syncStatus','La sala abrió, pero falló la sincronización. Comprueba tu conexión y vuelve a entrar.')}
+  }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+   say('syncStatus','Se perdió la conexión en tiempo real. Comprueba internet y vuelve a entrar a la sala.');
   }
  });
  $('salas').scrollIntoView({behavior:'smooth'});
@@ -1765,7 +1773,11 @@ function applyControl(p,broadcast=true){
   if(v.readyState>=1)syncPlayback();
   else if(url)v.addEventListener('loadedmetadata',syncPlayback,{once:true});
  });
- if(broadcast&&roomChannel)roomChannel.send({type:'broadcast',event:'control',payload:{...p,video_url:url,movie_id:movie?.id||p.movie_id||null,sentAt:Date.now()}});
+ if(broadcast&&roomChannel){
+  roomChannel.send({type:'broadcast',event:'control',payload:{...p,video_url:url,movie_id:movie?.id||p.movie_id||null,sentAt:Date.now()}})
+   .then(result=>{if(result?.status&&result.status!=='ok')say('syncStatus','No se pudo enviar el control a los demás. Revisa la conexión de la sala.')})
+   .catch(()=>say('syncStatus','No se pudo enviar el control a los demás. Revisa la conexión de la sala.'));
+ }
 }
 function control(action){
  if(!canControl())return
