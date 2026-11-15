@@ -1188,10 +1188,13 @@ const $=id=>document.getElementById(id);
 const say=(id,msg)=>$(id).textContent=msg;
 function notice(){return !supabase ? 'Falta configurar Supabase. Consulta README.md.' : ''}
 async function init(){
- if(!supabase){$('movies').innerHTML='<div class="muted">La interfaz está lista. Falta conectar Supabase para activar cuentas, catálogo, subidas y salas entre distintos celulares.</div>';return}
- const {data}=await supabase.auth.getSession();session=data.session;await refreshUser();
- supabase.auth.onAuthStateChange(async(_e,s)=>{session=s;await refreshUser();});
- await loadMovies();
+ try{
+  if(!supabase){$('movies').innerHTML='<div class="muted">La interfaz está lista. Falta conectar Supabase para activar cuentas, catálogo, subidas y salas entre distintos celulares.</div>';return}
+  const {data,error}=await supabase.auth.getSession();if(error)console.warn('Sesión:',error);session=data?.session||null;
+  try{await refreshUser()}catch(e){console.error('No se pudo actualizar el perfil de usuario:',e);updateHeaderAccount()}
+  supabase.auth.onAuthStateChange(async(_e,s)=>{session=s;try{await refreshUser()}catch(e){console.error('Actualización de cuenta:',e);updateHeaderAccount()}});
+  await loadMovies();
+ }catch(e){console.error('Error al iniciar Apoloprimer:',e);const box=$('movies');if(box)box.textContent='No se pudo iniciar la aplicación. Recarga la página.';showScreen('home')}
 }
 async function refreshUser(){
  isAdmin=false;
@@ -1233,7 +1236,7 @@ $('profileBio').oninput=()=>{$('bioCount').textContent=$('profileBio').value.len
 $('profileAvatarFile').onchange=()=>{const file=$('profileAvatarFile').files[0];if(!file)return;if(accountPreviewUrl)URL.revokeObjectURL(accountPreviewUrl);accountPreviewUrl=URL.createObjectURL(file);$('avatarFileName').textContent=file.name;$('avatarCropPreview').innerHTML='<img alt="Vista previa de recorte" src="'+accountPreviewUrl+'">';updateAvatarCropPreview()};
 $('profileCoverFile').onchange=()=>{const file=$('profileCoverFile').files[0];if(!file)return;if(coverPreviewUrl)URL.revokeObjectURL(coverPreviewUrl);coverPreviewUrl=URL.createObjectURL(file);$('profileCover').style.backgroundImage='linear-gradient(0deg,#09090955,#09090922),url("'+coverPreviewUrl+'")'};
 $('chooseCoverBtn').onclick=()=>$('profileCoverFile').click();
-$('centerAvatarBtn').onclick=()=>{$('avatarX').value=50;$('avatarY').value=50;updateAvatarCropPreview()};
+// El botón opcional de centrar puede no estar visible en esta versión del editor.
 function openAccount(tab='profile'){if(!session){showAuth();return}populateAccount();showAccountTab(tab);$('accountModal').classList.remove('hidden');document.body.classList.add('account-open')}
 const accountSections={profile:'profileSection',settings:'settingsSection',security:'securitySection',notifications:'notificationsSection',plan:'planSection'};
 function showAccountTab(tab){Object.entries(accountSections).forEach(([key,id])=>$(id).classList.toggle('hidden',key!==tab));document.querySelectorAll('[data-account-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.accountTab===tab))}
