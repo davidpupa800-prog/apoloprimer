@@ -1203,6 +1203,56 @@ footer{margin-top:35px}
  #featuredTitle{font-size:clamp(25px,7vw,34px)!important;line-height:1.1!important}
 }
 
+
+/* Diseño adaptable para escritorio, laptop, tablet y móviles */
+*,*::before,*::after{box-sizing:border-box}
+html{width:100%;overflow-x:hidden}
+body{width:100%;min-width:320px;overflow-x:hidden}
+img,video,iframe{max-width:100%}
+main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
+.stream-header{width:100%;padding-inline:clamp(16px,3vw,48px)}
+.stream-hero{min-height:clamp(440px,58vw,680px);padding:clamp(28px,5vw,76px)}
+.hero-content{max-width:min(58vw,720px)}
+.hero-content h1{font-size:clamp(30px,4.2vw,58px);overflow-wrap:anywhere}
+.movie-rail{display:flex;gap:clamp(12px,1.5vw,22px);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px}
+.movie-rail .movie{flex:0 0 clamp(145px,16vw,220px);min-width:0;scroll-snap-align:start}
+.movie-rail .poster{height:clamp(205px,22vw,310px)}
+#movies,#exploreMovies,#searchResults,#myList{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:clamp(12px,1.6vw,22px)}
+.movie{min-width:0}
+.movie-info{overflow-wrap:anywhere}
+@media(min-width:1500px){
+ main,.page-shell,.content-wrap{width:min(100% - 80px,1600px)}
+ .hero-content{max-width:760px}
+}
+@media(max-width:1100px){
+ main,.page-shell,.content-wrap{width:calc(100% - 36px)}
+ .stream-hero{min-height:500px}
+ .hero-content{max-width:68vw}
+}
+@media(max-width:800px){
+ main,.page-shell,.content-wrap{width:calc(100% - 28px)}
+ .stream-header{padding-inline:18px}
+ .stream-hero{min-height:460px;padding:34px 24px}
+ .hero-content{max-width:78vw}
+ .movie-rail .movie{flex-basis:175px}
+ .movie-rail .poster{height:245px}
+}
+@media(max-width:600px){
+ main,.page-shell,.content-wrap{width:calc(100% - 24px)}
+ .stream-hero{min-height:470px;padding:30px 18px}
+ .hero-content{max-width:100%}
+ .hero-content h1{font-size:clamp(27px,7vw,36px)}
+ .hero-content p{font-size:14px}
+ .movie-rail{gap:12px}
+ .movie-rail .movie{flex-basis:155px}
+ .movie-rail .poster{height:220px}
+ #movies,#exploreMovies,#searchResults,#myList{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+}
+@media(max-width:360px){
+ .stream-hero{padding-inline:14px}
+ .movie-rail .movie{flex-basis:140px}
+}
+
 </style>
 </head>
 <body>
