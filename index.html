@@ -1134,42 +1134,50 @@ footer{margin-top:35px}
 
 .poster-search-panel{margin:22px 0;padding:16px;border:1px solid #3a3032;border-radius:14px;background:#111}.poster-search-panel h3{margin:0 0 6px}.poster-search-panel .uploadrow{display:flex;gap:9px;flex-wrap:wrap}.poster-search-panel select,.poster-search-panel input{min-width:180px;flex:1}.poster-search-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:12px;margin-top:14px}.poster-search-result{min-width:0;background:#1b1b1b;border:1px solid #373737;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:7px}.poster-search-result img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;background:#222}.poster-search-result b{font-size:13px;line-height:1.3}.poster-search-result small{color:#aaa}.poster-search-result button{width:100%;font-size:12px;padding:8px 5px}@media(max-width:600px){.poster-search-panel .uploadrow>*{width:100%;min-width:0}.poster-search-results{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* Apoloprimer mobile nav: selected top-left reference design */
+/* Reference-matched Apoloprimer navigation */
 @media(max-width:650px){
-  main{padding-bottom:calc(116px + env(safe-area-inset-bottom))}
-  .bottom-nav{
-    position:fixed;z-index:50;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));
-    display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;
-    align-items:center;padding:9px 8px;
-    background:linear-gradient(180deg,rgba(13,13,14,.97),rgba(4,4,5,.99));
-    border:1px solid rgba(255,255,255,.25);border-radius:25px;
-    box-shadow:0 0 0 1px rgba(229,9,20,.12),0 8px 30px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.12);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  main{padding-bottom:calc(116px + env(safe-area-inset-bottom))!important}
+  body .bottom-nav{
+    position:fixed!important;z-index:999!important;display:grid!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:4px!important;
+    left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;
+    width:auto!important;height:84px!important;box-sizing:border-box!important;
+    padding:8px!important;margin:0!important;
+    background:linear-gradient(180deg,rgba(15,15,16,.98),rgba(5,5,6,.99))!important;
+    border:1px solid #464044!important;border-radius:27px!important;
+    box-shadow:0 0 0 1px rgba(255,255,255,.04),0 0 22px rgba(220,0,20,.12),0 10px 32px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.1)!important;
+    backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;
   }
-  .bottom-nav button{
-    min-width:0;width:100%;height:66px;padding:4px 1px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-    border:1px solid transparent;border-radius:17px;background:transparent;color:#d0d0d4;
-    font-size:clamp(8px,2.55vw,11px);font-weight:600;line-height:1.1;
-    white-space:nowrap;overflow:hidden;transition:background .2s ease,color .2s ease,box-shadow .2s ease,transform .2s ease;
-    -webkit-tap-highlight-color:transparent;
+  body .bottom-nav button{
+    display:flex!important;flex:initial!important;min-width:0!important;width:100%!important;height:66px!important;
+    margin:0!important;padding:5px 1px 4px!important;box-sizing:border-box!important;
+    flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;
+    border:1px solid transparent!important;border-radius:17px!important;background:transparent!important;
+    color:#e7e7e9!important;font-size:11px!important;font-weight:500!important;line-height:1.05!important;
+    text-decoration:none!important;white-space:nowrap!important;overflow:hidden!important;
+    box-shadow:none!important;transition:all .18s ease!important;
   }
-  .bottom-nav button span{
-    width:31px;height:31px;display:grid;place-items:center;
-    border-radius:9px;background:transparent;color:inherit;
-    font-size:25px;line-height:1;transition:all .2s ease;
+  body .bottom-nav button .nav-icon{
+    display:grid!important;place-items:center!important;width:30px!important;height:30px!important;
+    padding:0!important;margin:0!important;background:transparent!important;color:currentColor!important;
+    font-size:initial!important;line-height:1!important;
   }
-  .bottom-nav button.active{
-    color:#fff;background:linear-gradient(145deg,#ff2635,#b90010);
-    border-color:rgba(255,105,112,.7);
-    box-shadow:0 0 18px rgba(229,9,20,.55),inset 0 1px 0 rgba(255,255,255,.25);
+  body .bottom-nav button .nav-icon svg{
+    display:block!important;width:27px!important;height:27px!important;fill:none!important;
+    stroke:currentColor!important;stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important;
   }
-  .bottom-nav button.active span{color:#fff;text-shadow:0 0 10px rgba(255,255,255,.6)}
-  .bottom-nav button:active{transform:scale(.95)}
-  .bottom-nav button:focus-visible{outline:2px solid #ff5962;outline-offset:2px}
-  footer{padding-bottom:calc(116px + env(safe-area-inset-bottom))}
+  body .bottom-nav button b{display:block!important;margin:0!important;padding:0!important;color:inherit!important;font-size:11px!important;font-weight:500!important;line-height:1.1!important}
+  body .bottom-nav button.active{
+    color:#fff!important;background:linear-gradient(145deg,#ff2535 0%,#d90016 55%,#a90010 100%)!important;
+    border:1px solid rgba(255,95,105,.78)!important;
+    box-shadow:0 0 15px rgba(229,9,20,.52),inset 0 1px 0 rgba(255,255,255,.23)!important;
+  }
+  body .bottom-nav button.active .nav-icon svg{fill:none!important;stroke:#fff!important;stroke-width:2.2!important}
+  body .bottom-nav button.active b{color:#fff!important;font-weight:700!important}
+  body .bottom-nav button:active{transform:scale(.96)!important}
+  footer{padding-bottom:calc(116px + env(safe-area-inset-bottom))!important}
 }
-@media(min-width:651px){.bottom-nav{display:none}}
+@media(min-width:651px){body .bottom-nav{display:none!important}}
 
 </style>
 </head>
@@ -1206,7 +1214,14 @@ footer{margin-top:35px}
  </div>
 </section>
 </main>
-<nav class="bottom-nav" aria-label="Navegación principal"><button class="active" data-go="home"><span>⌂</span>Inicio</button><button data-go="explore"><span>✦</span>Explorar</button><button data-go="downloads"><span>⇩</span>Descargas</button><button data-go="mylist"><span>♥</span>Mi lista</button><button data-go="rooms"><span>▤</span>Salas</button><button id="bottomProfile"><span>●</span>Perfil</button></nav>
+<nav class="bottom-nav" aria-label="Navegación principal">
+<button class="active" data-go="home" aria-label="Inicio"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v9.7a.5.5 0 0 1-.5.5h-6v-7h-5v7h-6a.5.5 0 0 1-.5-.5z"/></svg></span><b>Inicio</b></button>
+<button data-go="explore" aria-label="Explorar"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m16.2 16.2 5 5"/></svg></span><b>Explorar</b></button>
+<button data-go="downloads" aria-label="Descargas"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13m-5-5 5 5 5-5M4 20h16"/></svg></span><b>Descargas</b></button>
+<button data-go="mylist" aria-label="Mi lista"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11s-8.8-5.8-8.8-11A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.8 2.6Z"/></svg></span><b>Mi lista</b></button>
+<button data-go="rooms" aria-label="Salas"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M16 4v16"/></svg></span><b>Salas</b></button>
+<button id="bottomProfile" aria-label="Perfil"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><b>Perfil</b></button>
+</nav>
 <footer>© 2026 Apoloprimer · Publica únicamente películas que tengas derecho a distribuir.</footer>
 <div class="modal hidden" id="authModal"><div class="modal-card"><h2 id="authTitle">Entrar</h2><label>Correo electrónico<input id="authEmail" type="email" autocomplete="email"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password"></label><div class="uploadrow"><button id="authSubmit">Entrar</button><button class="secondary" id="authToggle">Crear cuenta</button><button class="secondary" id="authClose">Cerrar</button></div><p class="muted small" id="authStatus"></p></div></div>
 
