@@ -1120,6 +1120,10 @@ footer{margin-top:35px}
 @media(max-width:760px){.admin-verified-v{width:34px;height:34px;font-size:28px}}
 
 .admin-verified-v{width:52px;height:44px;object-fit:contain;display:inline-block;flex:none;filter:drop-shadow(0 0 5px #ffcf42) drop-shadow(0 0 12px #ffb900);animation:adminVGlow 2s ease-in-out infinite}.admin-verified-v.hidden{display:none!important}@media(max-width:760px){.admin-verified-v{width:49px;height:42px}}
+
+/* Final override: keep the original shield badge discreetly small on every screen */
+.admin-name-line img.admin-verified-v{width:16px!important;height:14px!important;min-width:16px!important;max-width:16px!important;object-fit:contain!important;display:inline-block!important;flex:0 0 16px!important;border-radius:0!important;background:none!important;padding:0!important;filter:drop-shadow(0 0 2px #ffcf42)!important;vertical-align:middle!important}
+@media(max-width:760px){.admin-name-line img.admin-verified-v{width:16px!important;height:14px!important;min-width:16px!important;max-width:16px!important;flex-basis:16px!important}}
 </style>
 </head>
 <body>
