@@ -1287,6 +1287,42 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
  body .bottom-nav button b{font-size:11px!important}
 }
 
+
+/* Escritorio estilo Netflix: navegación superior, contenido ancho y hero compacto */
+@media(min-width:651px){
+ body{padding-bottom:0!important}
+ .stream-header{position:sticky;top:0;z-index:100;height:72px;padding:0 clamp(28px,4.5vw,76px)!important;display:flex;align-items:center;gap:34px;background:linear-gradient(180deg,#080808 0%,rgba(8,8,8,.96) 100%)!important}
+ .stream-header .top-nav{display:flex!important;align-items:center;gap:clamp(16px,2vw,30px);flex:1}
+ .stream-header .top-nav a{display:inline-flex!important;color:#ddd;font-size:14px;text-decoration:none;white-space:nowrap}
+ .stream-header .top-nav a.nav-active{color:#fff;font-weight:700}
+ .stream-header .header-actions{margin-left:auto}
+ body .bottom-nav{display:none!important}
+ main{width:100%!important;max-width:none!important;margin:0!important;padding:0 clamp(28px,4.5vw,76px) 48px!important}
+ .stream-hero{height:clamp(390px,38vw,510px)!important;min-height:0!important;padding:42px clamp(28px,4.5vw,76px) 52px!important;align-items:flex-end!important}
+ .hero-content{max-width:min(610px,55vw)!important}
+ .hero-content h1{font-size:clamp(34px,3.4vw,52px)!important;line-height:1.08!important;margin:10px 0 12px!important}
+ .hero-content p{font-size:16px!important;max-width:560px;line-height:1.45}
+ .hero-meta{bottom:45px!important}
+ .stream-section{margin:22px 0 30px!important}
+ .section-heading{margin-bottom:12px!important}
+ .section-heading h2{font-size:21px!important}
+ .movie-rail{gap:14px!important;padding:4px 2px 16px!important}
+ .movie-rail .movie{flex:0 0 clamp(150px,13.5vw,205px)!important}
+ .movie-rail .poster{height:clamp(215px,18vw,285px)!important}
+ .movie-rail .movie:hover{transform:scale(1.045)!important}
+ #catalogo{margin-top:18px!important}
+}
+@media(min-width:651px) and (max-width:950px){
+ .stream-header{gap:18px;padding-inline:22px!important}
+ .stream-header nav{gap:13px!important}
+ .stream-header .top-nav a{font-size:12px}
+ main{padding-inline:22px!important}
+ .stream-hero{height:400px!important;padding-inline:28px!important}
+ .hero-content{max-width:65vw!important}
+ .movie-rail .movie{flex-basis:155px!important}
+ .movie-rail .poster{height:220px!important}
+}
+
 </style>
 </head>
 <body>
