@@ -1382,8 +1382,7 @@ function applyControl(p,broadcast=true){
  if(!room)return;
  const preview=$('roomPlayer');
  const url=p.video_url||preview.dataset.url||preview.currentSrc||preview.src;
- const targets=[preview];
- if(roomCinemaActive&&solo!==preview)targets.push(solo);
+ const targets=roomCinemaActive?[solo]:[preview];
  const elapsed=p.action==='play'&&Number.isFinite(p.sentAt)?Math.max(0,(Date.now()-p.sentAt)/1000):0;
  targets.forEach(v=>{
   if(url&&v.dataset.url!==url){v.src=url;v.dataset.url=url;v.load()}
