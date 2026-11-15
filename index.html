@@ -1,10 +1,13 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Apoloprimer — Tu cine privado</title>
 <meta name="theme-color" content="#090909">
 <style>
+/* Evita el zoom táctil de la página en móviles; conserva el desplazamiento normal. */
+html,body{touch-action:pan-x pan-y}
+input,select,textarea,button{touch-action:manipulation}
 :root{--red:#e50914;--bg:#090909;--panel:#171717;--muted:#aaa;--line:#303030}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font:15px/1.45 Arial,sans-serif}
 header{height:68px;display:flex;align-items:center;gap:26px;padding:0 5%;position:sticky;top:0;z-index:5;background:#080808ed;border-bottom:1px solid #222}
@@ -1402,5 +1405,14 @@ if(apoloSplash&&apoloSplashVideo){
  }
 }
 init();
+</script>
+<script>
+/* Safari/iOS: bloquea los gestos de pellizco para ampliar la página. */
+(function(){
+  const stopPageZoom = event => { event.preventDefault(); };
+  ['gesturestart','gesturechange','gestureend'].forEach(type => {
+    document.addEventListener(type, stopPageZoom, { passive:false });
+  });
+})();
 </script>
 </body></html>
