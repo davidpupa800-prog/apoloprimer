@@ -1180,6 +1180,20 @@ footer{margin-top:35px}
 }
 @media(min-width:651px){body .bottom-nav{display:none!important}}
 
+
+/* Tipografías distintas por película: asignación determinista por ID */
+.movie-card-title{display:block;line-height:1.12;letter-spacing:.01em}
+.movie-font-0{font-family:Georgia,'Times New Roman',serif!important;font-weight:700!important;letter-spacing:-.035em!important}
+.movie-font-1{font-family:'Arial Black',Impact,sans-serif!important;font-weight:900!important;letter-spacing:-.045em!important}
+.movie-font-2{font-family:'Trebuchet MS',Arial,sans-serif!important;font-weight:800!important;letter-spacing:-.025em!important}
+.movie-font-3{font-family:'Courier New',monospace!important;font-weight:700!important;letter-spacing:-.055em!important}
+.movie-font-4{font-family:'Palatino Linotype',Palatino,serif!important;font-weight:700!important;font-style:italic!important}
+.movie-font-5{font-family:Impact,'Arial Narrow',sans-serif!important;font-weight:400!important;letter-spacing:.025em!important;text-transform:uppercase}
+.movie-font-6{font-family:Verdana,Geneva,sans-serif!important;font-weight:900!important;letter-spacing:-.04em!important}
+.movie-font-7{font-family:'Times New Roman',serif!important;font-weight:700!important;font-style:italic!important;letter-spacing:.015em!important}
+#featuredTitle.movie-font-0,#featuredTitle.movie-font-4,#featuredTitle.movie-font-7{font-style:italic!important}
+#featuredTitle.movie-font-3{letter-spacing:-.06em!important}
+
 </style>
 </head>
 <body>
@@ -1374,12 +1388,19 @@ async function loadMovies(){
  const {data,error}=await supabase.from('movies').select('*').order('created_at',{ascending:false});
  if(error){$('movies').textContent='No se pudo cargar el catálogo.';return}movies=data||[];renderMovies();refreshPosterMovieSelect();
 }
+
+// Tipografía individual y estable para cada película del catálogo
+function movieFontClass(m){
+ const key=String(m?.id||m?.title||'apolo');
+ let hash=0;for(let i=0;i<key.length;i++)hash=(hash*31+key.charCodeAt(i))>>>0;
+ return 'movie-font-'+(hash%8);
+}
 function renderMovies(){
  $('movies').innerHTML='';$('myList').innerHTML='';
  if(!movies.length){$('movies').innerHTML='<div class="muted">Todavía no hay películas. Vuelve pronto.</div>';updateFeatured(null);return}
  updateFeatured(movies[0]);
  const saved=JSON.parse(localStorage.getItem('apoloMyList')||'[]');
- movies.forEach(m=>{let c=document.createElement('article');c.className='movie';let poster=document.createElement('div');poster.className='poster';if(m.cover_url)poster.style.backgroundImage=`url("${m.cover_url}")`;else poster.textContent='APOLOPRIMER';let info=document.createElement('div');info.className='movie-info';let b=document.createElement('b');b.textContent=m.title;let s=document.createElement('small');s.textContent=`${m.category} · ${m.year||'—'}`;let add=document.createElement('button');add.className='secondary';add.textContent=saved.includes(String(m.id))?'✓ En mi lista':'＋ Mi lista';add.onclick=e=>{e.stopPropagation();let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]');const id=String(m.id);ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()};info.append(b,s,add);c.append(poster,info);c.onclick=()=>openMovie(m);$('movies').append(c);if(saved.includes(String(m.id))){const clone=c.cloneNode(true);clone.querySelector('button').onclick=()=>{let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]').filter(x=>x!==String(m.id));localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()};clone.onclick=()=>openMovie(m);$('myList').append(clone)}});
+ movies.forEach(m=>{let c=document.createElement('article');c.className='movie';let poster=document.createElement('div');poster.className='poster';if(m.cover_url)poster.style.backgroundImage=`url("${m.cover_url}")`;else poster.textContent='APOLOPRIMER';let info=document.createElement('div');info.className='movie-info';let b=document.createElement('b');b.className='movie-card-title '+movieFontClass(m);b.textContent=m.title;let s=document.createElement('small');s.textContent=`${m.category} · ${m.year||'—'}`;let add=document.createElement('button');add.className='secondary';add.textContent=saved.includes(String(m.id))?'✓ En mi lista':'＋ Mi lista';add.onclick=e=>{e.stopPropagation();let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]');const id=String(m.id);ids=ids.includes(id)?ids.filter(x=>x!==id):[...ids,id];localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()};info.append(b,s,add);c.append(poster,info);c.onclick=()=>openMovie(m);$('movies').append(c);if(saved.includes(String(m.id))){const clone=c.cloneNode(true);clone.querySelector('button').onclick=()=>{let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]').filter(x=>x!==String(m.id));localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()};clone.onclick=()=>openMovie(m);$('myList').append(clone)}});
  if(!$('myList').children.length)$('myList').innerHTML='<div class="muted">Pulsa «Mi lista» en una película para guardarla aquí.</div>';
  refreshRoomMovies();renderExploreMovies();renderSearchResults();
 }
@@ -1387,20 +1408,20 @@ function renderExploreMovies(category='Todos'){
  const box=$('exploreMovies');if(!box)return;box.innerHTML='';
  const list=category==='Todos'?movies:movies.filter(m=>(m.category||'').toLowerCase()===category.toLowerCase());
  if(!list.length){box.innerHTML='<span class="muted small">No hay títulos en esta categoría todavía.</span>';return}
- list.forEach(m=>{const card=document.createElement('article');card.className='movie';const p=document.createElement('div');p.className='poster';if(m.cover_url)p.style.backgroundImage='url("'+m.cover_url+'")';else p.textContent='APOLOPRIMER';const info=document.createElement('div');info.className='movie-info';const b=document.createElement('b');b.textContent=m.title;const s=document.createElement('small');s.textContent=(m.category||'Película')+' · '+(m.year||'');info.append(b,s);card.append(p,info);card.onclick=()=>openMovie(m);box.append(card)});
+ list.forEach(m=>{const card=document.createElement('article');card.className='movie';const p=document.createElement('div');p.className='poster';if(m.cover_url)p.style.backgroundImage='url("'+m.cover_url+'")';else p.textContent='APOLOPRIMER';const info=document.createElement('div');info.className='movie-info';const b=document.createElement('b');b.className='movie-card-title '+movieFontClass(m);b.textContent=m.title;const s=document.createElement('small');s.textContent=(m.category||'Película')+' · '+(m.year||'');info.append(b,s);card.append(p,info);card.onclick=()=>openMovie(m);box.append(card)});
 }
 function renderSearchResults(){
  const box=$('searchResults');if(!box)return;const q=($('catalogSearch')?.value||'').trim().toLowerCase();box.innerHTML='';
  const list=q?movies.filter(m=>(m.title+' '+(m.category||'')+' '+(m.year||'')).toLowerCase().includes(q)): [];
  if(!q){box.innerHTML='<span class="muted small">Escribe un título o categoría para buscar.</span>';return}
  if(!list.length){box.innerHTML='<span class="muted small">No encontramos resultados.</span>';return}
- list.forEach(m=>{const card=document.createElement('article');card.className='movie';const p=document.createElement('div');p.className='poster';if(m.cover_url)p.style.backgroundImage='url("'+m.cover_url+'")';else p.textContent='APOLOPRIMER';const info=document.createElement('div');info.className='movie-info';const b=document.createElement('b');b.textContent=m.title;info.append(b);card.append(p,info);card.onclick=()=>openMovie(m);box.append(card)});
+ list.forEach(m=>{const card=document.createElement('article');card.className='movie';const p=document.createElement('div');p.className='poster';if(m.cover_url)p.style.backgroundImage='url("'+m.cover_url+'")';else p.textContent='APOLOPRIMER';const info=document.createElement('div');info.className='movie-info';const b=document.createElement('b');b.className='movie-card-title '+movieFontClass(m);b.textContent=m.title;info.append(b);card.append(p,info);card.onclick=()=>openMovie(m);box.append(card)});
 }
 document.querySelectorAll('#categoryPills button').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('#categoryPills button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');renderExploreMovies(btn.dataset.category)}));
 $('catalogSearch')?.addEventListener('input',renderSearchResults);
 
 function stopFeaturedPreview(){featuredToken++;clearTimeout(featuredTimer);featuredTimer=null;const v=$('featuredPreviewVideo');if(v){v.pause();v.classList.remove('is-playing')}}
-function setFeaturedMovie(m){if(!m)return;featuredCurrentMovie=m;$('featuredTitle').textContent=m.title;$('featuredDescription').textContent=(m.category||'Película')+' · '+(m.year||'Disponible ahora')+' · Disfruta de esta película en Apoloprimer.';$('featuredHero').style.backgroundImage=m.cover_url?'linear-gradient(90deg,#000e 0%,#0008 45%,#0002 100%),linear-gradient(0deg,#050505,transparent 55%),url("'+m.cover_url+'")':'';$('featuredHero').classList.toggle('has-poster',!!m.cover_url);$('featuredPlay').onclick=()=>{stopFeaturedPreview();openMovie(m)};$('featuredList').onclick=()=>{let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]');if(!ids.includes(String(m.id)))ids.push(String(m.id));localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()}}
+function setFeaturedMovie(m){if(!m)return;featuredCurrentMovie=m;$('featuredTitle').textContent=m.title;$('featuredTitle').className='featured-title '+movieFontClass(m);$('featuredDescription').textContent=(m.category||'Película')+' · '+(m.year||'Disponible ahora')+' · Disfruta de esta película en Apoloprimer.';$('featuredHero').style.backgroundImage=m.cover_url?'linear-gradient(90deg,#000e 0%,#0008 45%,#0002 100%),linear-gradient(0deg,#050505,transparent 55%),url("'+m.cover_url+'")':'';$('featuredHero').classList.toggle('has-poster',!!m.cover_url);$('featuredPlay').onclick=()=>{stopFeaturedPreview();openMovie(m)};$('featuredList').onclick=()=>{let ids=JSON.parse(localStorage.getItem('apoloMyList')||'[]');if(!ids.includes(String(m.id)))ids.push(String(m.id));localStorage.setItem('apoloMyList',JSON.stringify(ids));renderMovies()}}
 function startFeaturedPreview(){stopFeaturedPreview();if(!featuredQueue.length||document.hidden||!document.querySelector('#featuredHero')?.classList.contains('is-active')||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;const token=featuredToken;const v=$('featuredPreviewVideo');if(!v)return;const m=featuredQueue[featuredIndex%featuredQueue.length];setFeaturedMovie(m);v.classList.remove('is-playing');v.muted=true;v.playsInline=true;v.src=m.video_url;v.load();let advanced=false;const advance=()=>{if(advanced||token!==featuredToken)return;advanced=true;v.pause();v.classList.remove('is-playing');featuredIndex=(featuredIndex+1)%featuredQueue.length;featuredTimer=setTimeout(()=>startFeaturedPreview(),450)};v.onerror=advance;v.onloadedmetadata=()=>{if(token!==featuredToken)return;const duration=Number.isFinite(v.duration)?v.duration:0;const clipLength=Math.min(9,Math.max(4,duration||9));const maxStart=Math.max(0,duration-clipLength);const startAt=maxStart>1?Math.random()*maxStart:0;try{v.currentTime=startAt}catch{};const playClip=()=>{if(token!==featuredToken)return;v.play().then(()=>v.classList.add('is-playing')).catch(()=>{v.classList.remove('is-playing');advance()});featuredTimer=setTimeout(advance,clipLength*1000)};if(v.readyState>=2)playClip();else v.oncanplay=playClip};}
 function updateFeatured(m){if(!m){stopFeaturedPreview();featuredQueue=[];featuredCurrentMovie=null;$('featuredTitle').textContent='Tu cine. Tu mundo.';$('featuredDescription').textContent='Descubre películas y comparte una función con tus amigos.';$('featuredHero').style.backgroundImage='';$('featuredHero').classList.remove('has-poster');$('featuredPlay').onclick=()=>document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'});$('featuredList').onclick=()=>{};return}
  featuredQueue=movies.filter(x=>x.video_url);featuredIndex=Math.max(0,featuredQueue.findIndex(x=>String(x.id)===String(m.id)));setFeaturedMovie(featuredQueue[featuredIndex]||m);if(featuredQueue.length)startFeaturedPreview();else stopFeaturedPreview();
