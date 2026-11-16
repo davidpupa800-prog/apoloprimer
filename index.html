@@ -1883,13 +1883,14 @@ async function lookupMovieMetadata(query,yearHint='',mediaType='movie',seasonHin
  const lookupText=(query+' '+officialTitle).toLowerCase();
  const isAnaBruno=lookupText.includes('ana')&&lookupText.includes('bruno');
  const known=isAnaBruno?{year:'2017',genres:['Animación','Aventura','Familiar']}:{};
+ const finalGenres=isAnaBruno?known.genres:(genres.length?genres:known.genres||[]);
  const yearSource=details.releaseInfo||details.released||details.releaseDate||details.datePublished||details.year||item.year||best.year||known.year||'';
  const officialYear=String(yearSource).match(/[0-9]{4}/)?.[0]||known.year||best.year||'';
  const videos=Array.isArray(details.videos)?details.videos:[];
  const seasons=[...new Set(videos.map(v=>Number(v.season)).filter(Number.isFinite).filter(n=>n>0))].sort((a,b)=>a-b);
  const episode=seasonHint&&episodeHint?videos.find(v=>Number(v.season)===Number(seasonHint)&&Number(v.episode||v.number)===Number(episodeHint))||null:null;
  return {
-  title:officialTitle,year:officialYear,poster,genres,
+  title:officialTitle,year:officialYear,poster,genres:finalGenres,
   overview:details.description||details.overview||item.description||item.overview||'',
   director:details.director||item.director||'',
   cast:Array.isArray(details.cast)?details.cast:Array.isArray(item.cast)?item.cast:[],
