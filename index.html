@@ -1816,19 +1816,22 @@ $('posterSearchBtn').onclick=async()=>{
 $('applyKnownPostersBtn').onclick=async()=>{if(!isAdmin){say('uploadStatus','Solo el administrador puede actualizar el catálogo.');return}const btn=$('applyKnownPostersBtn');btn.disabled=true;const targets=[{match:['sin malos rollos','no hard feelings'],search:'No Hard Feelings',title:'Sin malos rollos',year:2023,category:'Comedia'},{match:['como perder a un hombre en 10 dias','how to lose a guy in 10 days'],search:'How to Lose a Guy in 10 Days',title:'Cómo perder a un hombre en 10 días',year:2003,category:'Romance / Comedia'},{match:['paul'],search:'Paul 2011 film',title:'Paul',year:2011,category:'Ciencia ficción / Comedia'}];const norm=x=>(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();let updated=0,notFound=[];try{if(!movies.length)await loadMovies();for(const t of targets){const movie=movies.find(m=>t.match.some(alias=>norm(m.title).includes(norm(alias))||norm(alias).includes(norm(m.title))));if(!movie){notFound.push(t.title+' (no existe en el catálogo)');continue}say('uploadStatus','Buscando portada de '+t.title+'…');const response=await fetch('https://api.streamx.qzz.io/search?q='+encodeURIComponent(t.search)+'&type=movie');if(!response.ok)throw new Error('El buscador no respondió ('+response.status+').');const payload=await response.json();const results=Array.isArray(payload.metas)?payload.metas:Array.isArray(payload.results)?payload.results:[];const wanted=results.find(x=>{const n=norm(x.name||x.title);return n===norm(t.search)||n===norm(t.title)||n.includes(norm(t.search))});const item=wanted||results[0];const cover=item?.poster||item?.poster_url||item?.cover_url;if(!cover){notFound.push(t.title+' (no se encontró portada)');continue}const {error}=await supabase.from('movies').update({title:t.title,year:t.year,category:t.category,cover_url:cover}).eq('id',movie.id);if(error)throw new Error(t.title+': '+error.message);Object.assign(movie,{title:t.title,year:t.year,category:t.category,cover_url:cover});updated++}await loadMovies();say('uploadStatus','Terminado: '+updated+' películas actualizadas con portada, año y categoría.'+(notFound.length?' Pendientes: '+notFound.join('; '):''))}catch(e){say('uploadStatus','No se pudo completar la actualización: '+(e.message||'Error desconocido'))}finally{btn.disabled=false}};
 function parseMovieFilename(name){
  let base=String(name||'').replace(/\.[^.]+$/,'').replace(/[._]+/g,' ').replace(/\s+/g,' ').trim();
- const yearMatch=base.match(/\b(?:19|20)\d{2}\b/);
- const year=yearMatch?yearMatch[0]:'';
+ const yearMatch=base.match(/\b(?:19|20)\d{2}\b/),year=yearMatch?yearMatch[0]:'';
+ const episodeMatch=base.match(/\bS(\d{1,2})\s*E(\d{1,2})\b/i)||base.match(/\b(\d{1,2})x(\d{1,2})\b/i);
+ const season=episodeMatch?Number(episodeMatch[1]):null;
+ const episode=episodeMatch?Number(episodeMatch[2]):null;
+ base=base.replace(/\bS\d{1,2}\s*E\d{1,2}\b|\b\d{1,2}x\d{1,2}\b/gi,' ');
  base=base.replace(/\[[^\]]*\]|\([^)]*(?:1080p|720p|2160p|bluray|web.?dl|x26[45]|hevc|h264)[^)]*\)/gi,' ');
  base=base.replace(/\b(19|20)\d{2}\b/g,' ');
  base=base.replace(/\b(1080p|720p|2160p|4k|bluray|blu.?ray|web.?dl|hdrip|hdtv|x264|x265|hevc|h264|aac|dts|proper|repack|extended|unrated|limited|multi|dual audio|latino|spanish|english|webrip|dvdrip)\b/gi,' ');
  base=base.replace(/\bwww\.[^\s]+|\b[a-z0-9-]+\.(com|net|org)\b/gi,' ');
  base=base.replace(/[-–—]+$/,'').replace(/\s+/g,' ').trim();
- return {title:base,year};
+ return {title:base,year,season,episode};
 }
 function cleanMovieFilename(name){return parseMovieFilename(name).title}
 function inferMovieCategory(title){const t=title.toLowerCase();const rules=[['Terror',/horror|terror|scary|haunt|demon|devil|ghost|zombie|exorc|nightmare|scream|insidious|conjuring|annabelle/],['Romance',/romance|love|amor|wedding|boda|kiss|beso|valentine/],['Comedia',/comedy|comedia|funny|joke|vacation|vacaciones/],['Ciencia ficción',/sci.?fi|science fiction|space|alien|robot|future|matrix|dune|star wars|interstellar/],['Documental',/documentary|documental/],['Acción',/action|accion|war|guerra|fight|mission|avengers|john wick|fast.?furious/],['Drama',/drama|life|vida|father|madre|padre|story|historia/]];return (rules.find(x=>x[1].test(t))||[null])[0]||'Drama'}
 let apoloRecognizedMetadata=null;
-async function lookupMovieMetadata(query,yearHint='',mediaType='movie'){
+async function lookupMovieMetadata(query,yearHint='',mediaType='movie',seasonHint='',episodeHint=''){
  const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  const apiType=mediaType==='series'?'series':'movie';
  const response=await fetch('https://api.streamx.qzz.io/search?q='+encodeURIComponent(query)+'&type='+apiType);
@@ -1866,6 +1869,7 @@ async function lookupMovieMetadata(query,yearHint='',mediaType='movie'){
  const officialYear=String(details.year||details.releaseInfo||best.year||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||best.year;
  const videos=Array.isArray(details.videos)?details.videos:[];
  const seasons=[...new Set(videos.map(v=>Number(v.season)).filter(Number.isFinite).filter(n=>n>0))].sort((a,b)=>a-b);
+ const episode=seasonHint&&episodeHint?videos.find(v=>Number(v.season)===Number(seasonHint)&&Number(v.episode)===Number(episodeHint))||null:null;
  return {
   title:officialTitle,year:officialYear,poster,genres,
   overview:details.description||details.overview||item.description||item.overview||'',
@@ -1873,7 +1877,7 @@ async function lookupMovieMetadata(query,yearHint='',mediaType='movie'){
   cast:Array.isArray(details.cast)?details.cast:Array.isArray(item.cast)?item.cast:[],
   runtime:details.runtime||details.duration||item.runtime||null,
   originalTitle:details.originalName||details.original_title||item.originalName||'',
-  imdbId,mediaType:apiType,seasons,videos,
+  imdbId,mediaType:apiType,seasons,videos,episode,
   matched:best.score>=75
  };
 }
@@ -1966,10 +1970,11 @@ $('movieVideo').addEventListener('change',async()=>{
  say('uploadStatus','Buscando ficha oficial por título y año…');
  $('moviePosterHint').textContent='Buscando coincidencia exacta y póster oficial. No se usará una imagen aleatoria del video.';
  try{
-  const metadata=await lookupMovieMetadata(parsed.title,parsed.year,$('movieMediaType').value);
+  if(parsed.season&&parsed.episode){$('movieMediaType').value='series';$('movieSeriesTitle').disabled=false;$('movieSeason').disabled=false;$('movieEpisode').disabled=false;$('movieSeason').value=parsed.season;$('movieEpisode').value=parsed.episode;$('movieSeriesTitle').value=parsed.title}
+  const metadata=await lookupMovieMetadata(parsed.title,parsed.year,$('movieMediaType').value,parsed.season,parsed.episode);
   if(metadata&&metadata.matched){
    apoloRecognizedMetadata=metadata;
-   $('movieTitle').value=metadata.title;
+   $('movieTitle').value=$('movieMediaType').value==='series'?(metadata.episode?.title||metadata.episode?.name||('Temporada '+(parsed.season||$('movieSeason').value)+' · Episodio '+(parsed.episode||$('movieEpisode').value))):metadata.title;
    if($('movieMediaType').value==='series')$('movieSeriesTitle').value=metadata.title;
    if(metadata.year)$('movieYear').value=metadata.year;
    if(metadata.genres.length)setMovieCategoryOptions(metadata.genres);
