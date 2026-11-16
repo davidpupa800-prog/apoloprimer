@@ -2523,9 +2523,25 @@ async function loadLegalMovies(reset=false){
   const response=await fetch(url,{headers:{'Accept':'application/json'}});
   if(!response.ok)throw new Error('HTTP '+response.status);
   const data=await response.json(),docs=data?.response?.docs||[];
+  // Verificar el registro de cada candidato antes de mostrarlo: debe existir al menos
+  // un archivo de video reproducible y una licencia abierta compatible.
+  const candidates=docs.filter(item=>item.identifier&&!legalMovieSeen.has(item.identifier));
+  const checked=await Promise.all(candidates.map(async item=>{
+   try{
+    const mr=await fetch('https://archive.org/metadata/'+encodeURIComponent(item.identifier));
+    if(!mr.ok)return null;
+    const record=await mr.json(),meta=record?.metadata||{},files=record?.files||[];
+    const license=String(meta.licenseurl||item.licenseurl||'').toLowerCase();
+    const permitted=license.includes('publicdomain/mark/1.0')||license.includes('publicdomain/zero/1.0')||license.includes('/licenses/by/4.0')||license.includes('/licenses/by-sa/4.0');
+    const video=files.some(file=>/\.(mp4|m4v|webm|ogv|mov)$/i.test(file.name||'')&&Number(file.size||0)>0);
+    if(!permitted||!video)return null;
+    return {...item,title:meta.title||item.title,year:meta.year||item.year,creator:meta.creator||item.creator,description:meta.description||'',licenseurl:license};
+   }catch{return null}
+  }));
+  const playable=checked.filter(Boolean);
   let added=0;
-  docs.forEach(item=>{
-   if(!item.identifier||legalMovieSeen.has(item.identifier))return;
+  playable.forEach(item=>{
+   if(legalMovieSeen.has(item.identifier))return;
    legalMovieSeen.add(item.identifier);added++;
    const card=document.createElement('article');card.className='movie';
    const poster=document.createElement('div');poster.className='poster';
@@ -2533,12 +2549,12 @@ async function loadLegalMovies(reset=false){
    poster.style.backgroundSize='cover';poster.style.backgroundPosition='center';
    const info=document.createElement('div');info.className='movie-info';
    const title=document.createElement('b');title.textContent=item.title||'Película sin título';
-   const meta=document.createElement('small');meta.textContent=[item.year||'',legalLicenseLabel(item.licenseurl)].filter(Boolean).join(' · ');
+   const meta=document.createElement('small');meta.textContent=[item.year||'',item.creator||'',legalLicenseLabel(item.licenseurl)].filter(Boolean).join(' · ');
    const play=document.createElement('button');play.type='button';play.textContent='▶ Ver aquí';
    play.onclick=e=>{e.stopPropagation();openLegalMovie(item)};
    info.append(title,meta,play);card.append(poster,info);card.onclick=()=>openLegalMovie(item);box.append(card);
   });
-  status.textContent=added?('Mostrando '+legalMovieSeen.size+' películas. El video se reproduce desde Internet Archive.'):'No se encontraron más títulos con esos filtros.';
+  status.textContent=added?('Mostrando '+legalMovieSeen.size+' películas verificadas con archivo de video y licencia abierta declarada. Se reproducen desde el reproductor oficial de Internet Archive.'):'No se encontraron títulos reproducibles con esas licencias en esta página de resultados.';
   legalMoviePage++;
  }catch(error){
   status.textContent='No se pudo cargar el catálogo externo. Inténtalo de nuevo más tarde.';
