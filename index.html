@@ -1841,8 +1841,8 @@ async function lookupMovieMetadata(query,yearHint='',mediaType='movie',seasonHin
   const n=norm(name);
   const year=String(item.releaseInfo||item.year||item.released||item.releaseDate||'').match(/\\b(?:19|20)\\d{2}\\b/)?.[0]||'';
   let score=n===q?140:n.startsWith(q)?90:n.includes(q)?65:0;
-  const queryNumbers=q.match(/\\b\\d+\\b/g)||[];
-  const candidateNumbers=n.match(/\\b\\d+\\b/g)||[];
+  const queryNumbers=q.match(/\b\d+\b/g)||[];
+  const candidateNumbers=n.match(/\b\d+\b/g)||[];
   // No aceptar la película original cuando el usuario pidió una secuela numerada.
   if(queryNumbers.some(number=>!candidateNumbers.includes(number)))score=-100;
   score+=tokens.filter(t=>n.split(' ').includes(t)).length*5;
