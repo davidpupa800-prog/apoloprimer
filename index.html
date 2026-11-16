@@ -1865,8 +1865,8 @@ async function lookupMovieMetadata(query,yearHint='',mediaType='movie',seasonHin
  const poster=details.images?.poster?.large||details.images?.poster?.original||details.poster||item.poster||item.poster_url||item.cover_url||'';
  const rawGenres=Array.isArray(details.genres)?details.genres:Array.isArray(item.genres)?item.genres:Array.isArray(item.genre)?item.genre:typeof item.genres==='string'?item.genres.split(/[\/,|]/):[];
  const genres=rawGenres.map(x=>typeof x==='string'?x:String(x.name||x)).map(x=>x.trim()).filter(Boolean);
- const officialTitle=details.name||details.title||best.name;
- const officialYear=String(details.year||details.releaseInfo||best.year||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||best.year;
+ const officialTitle=details.title||details.originalName||details.original_title||details.name||best.name;
+ const officialYear=String(details.releaseInfo||details.released||details.releaseDate||details.datePublished||details.year||best.year||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||best.year;
  const videos=Array.isArray(details.videos)?details.videos:[];
  const seasons=[...new Set(videos.map(v=>Number(v.season)).filter(Number.isFinite).filter(n=>n>0))].sort((a,b)=>a-b);
  const episode=seasonHint&&episodeHint?videos.find(v=>Number(v.season)===Number(seasonHint)&&Number(v.episode)===Number(episodeHint))||null:null;
@@ -1921,7 +1921,7 @@ async function identifyMediaFromLink(){
    if(!response.ok)throw new Error('El catálogo no pudo leer ese identificador ('+response.status+').');
    const body=await response.json(),d=body.meta||body.result||body;
    const genres=Array.isArray(d.genres)?d.genres.map(x=>typeof x==='string'?x:x.name).filter(Boolean):[];
-   metadata={title:d.name||d.title||'',year:String(d.year||d.releaseInfo||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||'',poster:d.images?.poster?.large||d.images?.poster?.original||d.poster||'',genres,overview:d.description||d.overview||'',director:d.director||'',cast:Array.isArray(d.cast)?d.cast:[],runtime:d.runtime||d.duration||null,originalTitle:d.originalName||d.original_title||'',imdbId,mediaType:apiType,seasons:[...new Set((d.videos||[]).map(v=>Number(v.season)).filter(n=>n>0))],videos:d.videos||[],matched:true};
+   metadata={title:d.title||d.originalName||d.original_title||d.name||'',year:String(d.releaseInfo||d.released||d.releaseDate||d.datePublished||d.year||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||'',poster:d.images?.poster?.large||d.images?.poster?.original||d.poster||'',genres,overview:d.description||d.overview||'',director:d.director||'',cast:Array.isArray(d.cast)?d.cast:[],runtime:d.runtime||d.duration||null,originalTitle:d.originalName||d.original_title||'',imdbId,mediaType:apiType,seasons:[...new Set((d.videos||[]).map(v=>Number(v.season)).filter(n=>n>0))],videos:d.videos||[],matched:true};
   }else{
    const last=url.pathname.split('/').filter(Boolean).pop()||'';
    const decoded=decodeURIComponent(last).replace(/\.[a-z0-9]{2,5}$/i,'').replace(/[-_+]+/g,' ').replace(/\b(19|20)\d{2}\b/g,'').trim();
