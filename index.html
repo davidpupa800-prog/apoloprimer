@@ -1981,11 +1981,16 @@ $('movieVideo').addEventListener('change',async()=>{
  window.apoloRemotePosterUrl=null;window.apoloGeneratedPoster=null;
  const parsed=parseMovieFilename(file.name);
  const usableName=parsed.title&&!/^\d+$/.test(parsed.title)&&parsed.title.length>2;
- $('movieTitle').value=usableName?parsed.title:'';
- if(parsed.year)$('movieYear').value=parsed.year;else $('movieYear').value='';
- setMovieCategoryOptions([]);
+ // Si el archivo tiene un nombre numérico, conservar los datos que el usuario ya escribió.
+ if(usableName){
+  $('movieTitle').value=parsed.title;
+  if(parsed.year)$('movieYear').value=parsed.year;
+  setMovieCategoryOptions([]);
+ }else{
+  $('movieTitle').value=$('movieTitle').value.trim();
+ }
  $('moviePosterPreview').hidden=true;$('moviePosterPreview').removeAttribute('src');
- if(!usableName){say('uploadStatus','El archivo tiene un nombre numérico. Escribe el título real en el campo Título y pulsa Buscar portada.');$('moviePosterHint').textContent='No se puede identificar la película por un código numérico. Escribe su título real abajo y elige la ficha y portada correctas.';return}
+ if(!usableName){window.apoloRemotePosterUrl=null;apoloRecognizedMetadata=null;say('uploadStatus','El archivo tiene un nombre numérico. Se conservó el título escrito. Pulsa Identificar título automáticamente para buscar su ficha.');$('moviePosterHint').textContent='El nombre del archivo no permite reconocer la película. Escribe su título arriba y pulsa Identificar título automáticamente; no se borrarán el título ni los datos que ya hayas completado.';return}
  say('uploadStatus','Buscando ficha oficial por título y año…');
  $('moviePosterHint').textContent='Buscando coincidencia exacta y póster oficial. No se usará una imagen aleatoria del video.';
  try{
