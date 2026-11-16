@@ -1660,6 +1660,36 @@ function renderSearchCard(movie,external=false){
  if(!external)card.onclick=()=>openMovie(movie);
  return card;
 }
+function renderAuthorizedSources(item,name){
+ const box=$('externalSeriesDetails');if(!box)return;
+ const query=encodeURIComponent(name||'');
+ const sources=[
+  {name:'JustWatch',url:'https://www.justwatch.com/us/search?q='+query,detail:'Compara disponibilidad legal en Estados Unidos'},
+  {name:'Crunchyroll',url:'https://www.crunchyroll.com/search?q='+query,detail:'Anime y simulcasts oficiales'},
+  {name:'Prime Video',url:'https://www.amazon.com/s?k='+query+'&i=instant-video',detail:'Alquiler, compra o suscripción según el título'},
+  {name:'Netflix',url:'https://www.netflix.com/search?q='+query,detail:'Catálogo sujeto a región y suscripción'},
+  {name:'Hulu',url:'https://www.hulu.com/search?q='+query,detail:'Disponibilidad según región y plan'},
+  {name:'Disney+',url:'https://www.disneyplus.com/search',detail:'Busca el título en el catálogo oficial'},
+  {name:'Apple TV',url:'https://tv.apple.com/search?term='+query,detail:'Compra, alquiler o suscripción según el título'},
+  {name:'Max',url:'https://www.max.com/',detail:'Busca el título en el servicio oficial'},
+  {name:'Peacock',url:'https://www.peacocktv.com/',detail:'Catálogo oficial de Peacock'},
+  {name:'Tubi',url:'https://tubitv.com/search/'+query,detail:'Contenido gratuito con anuncios'}
+ ];
+ const panel=document.createElement('section');panel.className='panel';panel.style.marginTop='22px';
+ const heading=document.createElement('h3');heading.textContent='Dónde ver '+(name||'este título')+' legalmente';panel.append(heading);
+ const note=document.createElement('p');note.className='muted small';note.textContent='Abre cada servicio para comprobar si el título está disponible en tu región. Estos enlaces llevan a los proveedores oficiales; no extraen ni retransmiten sus videos.';panel.append(note);
+ const grid=document.createElement('div');grid.className='formgrid';
+ sources.forEach(source=>{
+  const a=document.createElement('a');a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';a.style.cssText='display:block;padding:12px;background:#222;border:1px solid #444;border-radius:7px;color:#fff;text-decoration:none';
+  const strong=document.createElement('b');strong.textContent=source.name;
+  const small=document.createElement('small');small.className='muted';small.style.display='block';small.style.marginTop='5px';small.textContent=source.detail;
+  a.append(strong,small);grid.append(a);
+ });
+ panel.append(grid);
+ const attribution=document.createElement('p');attribution.className='muted small';attribution.style.marginTop='12px';attribution.textContent='La disponibilidad cambia por país y fecha. Para mostrar ofertas automáticamente mediante la API de JustWatch se necesita una integración de socio y su token.';panel.append(attribution);
+ const justwatch=document.createElement('a');justwatch.href='https://www.justwatch.com/us/search?q='+query;justwatch.target='_blank';justwatch.rel='noopener noreferrer';justwatch.textContent='Consultar disponibilidad en JustWatch';justwatch.style.cssText='color:#f5c451;font-weight:bold';panel.append(justwatch);
+ box.append(panel);
+}
 async function showExternalSeries(item,name){
  const status=$('globalSearchStatus'),detailBox=$('externalSeriesDetails');if(!detailBox)return;
  detailBox.innerHTML='<p class="muted small">Cargando temporadas y episodios…</p>';
@@ -1725,7 +1755,7 @@ async function runGlobalSearch(query,requestId){
   ranked.forEach(({item,name,year})=>{
    const card=renderSearchCard({title:name,year,poster:item.poster||item.poster_url||item.cover_url||'',genres:Array.isArray(item.genres)?item.genres:[]},true);
    const tag=document.createElement('small');tag.className='muted';tag.textContent=item._apoloType==='series'?'Serie':'Película';card.querySelector('.movie-info').append(tag);
-   if(item._apoloType==='series'){card.style.cursor='pointer';card.addEventListener('click',()=>showExternalSeries(item,name))}
+   card.style.cursor='pointer';card.addEventListener('click',()=>{const details=$('externalSeriesDetails');if(details)details.innerHTML='';renderAuthorizedSources(item,name);if(item._apoloType==='series')showExternalSeries(item,name);});
    box.append(card);
   });
   status.textContent=ranked.length?'Resultados externos. Toca una serie para ver temporadas y episodios.':'No encontramos resultados externos. Revisa la conexión o prueba el título original.';
