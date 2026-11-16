@@ -44,6 +44,7 @@ footer{padding:28px 5%;border-top:1px solid #222;color:#777;font-size:12px}
 @media(max-width:650px){main{padding-bottom:115px}.stream-header{position:sticky;top:0}.stream-header nav{display:none}.stream-hero{min-height:470px}.app-screen[data-screen="home"]#catalogo{margin-top:14px}}
 
 @media(max-width:650px){.bottom-nav{position:fixed;display:flex;z-index:10;bottom:12px;left:5%;right:5%;background:#191919f2;border:1px solid #444;border-radius:35px;justify-content:space-around;align-items:center;padding:8px 5px;backdrop-filter:blur(16px);box-shadow:0 5px 25px #0009}.bottom-nav a,.bottom-nav button{display:flex;flex-direction:column;align-items:center;gap:1px;background:transparent;color:#aaa;text-decoration:none;font-size:10px;padding:5px 8px;font-weight:400}.bottom-nav span{font-size:21px;line-height:1.2}.bottom-nav .active{color:#ff2630}.bottom-nav button{border:0;min-width:0;flex:1;padding-left:2px;padding-right:2px}.bottom-nav{gap:0}.bottom-nav button{font-size:9px}footer{padding-bottom:100px}}
+#legalMoviePlayer:not(.hidden){display:flex!important}#legalMovieResults .movie{flex:0 0 155px}#legalMovieResults .poster{height:220px}@media(max-width:650px){#legalMovieResults .movie{flex-basis:145px}#legalMoviePlayer>div{max-height:94dvh;overflow:auto}#legalMovieFrame{height:58vh!important}}
 /* Apoloprimer streaming-inspired home */
 :root{--red:#e50914;--bg:#050505;--panel:#171717;--muted:#aaa;--line:#303030}
 body{background:#050505;font-family:Arial,sans-serif}
@@ -1399,6 +1400,20 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
 </div></section>
 <main>
 <section class="section stream-section app-screen" id="catalogo" data-screen="home"><div class="section-heading"><h2>Continuar viendo</h2><span class="muted small">Tu entretenimiento continúa aquí</span></div><div class="grid movie-rail" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
+<section class="section stream-section app-screen" id="catalogoLegal" data-screen="home">
+ <div class="section-heading"><h2>Películas gratis para ver aquí</h2><span class="muted small">Fuentes con licencias abiertas</span></div>
+ <p class="muted small">Películas alojadas en Internet Archive. Se reproducen desde su reproductor oficial; la disponibilidad y los derechos dependen de cada ficha.</p>
+ <div style="display:flex;gap:9px;flex-wrap:wrap;margin:12px 0"><input id="legalMovieSearch" type="search" placeholder="Buscar películas gratuitas…" style="flex:1;min-width:180px;margin:0"><button id="legalMovieSearchBtn" type="button">Buscar</button><button id="legalMovieMoreBtn" class="secondary" type="button">Más películas</button></div>
+ <p class="muted small" id="legalMovieStatus" aria-live="polite">Cargando películas con licencia abierta…</p>
+ <div class="movie-rail" id="legalMovieResults"></div>
+</section>
+<div id="legalMoviePlayer" class="hidden" style="position:fixed;inset:0;z-index:100;background:#000f;display:flex;align-items:center;justify-content:center;padding:12px">
+ <div style="width:min(1100px,100%);background:#111;border:1px solid #444;border-radius:12px;overflow:hidden">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;gap:10px"><b id="legalMoviePlayerTitle">Reproduciendo</b><button id="legalMoviePlayerClose" class="secondary" type="button">Cerrar ✕</button></div>
+  <iframe id="legalMovieFrame" title="Reproductor oficial de Internet Archive" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="display:block;width:100%;height:min(70vh,650px);border:0;background:#000"></iframe>
+  <p id="legalMovieAttribution" class="muted small" style="padding:8px 14px;margin:0"></p>
+ </div>
+</div>
 <section class="section stream-section app-screen" id="miLista" data-screen="mylist"><div class="section-heading"><h2>Mi lista</h2><span class="muted small">Tus favoritas</span></div><div class="grid movie-rail" id="myList"><div class="muted">Agrega películas a tu lista.</div></div></section>
 <section class="section stream-section app-screen" id="explorar" data-screen="explore"><div class="section-heading"><h2>Explorar</h2><span class="muted small">Encuentra algo para ver</span></div><div class="category-pills" id="categoryPills"><button class="active" data-category="Todos">Todos</button><button data-category="Acción">Acción</button><button data-category="Terror">Terror</button><button data-category="Comedia">Comedia</button><button data-category="Drama">Drama</button><button data-category="Romance">Romance</button><button data-category="Ciencia ficción">Ciencia ficción</button></div><div class="movie-rail" id="exploreMovies"></div></section>
 <section class="section stream-section app-screen" id="buscar" data-screen="search"><div class="section-heading"><h2>Buscar en Apoloprimer</h2></div><input id="catalogSearch" type="search" autocomplete="off" placeholder="Título, año, categoría… incluso si no recuerdas el nombre exacto"><p class="muted small" style="margin:9px 2px">Resultados de tu biblioteca</p><div class="movie-rail" id="searchResults"></div><div class="section-heading" style="margin-top:28px"><h2>Explorar más títulos</h2></div><p class="muted small" id="globalSearchStatus" aria-live="polite"></p><div class="movie-rail" id="globalSearchResults"></div><div id="externalSeriesDetails" class="section" style="margin-top:22px"></div><p class="muted small">Las fichas externas muestran información y episodios. Para reproducirlos, el archivo debe estar subido legalmente a tu biblioteca.</p></section>
@@ -2468,6 +2483,72 @@ if(apoloSplash&&apoloSplashVideo){
   window.setTimeout(dismissApoloSplash,4500);
  }
 }
+
+// Catálogo de películas alojadas por Internet Archive con licencias abiertas declaradas.
+// Se limita a dominio público/CC0/CC BY/CC BY-SA; no extrae enlaces de sitios no autorizados.
+let legalMoviePage=1,legalMovieQuery='';
+const legalMovieSeen=new Set();
+const legalMovieLicenseQuery='(licenseurl:http*creativecommons.org/publicdomain/mark/1.0* OR licenseurl:http*creativecommons.org/publicdomain/zero/1.0* OR licenseurl:http*creativecommons.org/licenses/by/4.0* OR licenseurl:http*creativecommons.org/licenses/by-sa/4.0*)';
+function legalLicenseLabel(url){
+ const u=String(url||'').toLowerCase();
+ if(u.includes('/publicdomain/mark'))return 'Dominio público';
+ if(u.includes('/publicdomain/zero'))return 'CC0';
+ if(u.includes('/by-sa/'))return 'CC BY-SA';
+ if(u.includes('/licenses/by/'))return 'CC BY';
+ return 'Licencia abierta declarada';
+}
+function openLegalMovie(item){
+ const modal=$('legalMoviePlayer'),frame=$('legalMovieFrame');
+ $('legalMoviePlayerTitle').textContent=item.title||'Película';
+ $('legalMovieAttribution').textContent='Fuente: Internet Archive · '+legalLicenseLabel(item.licenseurl)+' · '+(item.identifier||'');
+ frame.src='https://archive.org/embed/'+encodeURIComponent(item.identifier)+'?autoplay=1';
+ modal.classList.remove('hidden');
+}
+function closeLegalMovie(){
+ $('legalMovieFrame').src='about:blank';
+ $('legalMoviePlayer').classList.add('hidden');
+}
+$('legalMoviePlayerClose').addEventListener('click',closeLegalMovie);
+$('legalMoviePlayer').addEventListener('click',e=>{if(e.target===$('legalMoviePlayer'))closeLegalMovie()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('legalMoviePlayer').classList.contains('hidden'))closeLegalMovie()});
+async function loadLegalMovies(reset=false){
+ const box=$('legalMovieResults'),status=$('legalMovieStatus'),btn=$('legalMovieMoreBtn');
+ if(!box||!status)return;
+ if(reset){legalMoviePage=1;legalMovieSeen.clear();box.innerHTML=''}
+ status.textContent='Buscando películas con licencias abiertas…';btn.disabled=true;
+ const terms=legalMovieQuery?(' AND title:('+legalMovieQuery.replace(/[+\-!(){}\[\]^"~*?:\\/]/g,' ').trim()+')'):'';
+ const q='mediatype:movies AND '+legalMovieLicenseQuery+terms;
+ const url='https://archive.org/advancedsearch.php?q='+encodeURIComponent(q)+'&fl[]=identifier&fl[]=title&fl[]=year&fl[]=licenseurl&fl[]=creator&rows=24&page='+legalMoviePage+'&sort[]=downloads+desc&output=json';
+ try{
+  const response=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const data=await response.json(),docs=data?.response?.docs||[];
+  let added=0;
+  docs.forEach(item=>{
+   if(!item.identifier||legalMovieSeen.has(item.identifier))return;
+   legalMovieSeen.add(item.identifier);added++;
+   const card=document.createElement('article');card.className='movie';
+   const poster=document.createElement('div');poster.className='poster';
+   poster.style.backgroundImage='url("https://archive.org/services/img/'+encodeURIComponent(item.identifier)+'")';
+   poster.style.backgroundSize='cover';poster.style.backgroundPosition='center';
+   const info=document.createElement('div');info.className='movie-info';
+   const title=document.createElement('b');title.textContent=item.title||'Película sin título';
+   const meta=document.createElement('small');meta.textContent=[item.year||'',legalLicenseLabel(item.licenseurl)].filter(Boolean).join(' · ');
+   const play=document.createElement('button');play.type='button';play.textContent='▶ Ver aquí';
+   play.onclick=e=>{e.stopPropagation();openLegalMovie(item)};
+   info.append(title,meta,play);card.append(poster,info);card.onclick=()=>openLegalMovie(item);box.append(card);
+  });
+  status.textContent=added?('Mostrando '+legalMovieSeen.size+' películas. El video se reproduce desde Internet Archive.'):'No se encontraron más títulos con esos filtros.';
+  legalMoviePage++;
+ }catch(error){
+  status.textContent='No se pudo cargar el catálogo externo. Inténtalo de nuevo más tarde.';
+  console.error('Catálogo legal:',error);
+ }finally{btn.disabled=false}
+}
+$('legalMovieSearchBtn').addEventListener('click',()=>{legalMovieQuery=$('legalMovieSearch').value.trim();loadLegalMovies(true)});
+$('legalMovieSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){legalMovieQuery=e.currentTarget.value.trim();loadLegalMovies(true)}});
+$('legalMovieMoreBtn').addEventListener('click',()=>loadLegalMovies(false));
+loadLegalMovies(true);
 init();
 </script>
 <script>
