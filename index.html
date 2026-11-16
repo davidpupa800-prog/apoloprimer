@@ -1370,6 +1370,19 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
 .home-category-menu button.active{background:linear-gradient(135deg,rgba(229,9,20,.88),rgba(135,0,12,.82));border-color:rgba(255,210,210,.5);box-shadow:0 0 12px rgba(229,9,20,.25)}
 @media(max-width:650px){.home-category-wrap{left:16px;bottom:25px}.home-category-trigger{min-width:164px;padding:11px 16px;font-size:14px;border-radius:18px}.home-category-menu{min-width:260px;max-width:calc(100vw - 32px);grid-template-columns:repeat(2,minmax(0,1fr));max-height:48vh}}
 
+
+/* Apoloprimer downloads manager */
+.download-library{display:grid;gap:12px;margin-top:18px}
+.download-item{display:flex;align-items:center;gap:13px;padding:13px;background:#171717;border:1px solid #333;border-radius:10px}
+.download-item img{width:58px;height:82px;object-fit:cover;border-radius:6px;background:#292929;flex:none}
+.download-item-main{min-width:0;flex:1}.download-item-main b{display:block;overflow-wrap:anywhere}.download-item-main small{display:block;color:#aaa;margin-top:4px}
+.download-item a{color:#fff;background:#333;border-radius:6px;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:700}
+.download-modal-card{width:min(520px,100%)}.download-quality-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+.download-quality{padding:13px;border:1px solid #3a3a3a;border-radius:9px;background:#222;color:#fff;text-align:center}
+.download-quality.active{border:2px solid var(--red);background:#2a1719}.download-note{font-size:12px;color:#aaa;line-height:1.5}
+#downloadStart{width:100%;padding:14px;font-size:15px}.download-poster-line{display:flex;gap:12px;align-items:center;margin:14px 0;padding-bottom:14px;border-bottom:1px solid #333}
+.download-poster-line img{width:64px;height:88px;object-fit:cover;border-radius:6px;background:#252525}
+@media(max-width:520px){.download-item{align-items:flex-start;flex-wrap:wrap}.download-item a{margin-left:71px}.download-quality-grid{gap:7px}}
 </style>
 </head>
 <body>
@@ -1389,7 +1402,7 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
 <section class="section stream-section app-screen" id="miLista" data-screen="mylist"><div class="section-heading"><h2>Mi lista</h2><span class="muted small">Tus favoritas</span></div><div class="grid movie-rail" id="myList"><div class="muted">Agrega películas a tu lista.</div></div></section>
 <section class="section stream-section app-screen" id="explorar" data-screen="explore"><div class="section-heading"><h2>Explorar</h2><span class="muted small">Encuentra algo para ver</span></div><div class="category-pills" id="categoryPills"><button class="active" data-category="Todos">Todos</button><button data-category="Acción">Acción</button><button data-category="Terror">Terror</button><button data-category="Comedia">Comedia</button><button data-category="Drama">Drama</button><button data-category="Romance">Romance</button><button data-category="Ciencia ficción">Ciencia ficción</button></div><div class="movie-rail" id="exploreMovies"></div></section>
 <section class="section stream-section app-screen" id="buscar" data-screen="search"><div class="section-heading"><h2>Buscar</h2></div><input id="catalogSearch" type="search" placeholder="Buscar películas por título o categoría…"><div class="movie-rail" id="searchResults"></div></section>
-<section class="section stream-section app-screen" id="descargas" data-screen="downloads"><div class="section-heading"><h2>Descargas</h2></div><article class="download-video"><video controls playsinline preload="metadata" aria-label="Animación de ApoloPrimer"><source src="/apoloprimer-con-foto-animada-largo.mp4" type="video/mp4">Tu navegador no puede reproducir este video.</video><div class="download-video-info"><h3>Animación de ApoloPrimer</h3><p class="muted small">Reproduce o descarga el video de introducción animado.</p><a class="btn" href="/apoloprimer-con-foto-animada-largo.mp4" download="apoloprimer-con-foto-animada.mp4">Descargar video</a></div></article></section>
+<section class="section stream-section app-screen" id="descargas" data-screen="downloads"><div class="section-heading"><h2>Mis descargas</h2><span class="muted small">Archivos solicitados desde tu biblioteca</span></div><p class="muted small">Las descargas se guardan en el dispositivo mediante el navegador. El progreso y la opción de reanudar dependen del gestor de descargas del dispositivo.</p><div id="downloadLibrary" class="download-library"><div class="download-empty"><b>Todavía no has descargado contenido</b><p class="muted small">Abre una película de tu catálogo y pulsa Descargar.</p></div></div></section>
 <section class="panel hidden app-screen" data-screen="home" id="adminPanel">
  <h2>Panel de administración</h2><p class="muted small">Solo las cuentas autorizadas como administradoras pueden subir contenido.</p>
  <div class="formgrid">
@@ -1431,6 +1444,7 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
 <button id="bottomProfile" aria-label="Perfil"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><b>Perfil</b></button>
 </nav>
 <footer>© 2026 Apoloprimer · Publica únicamente películas que tengas derecho a distribuir.</footer>
+<div class="modal hidden" id="downloadModal"><div class="modal-card download-modal-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2 style="margin:0">Descargar</h2><button class="secondary" id="downloadClose" type="button" aria-label="Cerrar">×</button></div><div class="download-poster-line"><img id="downloadPoster" alt="Portada"><div><b id="downloadTitle">Contenido</b><small class="muted" id="downloadEpisode">Vídeo de tu biblioteca</small></div></div><b>Calidad disponible</b><div class="download-quality-grid" id="downloadQualities"><button class="download-quality active" type="button">Original</button></div><p class="download-note" id="downloadQualityNote">Se descargará el archivo original disponible en Apoloprimer. Las opciones 360p, 540p, 720p y HD solo aparecerán cuando existan versiones codificadas reales; no se simularán calidades.</p><button id="downloadStart" type="button">Descargar archivo</button><p class="muted small" id="downloadStatus" aria-live="polite"></p></div></div>
 <div class="modal hidden" id="authModal"><div class="modal-card"><h2 id="authTitle">Entrar</h2><label>Correo electrónico<input id="authEmail" type="email" autocomplete="email"></label><label>Contraseña<input id="authPassword" type="password" autocomplete="current-password"></label><div class="uploadrow"><button id="authSubmit">Entrar</button><button class="secondary" id="authToggle">Crear cuenta</button><button class="secondary" id="authClose">Cerrar</button></div><p class="muted small" id="authStatus"></p></div></div>
 
 <div class="modal hidden account-modal" id="accountModal"><div class="account-shell">
@@ -1478,7 +1492,7 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
  <label class="side-control side-volume" title="Volumen"><span><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm13-2a7 7 0 0 1 0 10m2-13a11 11 0 0 1 0 16"/></svg></span><input id="playerVolume" type="range" min="0" max="100" value="100" aria-label="Volumen"></label>
  <div class="cinema-center"><button id="seekBack" title="Retroceder 10 segundos"><svg viewBox="0 0 24 24"><path d="M3 8V3m0 5h5M4 8a9 9 0 1 1-1 7"/><text x="7" y="16">10</text></svg></button><button id="togglePlayback" class="big-play" title="Reproducir o pausar">Ⅱ</button><button id="seekForward" title="Avanzar 10 segundos"><svg viewBox="0 0 24 24"><path d="M21 8V3m0 5h-5m4 0a9 9 0 1 0 1 7"/><text x="5" y="16">10</text></svg></button></div>
  <div class="cinema-bottom"><div class="cinema-progress"><span id="playerCurrent">0:00</span><input id="playerProgress" type="range" min="0" max="1000" value="0" aria-label="Progreso"><span id="playerDuration">0:00</span><span id="playerTime" class="hidden">0:00 / 0:00</span></div>
-  <div class="cinema-toolbar"><button id="clipPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 15l4-4 4 4"/></svg><span>Recortar</span></button><button id="speedPlayer"><svg viewBox="0 0 24 24"><path d="M4 18a9 9 0 1 1 16 0M12 12l4-4M7 19h10"/></svg><span>Velocidad 1×</span></button><button id="episodesPlayer"><svg viewBox="0 0 24 24"><path d="m12 3 9 6-9 6-9-6 9-6Zm-9 12 9 6 9-6"/></svg><span>Episodios</span></button><button id="audioPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h6"/></svg><span>Audio y subtítulos</span></button><button id="nextPlayer"><svg viewBox="0 0 24 24"><path d="m5 4 11 8-11 8V4Zm14 0v16"/></svg><span>Próximo episodio</span></button><button id="fullscreenPlayer"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span>Pantalla completa</span></button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div>
+  <div class="cinema-toolbar"><button id="downloadPlayer" title="Descargar este vídeo"><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></svg><span>Descargar</span></button><button id="clipPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 15l4-4 4 4"/></svg><span>Recortar</span></button><button id="speedPlayer"><svg viewBox="0 0 24 24"><path d="M4 18a9 9 0 1 1 16 0M12 12l4-4M7 19h10"/></svg><span>Velocidad 1×</span></button><button id="episodesPlayer"><svg viewBox="0 0 24 24"><path d="m12 3 9 6-9 6-9-6 9-6Zm-9 12 9 6 9-6"/></svg><span>Episodios</span></button><button id="audioPlayer"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h6"/></svg><span>Audio y subtítulos</span></button><button id="nextPlayer"><svg viewBox="0 0 24 24"><path d="m5 4 11 8-11 8V4Zm14 0v16"/></svg><span>Próximo episodio</span></button><button id="fullscreenPlayer"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span>Pantalla completa</span></button></div><div id="playerMessage" class="cinema-message" aria-live="polite"></div>
  </div>
  </div></div>
 <script type="module">
@@ -1731,6 +1745,44 @@ $('clipPlayer').onclick=()=>playerSay('Para recortar un fragmento necesitamos ha
 $('episodesPlayer').onclick=()=>playerSay('Esta película no tiene episodios asociados.');
 $('nextPlayer').onclick=()=>playerSay('No hay un próximo episodio asociado a esta película.');
 $('audioPlayer').onclick=()=>{const tracks=solo.textTracks;if(!tracks||!tracks.length){playerSay('Este archivo no incluye pistas de subtítulos seleccionables.');return}let i=[...tracks].findIndex(t=>t.mode==='showing');tracks.forEach(t=>t.mode='disabled');const next=(i+1)%tracks.length;tracks[next].mode='showing';playerSay('Subtítulos: '+(tracks[next].label||tracks[next].language||'Pista '+(next+1)))};
+
+// Descargas de archivos alojados en el bucket privado de Apoloprimer.
+const APOLO_R2_API='https://apoloprimer-r2-api-production.up.railway.app';
+let downloadMovie=null;
+function getDownloadHistory(){try{return JSON.parse(localStorage.getItem('apoloDownloadHistory')||'[]')}catch{return []}}
+function saveDownloadHistory(item){const list=getDownloadHistory().filter(x=>x.id!==item.id);list.unshift(item);localStorage.setItem('apoloDownloadHistory',JSON.stringify(list.slice(0,40)));renderDownloadLibrary()}
+function renderDownloadLibrary(){
+ const box=$('downloadLibrary');if(!box)return;const list=getDownloadHistory();box.innerHTML='';
+ if(!list.length){box.innerHTML='<div class="download-empty"><b>Todavía no has descargado contenido</b><p class="muted small">Abre una película de tu catálogo y pulsa Descargar.</p></div>';return}
+ list.forEach(item=>{const row=document.createElement('article');row.className='download-item';const img=document.createElement('img');img.alt='';img.src=item.poster||'';const main=document.createElement('div');main.className='download-item-main';const title=document.createElement('b');title.textContent=item.title||'Vídeo';const detail=document.createElement('small');detail.textContent='Enlace enviado al navegador · '+new Date(item.createdAt).toLocaleString('es-ES');main.append(title,detail);const link=document.createElement('a');link.href=item.url;link.textContent='Descargar otra vez';link.rel='noopener';link.addEventListener('click',()=>{detail.textContent='Nueva solicitud enviada · '+new Date().toLocaleString('es-ES')});row.append(img,main,link);box.append(row)});
+}
+function openDownloadDialog(movie){
+ if(!movie)return;downloadMovie=movie;
+ $('downloadTitle').textContent=movie.title||'Vídeo';
+ $('downloadEpisode').textContent=movie.media_type==='series_episode'?'Temporada '+(movie.season_number||'?')+' · Episodio '+(movie.episode_number||'?'):'Archivo original de tu biblioteca';
+ $('downloadPoster').src=movie.cover_url||'';
+ $('downloadStatus').textContent='';
+ $('downloadQualities').innerHTML='<button class="download-quality active" type="button" aria-pressed="true">Original</button>';
+ $('downloadQualityNote').textContent='Se descargará el archivo original disponible en Apoloprimer. No se mostrarán 360p, 540p, 720p o HD si no existen versiones codificadas reales.';
+ const canDownload=typeof movie.video_path==='string'&&movie.video_path.startsWith('movies/');
+ $('downloadStart').disabled=!canDownload;
+ $('downloadStart').textContent=canDownload?'Descargar archivo':'Descarga no disponible';
+ $('downloadStatus').textContent=canDownload?'La descarga utiliza el archivo que ya está guardado en Apoloprimer.':'Este título no tiene un archivo propio descargable en la biblioteca.';
+ $('downloadModal').classList.remove('hidden');
+}
+$('downloadPlayer').addEventListener('click',()=>openDownloadDialog(activeMovie));
+$('downloadClose').addEventListener('click',()=>$('downloadModal').classList.add('hidden'));
+$('downloadModal').addEventListener('click',e=>{if(e.target===$('downloadModal'))$('downloadModal').classList.add('hidden')});
+$('downloadStart').addEventListener('click',()=>{
+ const movie=downloadMovie;if(!movie||!movie.video_path)return;
+ const filename=(movie.title||'apoloprimer-video').normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,90)+'.'+(String(movie.video_path).toLowerCase().endsWith('.webm')?'webm':'mp4');
+ const url=APOLO_R2_API+'/download?key='+encodeURIComponent(movie.video_path)+'&filename='+encodeURIComponent(filename);
+ const a=document.createElement('a');a.href=url;a.rel='noopener';a.style.display='none';document.body.append(a);a.click();a.remove();
+ saveDownloadHistory({id:String(movie.id),title:movie.title,poster:movie.cover_url||'',url,createdAt:new Date().toISOString()});
+ $('downloadStatus').textContent='Solicitud enviada al navegador. Revisa el gestor de descargas de tu dispositivo.';
+});
+renderDownloadLibrary();
+
 function openMovie(m){stopFeaturedPreview();roomCinemaActive=false;$('playerProgress').disabled=false;activeMovie=m;$('playerTitle').textContent=m.title;$('playerMeta').textContent=[m.year||'',m.category||''].filter(Boolean).join('  •  ');$('soloPlayer').src=m.video_url;$('player').classList.remove('hidden','controls-hidden','controls-locked');$('playerBrightness').value=100;$('soloPlayer').style.filter='brightness(100%)';$('soloPlayer').play().catch(()=>playerSay('Pulsa reproducir para comenzar.'));syncPlayerUI();showPlayerControls()}
 function openRoomCinema(){const preview=$('roomPlayer'),url=preview.currentSrc||preview.src;if(!room||!url){say('syncStatus','Selecciona una película para abrir el reproductor.');return}const wasPlaying=!preview.paused,time=preview.currentTime||0,m=movies.find(x=>x.id===$('roomMovie').value)||movies.find(x=>x.video_url===url);roomCinemaActive=true;activeMovie=m||null;$('playerTitle').textContent=m?.title||room.name;$('playerMeta').textContent=m?[m.year||'',m.category||''].filter(Boolean).join('  •  '):'Reproducción sincronizada en sala';playerRoot.classList.remove('hidden','controls-hidden','controls-locked');playerLocked=false;$('playerBrightness').value=100;solo.style.filter='brightness(100%)';$('playerProgress').disabled=!canControl();solo.pause();solo.src=url;solo.dataset.url=url;preview.pause();const start=()=>{if(!roomCinemaActive)return;try{solo.currentTime=Math.min(time,solo.duration||time)}catch{}syncPlayerUI();if(wasPlaying)solo.play().catch(()=>playerSay('Pulsa reproducir para comenzar.'))};if(solo.readyState>=1)start();else solo.addEventListener('loadedmetadata',start,{once:true});syncPlayerUI();showPlayerControls()}
 $('roomPlayer').onclick=openRoomCinema;
