@@ -1401,7 +1401,7 @@ main,.page-shell,.content-wrap{width:min(100% - 48px,1440px);margin-inline:auto}
 <section class="section stream-section app-screen" id="catalogo" data-screen="home"><div class="section-heading"><h2>Continuar viendo</h2><span class="muted small">Tu entretenimiento continúa aquí</span></div><div class="grid movie-rail" id="movies"><div class="muted">Conecta el proyecto para cargar el catálogo.</div></div></section>
 <section class="section stream-section app-screen" id="miLista" data-screen="mylist"><div class="section-heading"><h2>Mi lista</h2><span class="muted small">Tus favoritas</span></div><div class="grid movie-rail" id="myList"><div class="muted">Agrega películas a tu lista.</div></div></section>
 <section class="section stream-section app-screen" id="explorar" data-screen="explore"><div class="section-heading"><h2>Explorar</h2><span class="muted small">Encuentra algo para ver</span></div><div class="category-pills" id="categoryPills"><button class="active" data-category="Todos">Todos</button><button data-category="Acción">Acción</button><button data-category="Terror">Terror</button><button data-category="Comedia">Comedia</button><button data-category="Drama">Drama</button><button data-category="Romance">Romance</button><button data-category="Ciencia ficción">Ciencia ficción</button></div><div class="movie-rail" id="exploreMovies"></div></section>
-<section class="section stream-section app-screen" id="buscar" data-screen="search"><div class="section-heading"><h2>Buscar</h2></div><input id="catalogSearch" type="search" placeholder="Buscar películas por título o categoría…"><div class="movie-rail" id="searchResults"></div></section>
+<section class="section stream-section app-screen" id="buscar" data-screen="search"><div class="section-heading"><h2>Buscar en Apoloprimer</h2></div><input id="catalogSearch" type="search" autocomplete="off" placeholder="Título, año, categoría… incluso si no recuerdas el nombre exacto"><p class="muted small" style="margin:9px 2px">Resultados de tu biblioteca</p><div class="movie-rail" id="searchResults"></div><div class="section-heading" style="margin-top:28px"><h2>Explorar más títulos</h2></div><p class="muted small" id="globalSearchStatus" aria-live="polite"></p><div class="movie-rail" id="globalSearchResults"></div><p class="muted small">Las fichas externas son informativas. Para reproducir un título, debe estar agregado a tu biblioteca.</p></section>
 <section class="section stream-section app-screen" id="descargas" data-screen="downloads"><div class="section-heading"><h2>Mis descargas</h2><span class="muted small">Archivos solicitados desde tu biblioteca</span></div><p class="muted small">Las descargas se guardan en el dispositivo mediante el navegador. El progreso y la opción de reanudar dependen del gestor de descargas del dispositivo.</p><div id="downloadLibrary" class="download-library"><div class="download-empty"><b>Todavía no has descargado contenido</b><p class="muted small">Abre una película de tu catálogo y pulsa Descargar.</p></div></div></section>
 <section class="panel hidden app-screen" data-screen="home" id="adminPanel">
  <h2>Panel de administración</h2><p class="muted small">Solo las cuentas autorizadas como administradoras pueden subir contenido.</p>
@@ -1617,12 +1617,92 @@ function renderExploreMovies(category='Todos'){
  if(!list.length){box.innerHTML='<span class="muted small">No hay títulos en esta categoría todavía.</span>';return}
  list.forEach(m=>{const card=document.createElement('article');card.className='movie';const p=document.createElement('div');p.className='poster';if(m.cover_url)p.style.backgroundImage='url("'+m.cover_url+'")';else p.textContent='APOLOPRIMER';const info=document.createElement('div');info.className='movie-info';const b=document.createElement('b');b.className='movie-card-title '+movieFontClass(m);b.textContent=m.title;const s=document.createElement('small');s.textContent=(m.category||'Película')+' · '+(m.year||'');info.append(b,s);card.append(p,info);card.onclick=()=>openMovie(m);box.append(card)});
 }
+let globalSearchTimer=null,globalSearchRequest=0;
+function searchNormalize(value){
+ return String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+function searchDistance(a,b){
+ if(Math.abs(a.length-b.length)>2)return 3;
+ let prev=Array.from({length:b.length+1},(_,i)=>i);
+ for(let i=1;i<=a.length;i++){
+  const cur=[i];let rowMin=i;
+  for(let j=1;j<=b.length;j++){const v=Math.min(cur[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));cur[j]=v;rowMin=Math.min(rowMin,v)}
+  if(rowMin>2)return 3;prev=cur;
+ }
+ return prev[b.length];
+}
+function localSearchScore(movie,query){
+ const title=searchNormalize(movie.title),category=searchNormalize(movie.category),year=String(movie.year||''),original=searchNormalize(movie.original_title||movie.originalTitle||'');
+ const haystack=title+' '+category+' '+year+' '+original;
+ if(title===query||original===query)return 120;
+ if(title.startsWith(query)||original.startsWith(query))return 100;
+ if(haystack.includes(query))return 85;
+ const tokens=query.split(' ').filter(Boolean);let score=0;
+ for(const token of tokens){
+  const words=haystack.split(' ');
+  if(words.some(w=>w===token))score+=18;
+  else if(words.some(w=>w.startsWith(token)))score+=12;
+  else if(token.length>=4&&words.some(w=>searchDistance(w,token)<=1))score+=7;
+ }
+ return score>=Math.max(7,tokens.length*5)?score:0;
+}
+function renderSearchCard(movie,external=false){
+ const card=document.createElement('article');card.className='movie';
+ const poster=document.createElement('div');poster.className='poster';
+ const image=movie.cover_url||movie.poster||movie.poster_url||'';
+ if(image)poster.style.backgroundImage='url("'+image.replace(/"/g,'%22')+'")';else poster.textContent='APOLOPRIMER';
+ const info=document.createElement('div');info.className='movie-info';
+ const title=document.createElement('b');title.className='movie-card-title';title.textContent=movie.title||movie.name||'Título sin nombre';
+ const detail=document.createElement('small');detail.textContent=[movie.year||movie.releaseInfo||'',movie.category||((movie.genres||[]).slice(0,2).join(' · '))].filter(Boolean).join(' · ')||'Película / serie';
+ info.append(title,detail);
+ if(external){const note=document.createElement('small');note.className='muted';note.style.display='block';note.style.marginTop='7px';note.textContent='Ficha externa · No está en tu biblioteca';info.append(note)}
+ card.append(poster,info);
+ if(!external)card.onclick=()=>openMovie(movie);
+ return card;
+}
+async function runGlobalSearch(query,requestId){
+ const status=$('globalSearchStatus'),box=$('globalSearchResults');if(!status||!box)return;
+ status.textContent='Buscando en catálogos externos…';
+ try{
+  let response=await fetch('https://api.streamx.qzz.io/search?q='+encodeURIComponent(query)+'&type=movie');
+  if(!response.ok)throw new Error('Catálogo externo no disponible ('+response.status+').');
+  let payload=await response.json();
+  let results=Array.isArray(payload.metas)?payload.metas:Array.isArray(payload.results)?payload.results:[];
+  if(!results.length){
+   const fallback=await fetch('https://api.streamx.qzz.io/imdb/search?q='+encodeURIComponent(query));
+   if(fallback.ok){const data=await fallback.json();results=Array.isArray(data.results)?data.results:[]}
+  }
+  if(requestId!==globalSearchRequest)return;
+  const norm=searchNormalize(query),localNames=new Set(movies.map(m=>searchNormalize(m.title)));
+  const ranked=results.map(item=>{
+   const name=item.name||item.title||item.original_title||'';
+   const n=searchNormalize(name);const year=String(item.releaseInfo||item.year||item.released||'').match(/(?:19|20)\\d{2}/)?.[0]||'';
+   let score=n===norm?120:n.startsWith(norm)?100:n.includes(norm)?75:0;
+   const words=norm.split(' ').filter(Boolean);
+   score+=words.filter(w=>n.split(' ').some(x=>x===w||x.startsWith(w))).length*8;
+   return {item,name,year,score,n};
+  }).filter(x=>x.name&&x.score>0&&!localNames.has(x.n)).sort((a,b)=>b.score-a.score).slice(0,12);
+  box.innerHTML='';
+  ranked.forEach(({item,name,year})=>box.append(renderSearchCard({title:name,year,poster:item.poster||item.poster_url||item.cover_url||'',genres:Array.isArray(item.genres)?item.genres:[]},true)));
+  status.textContent=ranked.length?'También encontramos '+ranked.length+' fichas externas. Estas películas no están añadidas a tu biblioteca.':'No hay más coincidencias externas para este título.';
+ }catch(error){
+  if(requestId!==globalSearchRequest)return;
+  status.textContent='No se pudo consultar el catálogo externo ahora. Puedes seguir buscando en tu biblioteca.';
+ }
+}
 function renderSearchResults(){
- const box=$('searchResults');if(!box)return;const q=($('catalogSearch')?.value||'').trim().toLowerCase();box.innerHTML='';
- const list=q?movies.filter(m=>(m.title+' '+(m.category||'')+' '+(m.year||'')).toLowerCase().includes(q)): [];
- if(!q){box.innerHTML='<span class="muted small">Escribe un título o categoría para buscar.</span>';return}
- if(!list.length){box.innerHTML='<span class="muted small">No encontramos resultados.</span>';return}
- list.forEach(m=>{const card=document.createElement('article');card.className='movie';const p=document.createElement('div');p.className='poster';if(m.cover_url)p.style.backgroundImage='url("'+m.cover_url+'")';else p.textContent='APOLOPRIMER';const info=document.createElement('div');info.className='movie-info';const b=document.createElement('b');b.className='movie-card-title '+movieFontClass(m);b.textContent=m.title;info.append(b);card.append(p,info);card.onclick=()=>openMovie(m);box.append(card)});
+ const box=$('searchResults');if(!box)return;
+ const q=searchNormalize($('catalogSearch')?.value||'');
+ const external=$('globalSearchResults'),status=$('globalSearchStatus');
+ box.innerHTML='';if(external)external.innerHTML='';
+ if(globalSearchTimer)clearTimeout(globalSearchTimer);
+ if(!q){box.innerHTML='<span class="muted small">Escribe un título, año o categoría. También aceptamos búsquedas aproximadas.</span>';if(status)status.textContent='';globalSearchRequest++;return}
+ const ranked=movies.map(movie=>({movie,score:localSearchScore(movie,q)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score);
+ ranked.forEach(x=>box.append(renderSearchCard(x.movie,false)));
+ if(!ranked.length)box.innerHTML='<span class="muted small">No encontramos ese título en tu biblioteca. Buscando coincidencias externas…</span>';
+ else if(status)status.textContent='Encontrados '+ranked.length+' títulos en tu biblioteca.';
+ const requestId=++globalSearchRequest;
+ globalSearchTimer=setTimeout(()=>runGlobalSearch(q,requestId),420);
 }
 
 let homeSelectedCategory='Todos';
