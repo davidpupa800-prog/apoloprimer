@@ -1832,44 +1832,58 @@ function cleanMovieFilename(name){return parseMovieFilename(name).title}
 function inferMovieCategory(title){const t=title.toLowerCase();const rules=[['Terror',/horror|terror|scary|haunt|demon|devil|ghost|zombie|exorc|nightmare|scream|insidious|conjuring|annabelle/],['Romance',/romance|love|amor|wedding|boda|kiss|beso|valentine/],['Comedia',/comedy|comedia|funny|joke|vacation|vacaciones/],['Ciencia ficción',/sci.?fi|science fiction|space|alien|robot|future|matrix|dune|star wars|interstellar/],['Documental',/documentary|documental/],['Acción',/action|accion|war|guerra|fight|mission|avengers|john wick|fast.?furious/],['Drama',/drama|life|vida|father|madre|padre|story|historia/]];return (rules.find(x=>x[1].test(t))||[null])[0]||'Drama'}
 let apoloRecognizedMetadata=null;
 async function lookupMovieMetadata(query,yearHint='',mediaType='movie',seasonHint='',episodeHint=''){
- const norm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+ const norm=x=>String(x||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  const apiType=mediaType==='series'?'series':'movie';
- const response=await fetch('https://api.streamx.qzz.io/search?q='+encodeURIComponent(query)+'&type='+apiType);
- if(!response.ok)throw new Error('El buscador respondió '+response.status);
- const payload=await response.json();
- const results=Array.isArray(payload.metas)?payload.metas:Array.isArray(payload.results)?payload.results:[];
- if(!results.length)return null;
  const q=norm(query);
- const ranked=results.map(item=>{
-  const name=item.name||item.title||'';
+ const tokens=q.split(' ').filter(t=>t.length>1);
+ const rankItems=items=>items.map(item=>{
+  const name=item.name||item.title||item.original_title||item.originalName||item.label||'';
   const n=norm(name);
-  const year=String(item.releaseInfo||item.year||item.released||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||'';
-  const tokens=q.split(' ').filter(t=>t.length>1);
+  const year=String(item.releaseInfo||item.year||item.released||item.releaseDate||'').match(/\\b(?:19|20)\\d{2}\\b/)?.[0]||'';
   let score=n===q?120:n.startsWith(q)||q.startsWith(n)?80:n.includes(q)||q.includes(n)?60:0;
   score+=tokens.filter(t=>n.split(' ').includes(t)).length*5;
   if(yearHint&&year&&year===String(yearHint))score+=35;
   if(yearHint&&year&&year!==String(yearHint))score-=25;
   return {item,score,year,name};
  }).sort((a,b)=>b.score-a.score);
- const best=ranked[0];
- if(!best||best.score<Math.max(35,q.split(' ').filter(t=>t.length>1).length*5))return null;
+ let results=[];
+ const searchResponse=await fetch('https://api.streamx.qzz.io/search?q='+encodeURIComponent(query)+'&type='+apiType);
+ if(!searchResponse.ok)throw new Error('El buscador respondió '+searchResponse.status);
+ const payload=await searchResponse.json();
+ results=Array.isArray(payload.metas)?payload.metas:Array.isArray(payload.results)?payload.results:[];
+ let ranked=rankItems(results);
+ let best=ranked[0];
+ // El catálogo Cinemeta no contiene todos los títulos regionales. Si no hay coincidencia fiable,
+ // usar el endpoint de sugerencias de IMDb, que devuelve títulos, año, póster e IMDb ID.
+ if(!best||best.score<75){
+  const imdbResponse=await fetch('https://api.streamx.qzz.io/imdb/search?q='+encodeURIComponent(query));
+  if(!imdbResponse.ok)throw new Error('El catálogo principal no encontró el título y IMDb respondió '+imdbResponse.status);
+  const imdbPayload=await imdbResponse.json();
+  const imdbItems=Array.isArray(imdbPayload.results)?imdbPayload.results:[];
+  const compatible=imdbItems.filter(item=>!item.type||item.type===apiType);
+  const imdbRanked=rankItems(compatible.length?compatible:imdbItems);
+  if(imdbRanked.length&&(!best||imdbRanked[0].score>best.score)){
+   ranked=imdbRanked;best=ranked[0];
+  }
+ }
+ if(!best||best.score<75)return null;
  const item=best.item;
  let details={};
  const imdbId=String(item.imdb_id||item.imdbId||item.id||'');
- if(/^tt\d+$/i.test(imdbId)){
+ if(/^tt\\d+$/i.test(imdbId)){
   try{
    const metaResponse=await fetch('https://api.streamx.qzz.io/meta/'+apiType+'/'+encodeURIComponent(imdbId)+'?enrich=0');
    if(metaResponse.ok){const body=await metaResponse.json();details=body.meta||body.result||body||{}}
   }catch(e){}
  }
  const poster=details.images?.poster?.large||details.images?.poster?.original||details.poster||item.poster||item.poster_url||item.cover_url||'';
- const rawGenres=Array.isArray(details.genres)?details.genres:Array.isArray(item.genres)?item.genres:Array.isArray(item.genre)?item.genre:typeof item.genres==='string'?item.genres.split(/[\/,|]/):[];
+ const rawGenres=Array.isArray(details.genres)?details.genres:Array.isArray(item.genres)?item.genres:Array.isArray(item.genre)?item.genre:typeof item.genres==='string'?item.genres.split(/[\\/,|]/):[];
  const genres=rawGenres.map(x=>typeof x==='string'?x:String(x.name||x)).map(x=>x.trim()).filter(Boolean);
  const officialTitle=details.title||details.originalName||details.original_title||details.name||best.name;
- const officialYear=String(details.releaseInfo||details.released||details.releaseDate||details.datePublished||details.year||best.year||'').match(/\b(?:19|20)\d{2}\b/)?.[0]||best.year;
+ const officialYear=String(details.releaseInfo||details.released||details.releaseDate||details.datePublished||details.year||best.year||'').match(/\\b(?:19|20)\\d{2}\\b/)?.[0]||best.year;
  const videos=Array.isArray(details.videos)?details.videos:[];
  const seasons=[...new Set(videos.map(v=>Number(v.season)).filter(Number.isFinite).filter(n=>n>0))].sort((a,b)=>a-b);
- const episode=seasonHint&&episodeHint?videos.find(v=>Number(v.season)===Number(seasonHint)&&Number(v.episode)===Number(episodeHint))||null:null;
+ const episode=seasonHint&&episodeHint?videos.find(v=>Number(v.season)===Number(seasonHint)&&Number(v.episode||v.number)===Number(episodeHint))||null:null;
  return {
   title:officialTitle,year:officialYear,poster,genres,
   overview:details.description||details.overview||item.description||item.overview||'',
