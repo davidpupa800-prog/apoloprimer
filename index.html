@@ -627,6 +627,37 @@ footer{padding:34px var(--gutter);border-top:1px solid var(--line);text-align:ce
 @keyframes introOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.25);visibility:hidden}}
 @media(prefers-reduced-motion:reduce){#introA{animation-duration:.3s;animation-delay:.9s}#introA *{animation-duration:.01s!important;animation-delay:0s!important}}
 </style>
+<style id="apolo-player-landscape-compact">
+/* Reproductor compacto para móviles en horizontal (incluye iPhone con viewport CSS de ~768px) */
+@media (max-width:1000px) and (orientation:landscape) and (max-height:520px) {
+  .cinema-top { padding: max(6px,env(safe-area-inset-top)) 12px 14px; gap:8px; }
+  .cinema-heading { gap:8px; }
+  .cinema-back,.cinema-actions button { width:32px; height:32px; }
+  .cinema-actions { gap:5px; }
+  .cinema-back svg,.cinema-actions svg { width:16px; height:16px; }
+  .cinema-titleline { gap:7px; }
+  .cinema-titleline b { font-size:15px; }
+  .cinema-meta { font-size:10px; margin-top:1px; }
+  .cinema-hd { font-size:9px; padding:1px 5px; }
+  .cinema-center { gap:clamp(18px,6vw,54px); }
+  .cinema-center button { width:42px; height:42px; }
+  .cinema-center button svg { width:23px; height:23px; }
+  .cinema-center .big-play { width:64px; height:64px; }
+  .cinema-center .big-play svg { width:28px; height:28px; }
+  .side-control { width:30px; height:104px; padding:7px 0; border-radius:18px; font-size:14px; }
+  .side-control svg { width:15px; height:15px; }
+  .side-control input { width:58px; height:4px; margin:24px 0; }
+  .side-brightness { left:6px; } .side-volume { right:6px; }
+  .cinema-bottom { padding:12px 10px max(8px,env(safe-area-inset-bottom)); }
+  .cinema-progress { height:30px; padding:0 10px; gap:8px; font-size:10px; }
+  .cinema-progress input { height:4px; }
+  .cinema-toolbar { grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; padding-top:6px; }
+  .cinema-toolbar button { height:32px; padding:0; border-radius:18px; }
+  .cinema-toolbar button span { display:none; }
+  .cinema-toolbar svg { width:16px; height:16px; }
+}
+</style>
+
 </head>
 <body><div id="introA" aria-hidden="true"><div class="ia-wrap"><div class="ia-glow"></div><div class="ia-ring"></div><div class="ia-ring r2"></div><svg viewBox="0 0 64 64"><defs><linearGradient id="iaA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a3c"/><stop offset=".55" stop-color="#e0201b"/><stop offset="1" stop-color="#9b0610"/></linearGradient><linearGradient id="iaB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5c0309"/><stop offset="1" stop-color="#c10f17"/></linearGradient><linearGradient id="iaS" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="iaC"><path d="M2 61 25 4h14l23 57H47L32 24 17 61Z"/></clipPath></defs><g class="ia-fill"><path d="M2 61 25 4h14l23 57H47L32 24 17 61Z" fill="url(#iaA)"/><path d="M25 4h14l5 12-12 8Z" fill="#ff8a5c" opacity=".55"/><path d="M13 50c10-8 24-7 40 5l1 6H47L41 47c-8-3-17-2-24 7Z" fill="url(#iaB)"/></g><g clip-path="url(#iaC)"><rect class="ia-sheen" x="14" y="0" width="22" height="64" fill="url(#iaS)" transform="skewX(-18)"/></g><path class="ia-line" d="M2 61 25 4h14l23 57H47L32 24 17 61Z"/></svg></div><div class="ia-bar"></div></div><script>(function(){var el=document.getElementById('introA');if(!el)return;var done=function(){el.classList.add('gone')};el.addEventListener('animationend',function(e){if(e.target===el)done()});el.addEventListener('click',function(){el.style.animation='introOut .4s ease forwards'});setTimeout(done,4200)})()</script>
 <header class="stream-header"><div class="logo"><svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a3c"/><stop offset=".55" stop-color="#e0201b"/><stop offset="1" stop-color="#9b0610"/></linearGradient><linearGradient id="lgB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5c0309"/><stop offset="1" stop-color="#c10f17"/></linearGradient></defs><path d="M2 61 25 4h14l23 57H47L32 24 17 61Z" fill="url(#lgA)"/><path d="M25 4h14l5 12-12 8Z" fill="#ff8a5c" opacity=".55"/><path d="M13 50c10-8 24-7 40 5l1 6H47L41 47c-8-3-17-2-24 7Z" fill="url(#lgB)"/><path d="M13 50c10-8 24-7 40 5" fill="none" stroke="#ff6a4a" stroke-width="1" opacity=".7"/></svg><span class="logo-text"><span class="logo-name"><b>APOLO</b><i>PRIMER</i></span><small>TU CINE PRIVADO</small></span></div><nav class="top-nav"><a class="nav-active" href="#" data-go="home">Inicio</a><a href="#" data-go="explore">Explorar</a><a href="#" data-go="search">Buscar</a><a href="#" data-go="mylist">Mi lista</a><a href="#" data-go="downloads">Descargas</a><a href="#" data-go="rooms">Salas</a></nav><div class="right header-actions"><button class="icon-action" id="searchJump" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.2"/><path d="m16.2 16.2 5 5"/></svg></button><button class="account-chip" id="accountChip" type="button" aria-label="Abrir cuenta"><span class="account-chip-avatar" id="headerAvatar">A</span><span class="account-chip-name" id="headerAccountName">Entrar</span><span class="account-chip-chevron" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></button></div></header>
